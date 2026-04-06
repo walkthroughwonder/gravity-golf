@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Gravity Golf</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='b' cx='40%25' cy='35%25'%3E%3Cstop offset='0%25' stop-color='%23ffe566'/%3E%3Cstop offset='70%25' stop-color='%23ffcc00'/%3E%3Cstop offset='100%25' stop-color='%23aa8800'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='%23050510'/%3E%3Cellipse cx='16' cy='16' rx='14' ry='5' fill='none' stroke='%23ffffff30' stroke-width='0.8' transform='rotate(-25 16 16)'/%3E%3Ccircle cx='16' cy='14' r='6' fill='url(%23b)'/%3E%3Ccircle cx='13.5' cy='12' r='1.5' fill='%23fff8' opacity='0.6'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #020108; color: #fff; font-family: 'Exo 2', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .logo {
+    font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900;
+    letter-spacing: 8px; text-align: center; margin-bottom: 6px;
+    background: linear-gradient(90deg, #ffcc00, #ffe566, #ffd633, #ffaa00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; text-transform: uppercase;
+  }
+  .sub { font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 4px; color: rgba(220,195,100,0.4); margin-bottom: 40px; text-transform: uppercase; }
+  .card {
+    background: rgba(123,92,255,0.06); border: 1px solid rgba(123,92,255,0.25);
+    border-radius: 16px; padding: 36px 44px; text-align: center; max-width: 380px; width: 100%;
+  }
+  .card h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 800;
+    letter-spacing: 5px; color: #c4a0ff; margin-bottom: 6px; text-transform: uppercase;
+  }
+  .card .desc { font-size: 12px; color: rgba(200,180,255,0.4); margin-bottom: 24px; line-height: 1.5; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 13px; margin-bottom: 10px; border-radius: 10px;
+    font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 900;
+    letter-spacing: 3px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; border: 3px solid;
+  }
+  #googleBtn {
+    background: rgb(240,240,245); border-color: rgb(60,60,80); color: #1a1a2a;
+    box-shadow: 0 3px 0 rgba(30,30,45,0.7), 0 5px 12px rgba(0,0,0,0.3);
+  }
+  #googleBtn:hover { background: rgb(35,35,55); border-color: rgb(100,100,130); color: #e8e8f0; transform: translateY(-1px); }
+  .divider {
+    display: flex; align-items: center; gap: 12px; margin: 14px 0;
+    color: rgba(200,180,255,0.2); font-size: 9px; letter-spacing: 3px;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(123,92,255,0.12); }
+  .email-form { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .email-form input {
+    width: 100%; padding: 10px 14px; border-radius: 8px; border: 2px solid rgba(123,92,255,0.2);
+    background: rgba(123,92,255,0.06); color: #e0d0ff; font-family: 'Orbitron', sans-serif;
+    font-size: 10px; letter-spacing: 1px; outline: none; transition: border-color 0.2s;
+  }
+  .email-form input:focus { border-color: rgba(123,92,255,0.5); }
+  .email-form input::placeholder { color: rgba(200,180,255,0.25); letter-spacing: 2px; }
+  .email-btns { display: flex; gap: 8px; }
+  .email-btn {
+    flex: 1; padding: 10px; border-radius: 8px; cursor: pointer;
+    font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 900;
+    letter-spacing: 2px; transition: all 0.2s; text-transform: uppercase;
+    background: rgba(123,92,255,0.15); border: 2px solid rgba(123,92,255,0.3); color: #c4a0ff;
+    box-shadow: 0 2px 0 rgba(60,40,120,0.5);
+  }
+  .email-btn:hover { background: rgba(123,92,255,0.3); transform: translateY(-1px); }
+  #guestBtn {
+    background: rgba(200,170,60,0.1); border-color: rgba(200,170,60,0.3); color: rgba(220,195,100,0.7);
+    box-shadow: 0 3px 0 rgba(80,65,10,0.5);
+  }
+  #guestBtn:hover { background: rgba(200,170,60,0.2); }
+  .status { font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 1px; text-align: center; min-height: 14px; margin-top: 4px; }
+  .status.error { color: #ff6688; }
+  .status.success { color: #44ffaa; }
+  .logged-in { display: none; text-align: center; }
+  .logged-in.visible { display: block; }
+  .user-info { margin-bottom: 20px; }
+  .user-name {
+    font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 800;
+    letter-spacing: 3px; color: #ffe566; margin-bottom: 4px;
+  }
+  .user-email { font-size: 11px; color: rgba(200,180,255,0.4); }
+  .link-row { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+  .link-btn {
+    padding: 10px 24px; border-radius: 8px; cursor: pointer;
+    font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-decoration: none; transition: all 0.2s; text-transform: uppercase;
+    border: 2px solid;
+  }
+  .link-btn.play { background: rgb(18,14,8); border-color: rgba(200,170,60,0.5); color: #ffe566; }
+  .link-btn.play:hover { background: rgb(40,32,10); border-color: rgba(255,220,60,0.8); }
+  .link-btn.profile { background: rgba(123,92,255,0.12); border-color: rgba(123,92,255,0.25); color: #c4a0ff; }
+  .link-btn.profile:hover { background: rgba(123,92,255,0.25); }
+  .link-btn.out { background: rgba(255,60,80,0.08); border-color: rgba(255,60,80,0.2); color: #ff6688; font-size: 8px; }
+  .link-btn.out:hover { background: rgba(255,60,80,0.15); }
+  .back { margin-top: 24px; }
+  .back a { color: rgba(200,180,255,0.3); font-size: 10px; letter-spacing: 2px; text-decoration: none; }
+  .back a:hover { color: rgba(200,180,255,0.6); }
+</style>
+</head>
+<body>
+<div class="logo">Gravity Golf</div>
+<div class="sub">Shoot through the cosmos</div>
+
+<div class="card" id="loginCard">
+  <h2>SIGN IN</h2>
+  <div class="desc">Track your games and compete on leaderboards</div>
+  <button class="btn" id="googleBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    SIGN IN WITH GOOGLE
+  </button>
+  <div class="divider">OR</div>
+  <div class="email-form">
+    <input type="email" id="email" placeholder="Email" autocomplete="email">
+    <input type="password" id="pass" placeholder="Password" autocomplete="current-password">
+    <div class="email-btns">
+      <button class="email-btn" id="signInBtn">SIGN IN</button>
+      <button class="email-btn" id="signUpBtn">SIGN UP</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+  <div class="divider">OR</div>
+  <button class="btn" id="guestBtn">PLAY AS GUEST</button>
+</div>
+
+<div class="card logged-in" id="loggedIn">
+  <div class="user-info">
+    <div class="user-name" id="userName"></div>
+    <div class="user-email" id="userEmail"></div>
+  </div>
+  <div class="link-row">
+    <a href="/" class="link-btn play">▶ PLAY</a>
+    <a href="/profile.html" class="link-btn profile">MY STATS</a>
+  </div>
+  <div class="link-row" style="margin-top:10px;">
+    <button class="link-btn out" id="signOutBtn">SIGN OUT</button>
+  </div>
+</div>
+
+<div class="back"><a href="/">← BACK TO GAME</a></div>
+
+<script>
+const CONFIG = {
+  apiKey: "AIzaSyDPyq1wk3l-aMRJcOFwzY8CmKN5cpN7XXc",
+  authDomain: "gravity-golf-6ec4f.firebaseapp.com",
+  databaseURL: "https://gravity-golf-6ec4f-default-rtdb.firebaseio.com",
+  projectId: "gravity-golf-6ec4f",
+  storageBucket: "gravity-golf-6ec4f.firebasestorage.app",
+  messagingSenderId: "371434804348",
+  appId: "1:371434804348:web:98f1b3fd530bbf39c825f9"
+};
+firebase.initializeApp(CONFIG);
+firebase.auth().getRedirectResult().catch(() => {});
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('loginCard').style.display = 'none';
+    const li = document.getElementById('loggedIn');
+    li.classList.add('visible');
+    document.getElementById('userName').textContent = user.displayName || ('Cosmonaut-' + user.uid.slice(0,5));
+    document.getElementById('userEmail').textContent = user.isAnonymous ? 'Guest account' : (user.email || '');
+  } else {
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('loggedIn').classList.remove('visible');
+  }
+});
+
+document.getElementById('googleBtn').onclick = async () => {
+  const s = document.getElementById('status');
+  s.textContent = 'Connecting to Google...'; s.className = 'status';
+  try {
+    try {
+      await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    } catch(pe) {
+      if (pe.code === 'auth/popup-blocked' || pe.code === 'auth/popup-closed-by-user' || pe.code === 'auth/cancelled-popup-request') {
+        s.textContent = 'Redirecting...'; 
+        await firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+        return;
+      }
+      throw pe;
+    }
+  } catch(e) {
+    s.textContent = e.message; s.className = 'status error';
+  }
+};
+
+document.getElementById('signInBtn').onclick = async () => {
+  const s = document.getElementById('status');
+  try {
+    s.textContent = 'Signing in...'; s.className = 'status';
+    await firebase.auth().signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value);
+    s.textContent = 'Success!'; s.className = 'status success';
+  } catch(e) {
+    s.textContent = e.code === 'auth/user-not-found' ? 'No account found' : e.code === 'auth/wrong-password' ? 'Wrong password' : e.code === 'auth/invalid-credential' ? 'Invalid credentials' : e.message;
+    s.className = 'status error';
+  }
+};
+
+document.getElementById('signUpBtn').onclick = async () => {
+  const s = document.getElementById('status');
+  const pass = document.getElementById('pass').value;
+  if (pass.length < 6) { s.textContent = 'Password must be 6+ characters'; s.className = 'status error'; return; }
+  try {
+    s.textContent = 'Creating account...'; s.className = 'status';
+    const email = document.getElementById('email').value;
+    const cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: email.split('@')[0].slice(0,12) });
+    s.textContent = 'Account created!'; s.className = 'status success';
+  } catch(e) {
+    s.textContent = e.code === 'auth/email-already-in-use' ? 'Email already registered' : e.message;
+    s.className = 'status error';
+  }
+};
+
+document.getElementById('guestBtn').onclick = () => {
+  firebase.auth().signInAnonymously().then(() => window.location.href = '/');
+};
+
+document.getElementById('signOutBtn').onclick = () => firebase.auth().signOut();
+</script>
+</body>
+</html>

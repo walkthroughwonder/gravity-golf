@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Stats — Gravity Golf</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='b' cx='40%25' cy='35%25'%3E%3Cstop offset='0%25' stop-color='%23ffe566'/%3E%3Cstop offset='70%25' stop-color='%23ffcc00'/%3E%3Cstop offset='100%25' stop-color='%23aa8800'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='%23050510'/%3E%3Cellipse cx='16' cy='16' rx='14' ry='5' fill='none' stroke='%23ffffff30' stroke-width='0.8' transform='rotate(-25 16 16)'/%3E%3Ccircle cx='16' cy='14' r='6' fill='url(%23b)'/%3E%3Ccircle cx='13.5' cy='12' r='1.5' fill='%23fff8' opacity='0.6'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #020108; color: #fff; font-family: 'Exo 2', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 40px 20px;
+  }
+  .logo { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: 6px; margin-bottom: 4px;
+    background: linear-gradient(90deg, #ffcc00, #ffe566, #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .sub { font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 3px; color: rgba(220,195,100,0.4); margin-bottom: 30px; text-transform: uppercase; }
+  .card {
+    background: rgba(123,92,255,0.06); border: 1px solid rgba(123,92,255,0.25);
+    border-radius: 16px; padding: 28px 36px; max-width: 460px; width: 100%; margin-bottom: 16px;
+  }
+  .card h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 5px; text-align: center; margin-bottom: 16px;
+    background: linear-gradient(90deg, #ff6ef9, #7b5cff, #00d4ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-transform: uppercase;
+  }
+  .card h3 {
+    font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 4px; color: rgba(200,180,255,0.4); margin: 16px 0 10px; text-transform: uppercase;
+  }
+  .user-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(123,92,255,0.12); }
+  .user-avatar {
+    width: 48px; height: 48px; border-radius: 50%; background: rgba(123,92,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif; font-size: 20px; color: rgba(200,180,255,0.6);
+    overflow: hidden; flex-shrink: 0;
+  }
+  .user-avatar img { width: 100%; height: 100%; border-radius: 50%; }
+  .user-name { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 3px; color: #ffe566; }
+  .user-email { font-size: 10px; color: rgba(200,180,255,0.35); margin-top: 2px; }
+  .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(123,92,255,0.08); }
+  .stat-label { font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: rgba(200,180,255,0.4); text-transform: uppercase; }
+  .stat-val { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 800; color: #ffe566; }
+  .game-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(123,92,255,0.06); }
+  .game-date { font-size: 9px; color: rgba(200,180,255,0.3); letter-spacing: 1px; }
+  .game-mode { font-family: 'Orbitron', sans-serif; font-size: 9px; color: rgba(200,180,255,0.4); letter-spacing: 1px; }
+  .game-score { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; }
+  .game-score.under { color: #44ffaa; }
+  .game-score.over { color: #ff6688; }
+  .game-score.even { color: rgba(200,180,255,0.6); }
+  .empty { font-size: 11px; color: rgba(200,180,255,0.2); text-align: center; padding: 20px 0; }
+  .links { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+  .link {
+    padding: 10px 24px; border-radius: 8px; font-family: 'Orbitron', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px; text-decoration: none;
+    transition: all 0.2s; text-transform: uppercase; border: 2px solid;
+  }
+  .link.play { background: rgb(18,14,8); border-color: rgba(200,170,60,0.5); color: #ffe566; }
+  .link.play:hover { background: rgb(40,32,10); }
+  .link.out { background: rgba(255,60,80,0.08); border-color: rgba(255,60,80,0.2); color: #ff6688; cursor: pointer; }
+  .link.out:hover { background: rgba(255,60,80,0.15); }
+  .not-signed-in { text-align: center; padding: 40px 0; }
+  .not-signed-in p { color: rgba(200,180,255,0.4); margin-bottom: 16px; }
+  .not-signed-in a { color: #c4a0ff; }
+  #loading { font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(200,180,255,0.3); letter-spacing: 3px; }
+  #content { display: none; }
+</style>
+</head>
+<body>
+<div class="logo">Gravity Golf</div>
+<div class="sub">My Stats</div>
+
+<div id="loading">LOADING...</div>
+
+<div id="notSignedIn" class="not-signed-in" style="display:none;">
+  <p>Sign in to track your games</p>
+  <a href="/login.html" class="link play">SIGN IN</a>
+</div>
+
+<div id="content">
+  <div class="card">
+    <div class="user-header">
+      <div class="user-avatar" id="avatar">?</div>
+      <div>
+        <div class="user-name" id="name"></div>
+        <div class="user-email" id="email"></div>
+      </div>
+    </div>
+    <h2>STATISTICS</h2>
+    <div class="stat-row"><span class="stat-label">GAMES PLAYED</span><span class="stat-val" id="sGames">0</span></div>
+    <div class="stat-row"><span class="stat-label">BEST ROUND</span><span class="stat-val" id="sBest">—</span></div>
+    <div class="stat-row"><span class="stat-label">AVG SCORE</span><span class="stat-val" id="sAvg">—</span></div>
+    <div class="stat-row"><span class="stat-label">HOLES IN ONE</span><span class="stat-val" id="sHIO">0</span></div>
+    <div class="stat-row"><span class="stat-label">TOTAL STROKES</span><span class="stat-val" id="sTotal">0</span></div>
+  </div>
+
+  <div class="card">
+    <h3>RECENT GAMES</h3>
+    <div id="history"></div>
+  </div>
+
+  <div class="links">
+    <a href="/" class="link play">▶ PLAY</a>
+    <button class="link out" id="signOutBtn">SIGN OUT</button>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  apiKey: "AIzaSyDPyq1wk3l-aMRJcOFwzY8CmKN5cpN7XXc",
+  authDomain: "gravity-golf-6ec4f.firebaseapp.com",
+  databaseURL: "https://gravity-golf-6ec4f-default-rtdb.firebaseio.com",
+  projectId: "gravity-golf-6ec4f",
+  storageBucket: "gravity-golf-6ec4f.firebasestorage.app",
+  messagingSenderId: "371434804348",
+  appId: "1:371434804348:web:98f1b3fd530bbf39c825f9"
+};
+firebase.initializeApp(CONFIG);
+const db = firebase.database();
+firebase.auth().getRedirectResult().catch(() => {});
+
+firebase.auth().onAuthStateChanged(async user => {
+  document.getElementById('loading').style.display = 'none';
+  if (!user) {
+    document.getElementById('notSignedIn').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('content').style.display = 'block';
+  document.getElementById('name').textContent = user.displayName || ('Cosmonaut-' + user.uid.slice(0,5));
+  document.getElementById('email').textContent = user.isAnonymous ? 'Guest account' : (user.email || '');
+  const av = document.getElementById('avatar');
+  if (user.photoURL) av.innerHTML = '<img src="' + user.photoURL + '" alt="">';
+  else av.textContent = (user.displayName || '?').charAt(0).toUpperCase();
+
+  // Load games
+  try {
+    const snap = await db.ref('users/' + user.uid + '/games').orderByChild('date').limitToLast(30).once('value');
+    const games = [];
+    snap.forEach(c => games.push(c.val()));
+    games.reverse();
+
+    let best = Infinity, total = 0, hio = 0;
+    for (const g of games) {
+      if (g.diff < best) best = g.diff;
+      total += g.total || 0;
+      if (g.scores) Object.values(g.scores).forEach(s => { if (s === 1) hio++; });
+    }
+
+    document.getElementById('sGames').textContent = games.length;
+    document.getElementById('sBest').textContent = games.length ? (best === 0 ? 'EVEN' : (best > 0 ? '+' + best : '' + best)) : '—';
+    document.getElementById('sAvg').textContent = games.length ? (total / games.length).toFixed(1) : '—';
+    document.getElementById('sHIO').textContent = hio;
+    document.getElementById('sTotal').textContent = total;
+
+    const hist = document.getElementById('history');
+    if (!games.length) {
+      hist.innerHTML = '<div class="empty">No games yet — go play!</div>';
+    } else {
+      for (const g of games) {
+        const row = document.createElement('div');
+        row.className = 'game-row';
+        const d = new Date(g.date);
+        const cls = g.diff < 0 ? 'under' : g.diff > 0 ? 'over' : 'even';
+        const label = g.diff === 0 ? 'E' : (g.diff > 0 ? '+' + g.diff : '' + g.diff);
+        row.innerHTML = '<span class="game-date">' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>' +
+          '<span class="game-mode">' + (g.mode||'1P').toUpperCase() + ' · ' + (g.holes||'?') + 'H</span>' +
+          '<span class="game-score ' + cls + '">' + g.total + ' (' + label + ')</span>';
+        hist.appendChild(row);
+      }
+    }
+  } catch(e) {
+    document.getElementById('history').innerHTML = '<div class="empty">Could not load data</div>';
+  }
+});
+
+document.getElementById('signOutBtn').onclick = () => {
+  firebase.auth().signOut().then(() => window.location.href = '/login.html');
+};
+</script>
+</body>
+</html>
