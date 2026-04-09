@@ -2012,6 +2012,39 @@
     font-family: 'Orbitron', sans-serif; font-size: 6px; letter-spacing: 2px;
     color: rgba(200,170,100,0.2); text-transform: uppercase;
   }
+
+  /* Boost tutorial overlay */
+  #boostTutorial {
+    display: none; position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 20; pointer-events: none;
+    font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: #ffe566; text-shadow: 0 0 20px rgba(255,230,100,0.6), 0 0 40px rgba(255,200,0,0.3);
+    animation: boostPulse 1.2s ease-in-out infinite;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  #boostTutorial.visible { opacity: 1; }
+  @keyframes boostPulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(255,230,100,0.4), 0 0 40px rgba(255,200,0,0.2); }
+    50% { text-shadow: 0 0 30px rgba(255,230,100,0.8), 0 0 60px rgba(255,200,0,0.5); }
+  }
+
+  /* Session stats overlay */
+  #sessionStatsOverlay {
+    display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 15; pointer-events: none;
+    padding: 14px 28px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(15,10,40,0.75) 0%, rgba(8,4,28,0.65) 100%);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 2px;
+    color: rgba(220,195,100,0.8); text-transform: uppercase; text-align: center;
+    opacity: 0; transition: opacity 0.6s;
+  }
+  #sessionStatsOverlay.visible { opacity: 1; }
+  #sessionStatsOverlay .stat-line { margin: 4px 0; }
+  #sessionStatsOverlay .stat-highlight { color: #ffe566; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -2147,7 +2180,7 @@
   <div class="sub" id="msgSub"></div>
   <button id="nextHoleBtn">NEXT HOLE</button>
   <div id="unlockPrompt">
-    <button id="unlockPromptBtn">★ UNLOCK HOLES 6-18</button>
+    <button id="unlockPromptBtn">★ UNLOCK HOLES 9-19</button>
   </div>
   <button id="postScoreBtn">POST TO LEADERBOARD</button>
 </div>
@@ -2157,7 +2190,7 @@
     <div class="unlock-desc">
       13 more holes with asteroid fields, black holes,<br>
       neutron alleys, and The Final Frontier.<br>
-      Holes 6-18 — the real challenge begins.
+      Holes 9-19 — the real challenge begins.
     </div>
     <div class="unlock-price">$2.99</div>
     <div class="unlock-price-note">ONE-TIME PURCHASE</div>
@@ -2234,6 +2267,8 @@
   <button id="lbClose">CLOSE</button>
 </div>
 
+<div id="boostTutorial">HOLD SPACE TO BOOST</div>
+<div id="sessionStatsOverlay"></div>
 <canvas id="shaderBg"></canvas>
 <div id="mobileTitleBg"></div>
 <div id="titleScreen">
@@ -2241,10 +2276,10 @@
   <h1>Gravity Golf</h1>
   <div class="title-sub">Shoot through the cosmos</div>
   <button class="mode-btn" id="mode1p">1 PLAYER</button>
-  <button class="mode-btn" id="mode2p">2 PLAYERS</button>
+  <button class="mode-btn" id="mode2p" style="display:none">2 PLAYERS</button>
   <button class="mode-btn daily" id="modeDaily">☀ DAILY CHALLENGE<span class="daily-date" id="dailyDateLabel"></span></button>
-  <button class="mode-btn" id="modeOnline">PLAY ONLINE</button>
-  <div id="titleAuth">
+  <button class="mode-btn" id="modeOnline" style="display:none">PLAY ONLINE</button>
+  <div id="titleAuth" style="display:none">
     <button id="titleSignIn" class="title-auth-btn">
       <span class="ta-icon">👤</span> SIGN IN
     </button>
@@ -2262,7 +2297,7 @@
   <div class="level-select" id="levelSelect" style="display:none;">
     <div class="level-select-label">JUMP TO HOLE</div>
   </div>
-  <div id="liveMetrics">
+  <div id="liveMetrics" style="display:none">
     <div class="metric"><span class="metric-val" id="metricPlayers">0</span><span class="metric-label">PLAYERS ONLINE</span></div>
     <div class="metric-divider"></div>
     <div class="metric"><span class="metric-val" id="metricGames">0</span><span class="metric-label">ACTIVE GAMES</span></div>
@@ -3671,6 +3706,44 @@ function clearGravityFields() {
   gravityFieldMeshes.length = 0;
 }
 
+// ===================== SENTINEL FIELD VISUALIZATION =====================
+const sentinelFields = [];
+
+function createSentinelField(planet) {
+  const strength = planet.gravityStrength;
+  const fieldRadius = Math.min(strength * 2.5, 20);
+  const geo = new THREE.SphereGeometry(fieldRadius, 24, 24);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0x8844ff, transparent: true, opacity: 0.04,
+    blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(planet.pos);
+  mesh.visible = gravityFieldsVisible;
+  scene.add(mesh);
+  sentinelFields.push({ mesh, mat, planet, baseRadius: fieldRadius });
+  return mesh;
+}
+
+function animateSentinelFields(time) {
+  for (const sf of sentinelFields) {
+    const pulse = 0.03 + Math.sin(time * 2.5) * 0.02; // 0.01 to 0.05
+    sf.mat.opacity = pulse;
+    const scale = 1.0 + Math.sin(time * 1.8) * 0.08;
+    sf.mesh.scale.setScalar(scale);
+    sf.mesh.visible = gravityFieldsVisible;
+  }
+}
+
+function clearSentinelFields() {
+  for (const sf of sentinelFields) {
+    scene.remove(sf.mesh);
+    sf.mesh.geometry.dispose();
+    sf.mat.dispose();
+  }
+  sentinelFields.length = 0;
+}
+
 // ===================== BLACK HOLE ACCRETION DISKS =====================
 const BLACK_HOLE_COLORS = [0x110011, 0x220022, 0x110022, 0x050005, 0x0a000a, 0x050010];
 const accretionDisks = [];
@@ -4191,7 +4264,15 @@ function animateGoalBeacon(time, dt) {
 
 // ===================== LEVEL DATA =====================
 const LEVELS = [
-  { // Hole 1: GENTLE APPROACH
+  { // Hole 1: FIRST CONTACT (Tutorial)
+    name: 'FIRST CONTACT', par: 1,
+    planets: [
+      { pos: [0, 0, 0], r: 3.5, color: 0x8a7d65, emissive: 0x6b6050, type: 'start', gravMult: 0.05 },
+      { pos: [25, 0, 0], r: 3.5, color: 0x143820, emissive: 0x0e6630, type: 'goal', gravMult: 2.0 },
+    ],
+    holeAngle: 0, holePhi: 1.57, ballDir: [0, 1, 0],
+  },
+  { // Hole 2: GENTLE APPROACH
     name: 'GENTLE APPROACH', par: 2,
     planets: [
       { pos: [0, 0, 0], r: 3.5, color: 0x8a7d65, emissive: 0x6b6050, type: 'start', gravMult: 0.05 },
@@ -4269,10 +4350,6 @@ const LEVELS = [
     holeAngle: -1.0, holePhi: 1.2,
     ballDir: [0.2, 1, -0.1],
   },
-];
-
-// ===================== PRO LEVELS (6-18) — Requires unlock =====================
-const PRO_LEVELS = [
   { // Hole 6: ASTEROID FIELD
     name: 'ASTEROID FIELD', par: 4,
     planets: [
@@ -4325,7 +4402,14 @@ const PRO_LEVELS = [
     ],
     holeAngle: -0.5, holePhi: 1.1,
     ballDir: [0, 1, 0.2],
+    wormholes: [
+      { a: [30, 8, -20], b: [140, -8, 16], colorA: 0x4488ff, colorB: 0xff8844 },
+    ],
   },
+];
+
+// ===================== PRO LEVELS (8-18) — Requires unlock =====================
+const PRO_LEVELS = [
   { // Hole 8: DEEP SPACE ODYSSEY
     name: 'DEEP SPACE ODYSSEY', par: 5,
     planets: [
@@ -4357,6 +4441,9 @@ const PRO_LEVELS = [
     ],
     holeAngle: 0.8, holePhi: 0.9,
     ballDir: [0.1, 1, 0.3],
+    wormholes: [
+      { a: [50, -10, 20], b: [160, 10, -8], colorA: 0x44ff88, colorB: 0xff44cc },
+    ],
   },
   { // Hole 9: BLACK HOLE GAUNTLET
     name: 'BLACK HOLE GAUNTLET', par: 6,
@@ -4393,6 +4480,9 @@ const PRO_LEVELS = [
     ],
     holeAngle: -0.3, holePhi: 1.3,
     ballDir: [0, 1, -0.2],
+    wormholes: [
+      { a: [60, 20, -10], b: [190, -12, 14], colorA: 0xaa22ff, colorB: 0x22ffaa },
+    ],
   },
 
   { // Hole 10: TWIN SUNS
@@ -4713,7 +4803,7 @@ async function validateUnlockCode(code) {
 function unlockPro() {
   proUnlocked = true;
   // Merge pro levels into LEVELS
-  if (LEVELS.length <= 5) {
+  if (LEVELS.length <= 8) {
     LEVELS.push(...PRO_LEVELS);
   }
   // Save to localStorage for persistence
@@ -5946,7 +6036,7 @@ function generateDailyChallenge() {
   const rng = mulberry32(seed);
 
   const holes = [];
-  const totalHoles = 3; // 3 holes per daily challenge — quick but meaningful
+  const totalHoles = 5; // 5 holes per daily challenge — quick but meaningful
 
   for (let h = 0; h < totalHoles; h++) {
     const difficulty = 0.3 + (h / (totalHoles - 1)) * 0.7; // ramps 0.3 → 1.0
@@ -6054,6 +6144,7 @@ document.getElementById('modeDaily').addEventListener('click', () => {
   ensureAudio();
   gameMode = '1p';
   dailyMode = true;
+  resetSessionStats();
   dailyPosted = false;
   dailyScores = [];
   dailyTotalStrokes = 0;
@@ -6264,6 +6355,7 @@ function clearLevel() {
   goalPlanet = null;
   clearWormholes();
   clearGravityFields();
+  clearSentinelFields();
   clearAccretionDisks();
   clearArtifact();
   holeStartTime = 0;
@@ -6274,6 +6366,9 @@ function clearLevel() {
   celebActive.rings.length = 0;
   boostActiveParts.length = 0;
   boostPartHead = 0;
+  dustActiveParts.length = 0;
+  for (let i = 0; i < MAX_DUST_PARTS; i++) dustInstanced.setMatrixAt(i, _dummy.matrix);
+  dustInstanced.instanceMatrix.needsUpdate = true;
   _dummy.scale.set(0, 0, 0);
   _dummy.updateMatrix();
   for (let i = 0; i < MAX_CELEB_STARS; i++) starInstanced.setMatrixAt(i, _dummy.matrix);
@@ -6386,6 +6481,7 @@ function startBoostCharge() {
   if (!shotInFlight || ballOnPlanet || gameWon || lostInSpace) return;
   if (boostActive) return;
   if (!hasInfiniteBoost && boostsRemaining <= 0) return; // out of boosts
+  dismissBoostTutorial();
 
   const speed = ballVel.length();
   if (speed < 0.01) return;
@@ -6521,6 +6617,7 @@ function loadLevel(idx) {
   // Create gravity field visualizations (skip invisible sentinels)
   for (const p of planetoids) {
     if (p.radius > 0.1) createGravityField(p);
+    else if (p.radius <= 0.1 && p.gravityStrength > 1.0) createSentinelField(p);
     if (isBlackHole(p)) createAccretionDisk(p);
   }
   // Restore visibility state
@@ -6974,6 +7071,7 @@ let ballPickPhase = 0; // 0 = P1 picking, 1 = P2 picking, 2 = done
 document.getElementById('mode1p').addEventListener('click', () => {
   gameMode = '1p';
   dailyMode = false;
+  resetSessionStats();
   currentPlayer = 0;
   players[0].scores = [];
   players[1].scores = [];
@@ -7098,6 +7196,7 @@ document.getElementById('winnerPlayAgain').addEventListener('click', () => {
   document.getElementById('winnerScreen').classList.remove('visible');
   document.getElementById('titleScreen').classList.remove('hidden');
   document.getElementById('turnIndicator').classList.remove('visible');
+  showSessionStatsOverlay();
   currentLevel = 0;
   totalScore = 0;
   levelScores = [];
@@ -7184,6 +7283,7 @@ let aimCurrent = new THREE.Vector2();
 let gameWon = false;
 let holeScored = false;
 let lostInSpace = false;
+let _lostSkipRequested = false;
 let lostTimer = 0;
 let lastBallPos = new THREE.Vector3();
 let ballSettled = false;
@@ -7784,6 +7884,8 @@ window.addEventListener('keydown', (e) => {
       // Fire immediately with current slider power
       updateKeyHud('kSpace', true);
       fireLockedShot();
+    } else if (lostInSpace) {
+      _lostSkipRequested = true;
     } else if (shotInFlight && !ballOnPlanet && !gameWon && !lostInSpace) {
       startBoostCharge();
     }
@@ -7915,6 +8017,8 @@ function fireLockedShot() {
     ballOnPlanet = null;
   }
   shotInFlight = true;
+  // Show first-flight boost tutorial
+  showBoostTutorialIfFirst();
   // Show tap-to-boost hint on mobile
   if (typeof showBoostHint === 'function') setTimeout(showBoostHint, 600);
   // Initialize follow-cam target to ball so it doesn't lerp from stale position
@@ -8509,7 +8613,7 @@ function showGameComplete(title, isFreeEnd) {
     if (!gcUnlockBtn) {
       gcUnlockBtn = document.createElement('button');
       gcUnlockBtn.id = 'gcUnlockBtn';
-      gcUnlockBtn.textContent = '★ UNLOCK HOLES 6-18';
+      gcUnlockBtn.textContent = '★ UNLOCK HOLES 9-19';
       gcUnlockBtn.style.cssText = `
         background: linear-gradient(135deg, #ffcc00, #ffaa00);
         color: #1a1400; -webkit-text-fill-color: #1a1400;
@@ -8585,6 +8689,52 @@ function hideGameComplete() {
   document.getElementById('gameCompleteScreen').classList.remove('visible');
 }
 
+// ===================== SESSION STATS TRACKING =====================
+const sessionStats = { holesPlayed: 0, birdies: 0, bogeys: 0, bestHoleScore: Infinity, bestHoleIndex: -1, artifacts: 0 };
+
+function recordSessionHole(holeIndex, strokes, par) {
+  sessionStats.holesPlayed++;
+  const diff = strokes - par;
+  if (diff <= -1) sessionStats.birdies++;
+  if (diff >= 1) sessionStats.bogeys++;
+  if (strokes < sessionStats.bestHoleScore) {
+    sessionStats.bestHoleScore = strokes;
+    sessionStats.bestHoleIndex = holeIndex;
+  }
+  sessionStats.artifacts = artifactsCollected;
+}
+
+function resetSessionStats() {
+  sessionStats.holesPlayed = 0;
+  sessionStats.birdies = 0;
+  sessionStats.bogeys = 0;
+  sessionStats.bestHoleScore = Infinity;
+  sessionStats.bestHoleIndex = -1;
+  sessionStats.artifacts = 0;
+}
+
+let _sessionStatsTimeout = null;
+function showSessionStatsOverlay() {
+  if (sessionStats.holesPlayed === 0) return;
+  const el = document.getElementById('sessionStatsOverlay');
+  const bestName = sessionStats.bestHoleIndex >= 0 && sessionStats.bestHoleIndex < LEVELS.length
+    ? LEVELS[sessionStats.bestHoleIndex].name : '—';
+  let html = '<div class="stat-line">SESSION: <span class="stat-highlight">' + sessionStats.holesPlayed + '</span> HOLES PLAYED</div>';
+  if (sessionStats.birdies > 0) html += '<div class="stat-line">BIRDIES: <span class="stat-highlight">' + sessionStats.birdies + '</span></div>';
+  if (sessionStats.bogeys > 0) html += '<div class="stat-line">BOGEYS: <span class="stat-highlight">' + sessionStats.bogeys + '</span></div>';
+  if (sessionStats.bestHoleScore < Infinity) html += '<div class="stat-line">BEST: <span class="stat-highlight">' + sessionStats.bestHoleScore + '</span> ON ' + bestName + '</div>';
+  if (sessionStats.artifacts > 0) html += '<div class="stat-line">ARTIFACTS: <span class="stat-highlight">' + sessionStats.artifacts + '</span></div>';
+  el.innerHTML = html;
+  el.style.display = 'block';
+  requestAnimationFrame(() => el.classList.add('visible'));
+  if (_sessionStatsTimeout) clearTimeout(_sessionStatsTimeout);
+  _sessionStatsTimeout = setTimeout(() => {
+    el.classList.remove('visible');
+    setTimeout(() => { el.style.display = 'none'; }, 600);
+    _sessionStatsTimeout = null;
+  }, 4000);
+}
+
 document.getElementById('gcPlayAgain').addEventListener('click', () => {
   sfxClick();
   hideGameComplete();
@@ -8618,6 +8768,7 @@ document.getElementById('gcHome').addEventListener('click', () => {
   document.getElementById('postScoreBtn').style.display = 'none';
   if (dailyMode) endDailyChallenge();
   document.getElementById('titleScreen').classList.remove('hidden');
+  showSessionStatsOverlay();
   loadLevel(0);
 });
 
@@ -8678,7 +8829,7 @@ document.getElementById('nextHoleBtn').addEventListener('click', () => {
     if (dailyMode) {
       showGameComplete('DAILY COMPLETE');
     } else {
-      const isFreeEnd = !dailyMode && currentLevel === 4 && !proUnlocked;
+      const isFreeEnd = !dailyMode && currentLevel === 7 && !proUnlocked;
       showGameComplete(isFreeEnd ? 'FREE COURSE COMPLETE' : 'COURSE COMPLETE', isFreeEnd);
     }
     return;
@@ -8721,6 +8872,11 @@ document.getElementById('nextHoleBtn').addEventListener('click', () => {
 let _swipeStartY = 0;
 let _swipeStartX = 0;
 let _wasAiming = false;
+// Tap-to-skip lost-in-space reset
+renderer.domElement.addEventListener('pointerdown', () => {
+  if (lostInSpace) _lostSkipRequested = true;
+});
+
 renderer.domElement.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1) {
     _swipeStartY = e.touches[0].clientY;
@@ -8883,6 +9039,7 @@ function physicsStep(dt) {
             ballVel.multiplyScalar(0.825);
             ballSettled = false;
             playLandingSound();
+            spawnLandingDust(p);
             break;
           }
         }
@@ -8926,7 +9083,8 @@ function physicsStep(dt) {
         lostInSpace = true;
         shotInFlight = false;
         ballJustSettled = false;
-        lostTimer = 2;
+        lostTimer = 0.6;
+        _lostSkipRequested = false;
         strokes++;
         document.getElementById('strokeCount').textContent = strokes;
         playLostSound();
@@ -8963,13 +9121,18 @@ function physicsStep(dt) {
       else if (diff === 1) label = 'BOGEY';
       else label = '+' + diff;
 
+      // Celebration multiplier: hole-in-one=3x, eagle=2x, birdie=1.5x, par=1x, bogey+=0.5x
+      const celebMult = strokes === 1 ? 3 : diff <= -2 ? 2 : diff === -1 ? 1.5 : diff === 0 ? 1 : 0.5;
+      // Consolation message for bogey+
+      const consolationSub = diff >= 1 ? ' · ' + CONSOLATION_MESSAGES[Math.floor(Math.random() * CONSOLATION_MESSAGES.length)] : '';
+
       if (gameMode === '2p') {
         // 2P scoring
         players[currentPlayer].scores[currentLevel] = strokes;
         players[currentPlayer].totalScore = players[currentPlayer].scores.reduce((a, b) => a + (b || 0), 0);
-        const sub = players[currentPlayer].name + ' · ' + strokes + (strokes === 1 ? ' STROKE' : ' STROKES');
+        const sub = players[currentPlayer].name + ' · ' + strokes + (strokes === 1 ? ' STROKE' : ' STROKES') + consolationSub;
         showMessage(label, sub);
-        spawnCelebration();
+        spawnCelebration(celebMult);
         totalScore = players[currentPlayer].totalScore;
         document.getElementById('totalScore').textContent = totalScore;
 
@@ -9034,12 +9197,13 @@ function physicsStep(dt) {
         levelScores[currentLevel] = strokes;
         totalScore = levelScores.reduce((a, b) => a + b, 0);
         document.getElementById('totalScore').textContent = totalScore;
+        recordSessionHole(currentLevel, strokes, par);
         saveHoleProgress(); // Save after each hole
         const isLast = currentLevel >= LEVELS.length - 1;
-        const isFreeEnd = !dailyMode && currentLevel === 4 && !proUnlocked;
-        const sub = strokes + (strokes === 1 ? ' STROKE' : ' STROKES');
+        const isFreeEnd = !dailyMode && currentLevel === 7 && !proUnlocked;
+        const sub = strokes + (strokes === 1 ? ' STROKE' : ' STROKES') + consolationSub;
         showMessage(label, sub);
-        spawnCelebration();
+        spawnCelebration(celebMult);
         const btn = document.getElementById('nextHoleBtn');
 
         if (dailyMode) {
@@ -9091,9 +9255,9 @@ function showMessage(text, sub) {
 }
 
 // ===================== CELEBRATION PARTICLES (Instanced) =====================
-const MAX_CELEB_STARS = 25;
-const MAX_CELEB_DOTS = 60;
-const MAX_CELEB_RINGS = 3;
+const MAX_CELEB_STARS = 75;
+const MAX_CELEB_DOTS = 180;
+const MAX_CELEB_RINGS = 9;
 const celebActive = { stars: [], dots: [], rings: [] };
 const _dummy = new THREE.Object3D();
 const _iColor = new THREE.Color();
@@ -9146,15 +9310,37 @@ starInstanced.instanceMatrix.needsUpdate = true;
 dotInstanced.instanceMatrix.needsUpdate = true;
 ringInstanced.instanceMatrix.needsUpdate = true;
 
-function spawnCelebration() {
+const CONSOLATION_MESSAGES = [
+  'Keep reaching for the stars',
+  'The cosmos is forgiving',
+  'Even black holes miss sometimes',
+  'Gravity is a harsh teacher',
+  'The universe is patient',
+  'Every astronaut stumbles',
+  'Recalculating trajectory...',
+  'Houston, we had a moment',
+];
+
+function spawnCelebration(multiplier) {
+  const m = multiplier || 1;
   const colors = [0xffdd00, 0xff4488, 0x44ffaa, 0x88ccff, 0xff8844, 0xaa66ff, 0x44ff44, 0xffaacc];
-  
+
   // Clear previous
   celebActive.stars.length = 0;
   celebActive.dots.length = 0;
   celebActive.rings.length = 0;
 
-  for (let i = 0; i < MAX_CELEB_STARS; i++) {
+  const starCount = Math.min(Math.floor(MAX_CELEB_STARS * m / 3), MAX_CELEB_STARS);
+  const dotCount = Math.min(Math.floor(MAX_CELEB_DOTS * m / 3), MAX_CELEB_DOTS);
+  const ringCount = Math.min(Math.floor(MAX_CELEB_RINGS * m / 3), MAX_CELEB_RINGS);
+
+  // Hide all first
+  _dummy.scale.set(0, 0, 0); _dummy.updateMatrix();
+  for (let i = 0; i < MAX_CELEB_STARS; i++) starInstanced.setMatrixAt(i, _dummy.matrix);
+  for (let i = 0; i < MAX_CELEB_DOTS; i++) dotInstanced.setMatrixAt(i, _dummy.matrix);
+  for (let i = 0; i < MAX_CELEB_RINGS; i++) ringInstanced.setMatrixAt(i, _dummy.matrix);
+
+  for (let i = 0; i < starCount; i++) {
     const vel = new THREE.Vector3((Math.random()-0.5)*12, (Math.random()-0.5)*12, (Math.random()-0.5)*12);
     vel.add(holeDir.clone().multiplyScalar(4 + Math.random() * 8));
     celebActive.stars.push({ idx: i, pos: holePos.clone(), vel, life: 2.5 + Math.random(), maxLife: 3.5, spin: (Math.random()-0.5)*15, rotZ: 0 });
@@ -9162,8 +9348,9 @@ function spawnCelebration() {
     starInstanced.setColorAt(i, _iColor);
   }
   starInstanced.instanceColor.needsUpdate = true;
+  starInstanced.instanceMatrix.needsUpdate = true;
 
-  for (let i = 0; i < MAX_CELEB_DOTS; i++) {
+  for (let i = 0; i < dotCount; i++) {
     const vel = new THREE.Vector3((Math.random()-0.5)*10, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
     vel.add(holeDir.clone().multiplyScalar(3 + Math.random() * 6));
     celebActive.dots.push({ idx: i, pos: holePos.clone(), vel, life: 1.5 + Math.random()*1.5, maxLife: 3.0 });
@@ -9171,14 +9358,27 @@ function spawnCelebration() {
     dotInstanced.setColorAt(i, _iColor);
   }
   dotInstanced.instanceColor.needsUpdate = true;
+  dotInstanced.instanceMatrix.needsUpdate = true;
 
-  for (let i = 0; i < MAX_CELEB_RINGS; i++) {
+  for (let i = 0; i < ringCount; i++) {
     const vel = holeDir.clone().multiplyScalar(2 + i * 3);
     celebActive.rings.push({ idx: i, pos: holePos.clone(), vel, life: 2, maxLife: 2, scale: 1, dir: vel.clone().normalize() });
     _iColor.setHex(colors[i * 2 % colors.length]);
     ringInstanced.setColorAt(i, _iColor);
   }
   ringInstanced.instanceColor.needsUpdate = true;
+  ringInstanced.instanceMatrix.needsUpdate = true;
+
+  // Screen flash for hole-in-one or eagle
+  if (m >= 2) screenFlash(m >= 3 ? 0.4 : 0.25);
+}
+
+function screenFlash(duration) {
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,200,0.3);z-index:50;pointer-events:none;transition:opacity ' + duration + 's;';
+  document.body.appendChild(flash);
+  requestAnimationFrame(() => { flash.style.opacity = '0'; });
+  setTimeout(() => flash.remove(), duration * 1000 + 100);
 }
 
 // ===================== BOOST TRAIL PARTICLES (Instanced) =====================
@@ -9224,6 +9424,71 @@ function spawnBoostTrail() {
     boostInstanced.setColorAt(idx, _iColor);
   }
   boostInstanced.instanceColor.needsUpdate = true;
+}
+
+// ===================== LANDING DUST PARTICLES (Instanced) =====================
+const MAX_DUST_PARTS = 16;
+const dustActiveParts = [];
+const dustGeoInst = new THREE.SphereGeometry(0.04, 4, 4);
+const dustMatInst = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+const dustInstanced = new THREE.InstancedMesh(dustGeoInst, dustMatInst, MAX_DUST_PARTS);
+dustInstanced.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+dustInstanced.frustumCulled = false;
+scene.add(dustInstanced);
+_dummy.scale.set(0, 0, 0);
+_dummy.updateMatrix();
+for (let i = 0; i < MAX_DUST_PARTS; i++) dustInstanced.setMatrixAt(i, _dummy.matrix);
+dustInstanced.instanceMatrix.needsUpdate = true;
+
+function spawnLandingDust(planet) {
+  if (!planet) return;
+  const surfaceNormal = ball.position.clone().sub(planet.pos).normalize();
+  const planetColor = planet.emissiveColor || 0xaaaaaa;
+  const count = 8 + Math.floor(Math.random() * 5); // 8-12 particles
+  for (let i = 0; i < count && i < MAX_DUST_PARTS; i++) {
+    // Hemisphere emission along surface normal
+    const tangent1 = new THREE.Vector3().crossVectors(surfaceNormal, new THREE.Vector3(0, 1, 0));
+    if (tangent1.length() < 0.01) tangent1.crossVectors(surfaceNormal, new THREE.Vector3(1, 0, 0));
+    tangent1.normalize();
+    const tangent2 = new THREE.Vector3().crossVectors(surfaceNormal, tangent1).normalize();
+    const angle = Math.random() * Math.PI * 2;
+    const spread = Math.random() * 0.8;
+    const vel = surfaceNormal.clone().multiplyScalar(1.5 + Math.random() * 2)
+      .add(tangent1.clone().multiplyScalar(Math.cos(angle) * spread * 3))
+      .add(tangent2.clone().multiplyScalar(Math.sin(angle) * spread * 3));
+    const pos = ball.position.clone().add(surfaceNormal.clone().multiplyScalar(0.1));
+    const life = 0.3 + Math.random() * 0.2;
+    dustActiveParts[i] = { idx: i, pos, vel, life, maxLife: life };
+    _iColor.setHex(planetColor);
+    _iColor.lerp(new THREE.Color(0xffffff), 0.3 + Math.random() * 0.3);
+    dustInstanced.setColorAt(i, _iColor);
+  }
+  dustInstanced.instanceColor.needsUpdate = true;
+}
+
+// ===================== FIRST-FLIGHT BOOST TUTORIAL =====================
+let _firstFlightShown = false;
+let _boostTutorialTimeout = null;
+try { _firstFlightShown = localStorage.getItem('gg_firstFlight') === '1'; } catch(e) {}
+
+function showBoostTutorialIfFirst() {
+  if (_firstFlightShown) return;
+  _firstFlightShown = true;
+  try { localStorage.setItem('gg_firstFlight', '1'); } catch(e) {}
+  const el = document.getElementById('boostTutorial');
+  const isMobile = 'ontouchstart' in window;
+  el.textContent = isMobile ? 'HOLD TO BOOST' : 'HOLD SPACE TO BOOST';
+  el.classList.add('visible');
+  _boostTutorialTimeout = setTimeout(() => {
+    el.classList.remove('visible');
+    _boostTutorialTimeout = null;
+  }, 3000);
+}
+
+function dismissBoostTutorial() {
+  const el = document.getElementById('boostTutorial');
+  el.classList.remove('visible');
+  if (_boostTutorialTimeout) { clearTimeout(_boostTutorialTimeout); _boostTutorialTimeout = null; }
 }
 
 // Legacy compat references
@@ -9993,7 +10258,8 @@ function animate() {
   if (!gameWon) {
     if (lostInSpace) {
       lostTimer -= dt;
-      if (lostTimer <= 0) {
+      if (lostTimer <= 0 || _lostSkipRequested) {
+        _lostSkipRequested = false;
         lostInSpace = false;
         document.getElementById('message').style.display = 'none';
         // Reset to last known position if undo available, otherwise home
@@ -10229,6 +10495,7 @@ function animate() {
 
   // Animate wormholes
   animateWormholes(time);
+  animateSentinelFields(time);
   animateAccretionDisks(time, dt);
   animateArtifact(time, dt);
 
@@ -10478,6 +10745,31 @@ function animate() {
       ghostMat.opacity *= 0.9;
       optimalPathLine.material.opacity *= 0.9;
     }
+  }
+
+  // === UPDATE DUST PARTICLES ===
+  for (let i = dustActiveParts.length - 1; i >= 0; i--) {
+    const dp = dustActiveParts[i];
+    if (!dp) continue;
+    dp.pos.addScaledVector(dp.vel, dt);
+    dp.vel.multiplyScalar(0.94);
+    dp.life -= dt;
+    if (dp.life <= 0) {
+      _dummy.scale.set(0, 0, 0);
+      _dummy.updateMatrix();
+      dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
+      dustActiveParts.splice(i, 1);
+    } else {
+      const alpha = dp.life / dp.maxLife;
+      const s = alpha * 1.5;
+      _dummy.position.copy(dp.pos);
+      _dummy.scale.set(s, s, s);
+      _dummy.updateMatrix();
+      dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
+    }
+  }
+  if (dustActiveParts.length > 0 || dustInstanced.instanceMatrix.needsUpdate) {
+    dustInstanced.instanceMatrix.needsUpdate = true;
   }
 
   // === UPDATE CELEBRATION INSTANCES ===
