@@ -230,23 +230,6 @@
     transform: translateY(-1px);
   }
   #cancelBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(60,48,8,0.7), 0 2px 6px rgba(0,0,0,0.3); }
-  #snapOptimalBtn, #panelSnapBtn {
-    background: rgb(40,32,10); border: 3px solid rgba(200,170,50,0.5); border-radius: 8px;
-    color: rgba(255,220,100,0.8); padding: 10px 16px; cursor: pointer; font-family: 'Orbitron', sans-serif;
-    font-size: 9px; font-weight: 900; letter-spacing: 2px; transition: all 0.2s;
-    text-transform: uppercase;
-    box-shadow: 0 3px 0 rgba(80,65,10,0.7), 0 5px 12px rgba(0,0,0,0.3);
-  }
-  #snapOptimalBtn:hover, #panelSnapBtn:hover {
-    background: rgb(60,50,15); color: #ffe680;
-    border-color: rgba(255,210,60,0.7);
-    box-shadow: 0 4px 0 rgba(80,65,10,0.8), 0 7px 16px rgba(0,0,0,0.4);
-    transform: translateY(-1px);
-  }
-  #snapOptimalBtn:active, #panelSnapBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(80,65,10,0.7), 0 2px 6px rgba(0,0,0,0.3); }
-  #snapOptimalBtn.computing, #panelSnapBtn.computing {
-    opacity: 0.5; pointer-events: none;
-  }
   #aimLabel {
     color: rgba(220,195,100,0.6); font-size: 10px; letter-spacing: 2px;
     font-weight: 500; text-transform: uppercase;
@@ -413,6 +396,14 @@
     font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 6px;
     color: rgba(220,195,100,0.4); margin-bottom: 60px; padding: 0 20px; text-align: center; text-transform: uppercase;
   }
+  #titleScreen .title-credit, #ballPicker .title-credit {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-family: 'Orbitron', sans-serif; font-size: 6px; font-weight: 400;
+    letter-spacing: 1.6px; color: rgba(220,195,100,0.22);
+    text-transform: uppercase; white-space: nowrap; pointer-events: none;
+  }
+  #titleScreen .title-credit .sol-credit, #ballPicker .title-credit .sol-credit { color: rgba(255,215,80,0.38); }
   .mode-btn {
     display: block; width: 260px; margin-bottom: 16px; padding: 16px 0;
     background: rgb(255,230,120);
@@ -1872,8 +1863,6 @@
     #nudgeFlash { font-size: 11px; }
     #gameBottomBar #fireBtn { padding: 10px 20px; font-size: 11px; min-width: 80px; }
     #gameBottomBar #cancelBtn { padding: 8px 16px; font-size: 8px; min-width: 70px; white-space: nowrap; }
-    #gameBottomBar #panelSnapBtn { padding: 8px 12px; font-size: 8px; }
-
     /* Aim panel */
     #aimWrapper { display: none !important; }
     #powerColumn { transform: scale(0.75); }
@@ -1957,8 +1946,6 @@
     #nudgeFlash { font-size: 9px; }
     #gameBottomBar #fireBtn { padding: 8px 16px; font-size: 10px; min-width: 70px; }
     #gameBottomBar #cancelBtn { padding: 7px 14px; font-size: 7px; min-width: 60px; white-space: nowrap; }
-    #gameBottomBar #panelSnapBtn { padding: 7px 10px; font-size: 7px; }
-
     #aimWrapper { display: none !important; }
 
     /* Title screen */
@@ -2090,7 +2077,7 @@
   <div class="vol-row">
     <span class="vol-label">MUSIC</span>
     <input type="range" class="vol-slider" id="musicVol" min="0" max="100" value="28">
-    <span class="vol-pct" id="musicPct">50%</span>
+    <span class="vol-pct" id="musicPct">28%</span>
   </div>
   <div class="vol-row">
     <span class="vol-label">SFX</span>
@@ -2180,7 +2167,7 @@
   <div class="sub" id="msgSub"></div>
   <button id="nextHoleBtn">NEXT HOLE</button>
   <div id="unlockPrompt">
-    <button id="unlockPromptBtn">★ UNLOCK HOLES 9-19</button>
+    <button id="unlockPromptBtn">★ UNLOCK HOLES 6-18</button>
   </div>
   <button id="postScoreBtn">POST TO LEADERBOARD</button>
 </div>
@@ -2306,7 +2293,10 @@
   </div>
   <button id="titleSoundBtn" style="display:none;">♪ SOUND</button>
   <button id="installBtn" style="display:none; margin-top:10px; background:rgba(30,60,30,0.7); border:1px solid rgba(80,200,80,0.35); border-radius:8px; color:rgba(120,230,120,0.7); padding:8px 18px; cursor:pointer; font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; transition:all 0.2s; pointer-events:auto;">📲 INSTALL APP</button>
-  <div style="margin-top:28px; font-family:'Orbitron',sans-serif; font-size:7px; font-weight:400; letter-spacing:2px; color:rgba(200,170,100,0.25); text-transform:uppercase;">© 2026 EPOCH6. All rights reserved.</div>
+  <div class="title-credit">
+    <span>© 2026 EPOCH6. All rights reserved.</span>
+    <span class="sol-credit">Made with 5.6 Sol</span>
+  </div>
 </div>
 
 <div id="lobbyScreen">
@@ -2357,6 +2347,10 @@
     <div id="ballLoreText">The legendary golden orb. Said to carry the blessing of the cosmos itself.</div>
   </div>
   <button id="playBtn">TEE OFF</button>
+  <div class="title-credit">
+    <span>© 2026 EPOCH6. All rights reserved.</span>
+    <span class="sol-credit">Made with 5.6 Sol</span>
+  </div>
 </div>
 
 <div id="instructions">
@@ -2414,7 +2408,6 @@
   <button id="findBallBtn">◎ FIND BALL</button>
   <button id="fireBtn" class="aim-only">FIRE</button>
   <button id="cancelBtn" class="aim-only">CANCEL</button>
-  <button id="panelSnapBtn" class="aim-only">✧ SNAP</button>
 </div>
 <div id="keyDisplay">
   <div class="key-row">
@@ -2484,9 +2477,14 @@ scene.fog = new THREE.FogExp2(0x030108, 0.005);
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 500);
 // Initial position will be set after ball is placed
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+const isLowPowerDevice = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
+  || (navigator.deviceMemory && navigator.deviceMemory <= 4);
+const maxPixelRatio = isLowPowerDevice ? 1.2 : (isTouchDevice ? 1.35 : 1.6);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, ('ontouchstart' in window) ? 1.5 : 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.5;
 renderer.shadowMap.enabled = true;
@@ -2611,16 +2609,27 @@ function initAudio() {
 // Ensure audio context starts on user interaction
 function ensureAudio() {
   if (!audioInitialized) initAudio();
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().then(() => {
+      tryStartSoundtrack();
+    }).catch(() => {});
+  } else {
+    tryStartSoundtrack();
+  }
 }
 
 // --- Soundtrack (MP3) ---
 let soundtrackEl = null;
 let soundtrackSource = null;
+function tryStartSoundtrack() {
+  if (!soundtrackEl || !soundEnabled || musicVolume <= 0) return;
+  soundtrackEl.play().catch(() => {});
+}
 function initSoundtrack() {
   if (!audioCtx) return;
   // Try to load soundtrack.mp3 from same directory
   soundtrackEl = new Audio('soundtrack.mp3');
+  soundtrackEl.preload = 'auto';
   soundtrackEl.loop = true;
   soundtrackEl.volume = 1; // volume controlled via gain node
   soundtrackSource = audioCtx.createMediaElementSource(soundtrackEl);
@@ -2628,10 +2637,14 @@ function initSoundtrack() {
   soundtrackEl.play().catch(() => {
     // Will retry on next user interaction
     const retryPlay = () => {
-      soundtrackEl.play().catch(() => {});
+      tryStartSoundtrack();
       document.removeEventListener('click', retryPlay);
+      document.removeEventListener('pointerdown', retryPlay);
+      document.removeEventListener('keydown', retryPlay);
     };
     document.addEventListener('click', retryPlay);
+    document.addEventListener('pointerdown', retryPlay);
+    document.addEventListener('keydown', retryPlay);
   });
 }
 
@@ -6893,6 +6906,8 @@ function initBallPicker() {
       grid.appendChild(opt);
 
       opt.addEventListener('click', () => {
+        ensureAudio();
+        sfxClick();
         document.querySelectorAll('.ball-option').forEach(el => el.classList.remove('selected'));
         opt.classList.add('selected');
         selectedBallColor = idx;
@@ -7246,6 +7261,7 @@ const trailPositions = [];
 const trailGeo = new THREE.BufferGeometry();
 const trailMat = new THREE.LineBasicMaterial({ color: 0xffcc33, transparent: true, opacity: 0.4 });
 const trailLine = new THREE.Line(trailGeo, trailMat);
+trailLine.frustumCulled = false;
 scene.add(trailLine);
 
 // Motion lines (speed streaks around ball in flight)
@@ -7263,6 +7279,49 @@ for (let i = 0; i < MOTION_LINE_COUNT; i++) {
   line.frustumCulled = false;
   scene.add(line);
   motionLines.push({ line, mat, geo, pos: new THREE.Vector3(), vel: new THREE.Vector3(), life: 0, maxLife: 0 });
+}
+
+// Reuse line buffers instead of replacing GPU geometry every animation frame.
+function updateDynamicLine(line, points, pointCount = points.length) {
+  const count = Math.min(pointCount, points.length);
+  if (count < 2) {
+    line.visible = false;
+    return;
+  }
+
+  let geometry = line.geometry;
+  let position = geometry.getAttribute('position');
+  if (!position || position.count < count) {
+    let capacity = 64;
+    while (capacity < count) capacity *= 2;
+    geometry.dispose();
+    geometry = new THREE.BufferGeometry();
+    position = new THREE.BufferAttribute(new Float32Array(capacity * 3), 3);
+    position.setUsage(THREE.DynamicDrawUsage);
+    geometry.setAttribute('position', position);
+    line.geometry = geometry;
+    line.frustumCulled = false;
+  }
+
+  const values = position.array;
+  for (let i = 0; i < count; i++) {
+    const point = points[i];
+    const offset = i * 3;
+    values[offset] = point.x;
+    values[offset + 1] = point.y;
+    values[offset + 2] = point.z;
+  }
+  position.needsUpdate = true;
+  geometry.setDrawRange(0, count);
+  line.visible = true;
+}
+
+function appendTrailPoint(points, position, maxPoints, minDistanceSq) {
+  const last = points[points.length - 1];
+  if (last && last.distanceToSquared(position) < minDistanceSq) return false;
+  points.push(position.clone());
+  if (points.length > maxPoints) points.shift();
+  return true;
 }
 
 // ===================== GAME STATE =====================
@@ -8198,8 +8257,6 @@ function snapToOptimal(sourceBtn) {
   });
 }
 
-document.getElementById('panelSnapBtn').addEventListener('click', () => { sfxClick(); snapToOptimal('panel'); });
-
 // ===================== SLIDER AIM PANEL =====================
 const aimPanel = document.getElementById('aimPanel');
 const aimWrapper = document.getElementById('aimWrapper');
@@ -8341,6 +8398,7 @@ function showAimPanel() {
   // Compute initial aim and lock it
   aimLocked = true;
   updateAimFromSliders();
+  snapToOptimal('auto');
 }
 
 function hideAimPanel() {
@@ -10202,16 +10260,37 @@ const clock = new THREE.Clock();
 let time = 0;
 
 let _idleSkip = false;
+let _idleAccumulatedDt = 0;
+let _lastHoleTimePaint = 0;
+let _lastHoleTimeText = '';
+let _mobileUiDimmed = null;
+const _introCurrentTarget = new THREE.Vector3();
+const _zAxis = new THREE.Vector3(0, 0, 1);
+const _perfQuaternion = new THREE.Quaternion();
+const holeTimeEl = document.getElementById('holeTime');
+const fireBtnEl = document.getElementById('fireBtn');
+const bottomBarEl = document.getElementById('gameBottomBar');
+const aimWrapperEl = document.getElementById('aimWrapper');
+const statsEl = document.getElementById('stats');
+const topRightBtnsEl = document.getElementById('topRightBtns');
+
 function animate() {
   requestAnimationFrame(animate);
-  const dt = Math.min(clock.getDelta(), 0.05);
-  // 30fps cap when idle (ball on planet, not aiming, not in flight)
+  const rawDt = Math.min(clock.getDelta(), 0.05);
+  if (document.hidden) return;
+
+  // 30fps cap when idle; input and active gameplay remain full-rate.
   const isIdle = ballOnPlanet && !shotInFlight && !aiming && !aimLocked && !introPlaying && !gameWon
     && !(activeArtifact && !activeArtifact.collected);
-  if (isIdle && ('ontouchstart' in window)) {
+  if (isIdle && !controls._userInteracting) {
     _idleSkip = !_idleSkip;
-    if (_idleSkip) return;
+    if (_idleSkip) {
+      _idleAccumulatedDt += rawDt;
+      return;
+    }
   }
+  const dt = Math.min(rawDt + _idleAccumulatedDt, 0.05);
+  _idleAccumulatedDt = 0;
   time += dt;
 
   // Animate background Earth rotation and clouds
@@ -10231,10 +10310,10 @@ function animate() {
     t = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     camera.position.lerpVectors(introCamStart, introCamEnd, t);
-    const currentTarget = new THREE.Vector3().lerpVectors(introTargetStart, introTargetEnd, t);
+    _introCurrentTarget.lerpVectors(introTargetStart, introTargetEnd, t);
     camera.fov = introFovStart + (introFovEnd - introFovStart) * t;
     camera.updateProjectionMatrix();
-    camera.lookAt(currentTarget);
+    camera.lookAt(_introCurrentTarget);
 
     if (introTimer >= INTRO_SWEEP_DURATION) {
       // Intro complete — hand controls to player
@@ -10446,16 +10525,8 @@ function animate() {
       ghostGlowMat.opacity = Math.max(0.04, ghostGlowMat.opacity) + Math.sin(time * 3) * 0.02;
 
       // Accumulate ghost trail
-      ghostTrailPositions.push(ghostBall.position.clone());
-      if (ghostTrailPositions.length > GHOST_TRAIL_MAX) ghostTrailPositions.shift();
-      if (ghostTrailPositions.length > 1) {
-        const pts = [];
-        for (const p of ghostTrailPositions) pts.push(p.x, p.y, p.z);
-        const oldGeo = ghostTrailLine.geometry;
-        ghostTrailLine.geometry = new THREE.BufferGeometry();
-        ghostTrailLine.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-        oldGeo.dispose();
-        ghostTrailLine.visible = true;
+      if (appendTrailPoint(ghostTrailPositions, ghostBall.position, GHOST_TRAIL_MAX, 0.0025)) {
+        updateDynamicLine(ghostTrailLine, ghostTrailPositions);
       }
 
       // Fade out if no update in 3 seconds
@@ -10483,9 +10554,9 @@ function animate() {
     // Orient perpendicular to velocity
     const spd = ballVel.length();
     if (spd > 0.05) {
-      const velDir = ballVel.clone().normalize();
-      const ringQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), velDir);
-      boostRing.quaternion.copy(ringQ);
+      _vTemp1.copy(ballVel).normalize();
+      _perfQuaternion.setFromUnitVectors(_zAxis, _vTemp1);
+      boostRing.quaternion.copy(_perfQuaternion);
     }
     boostRing.rotateZ(dt * 6);
   } else {
@@ -10502,12 +10573,11 @@ function animate() {
   // Artifact gravity pull + collision check
   if (activeArtifact && !activeArtifact.collected && !gameWon) {
     const artPos = activeArtifact.group.position;
-    const toBall = ball.position.clone().sub(artPos);
-    const artifactDist = toBall.length();
+    const artifactDist = _vTemp1.copy(ball.position).sub(artPos).length();
     
     // Small gravity pull toward artifact (attracts the ball)
     if (artifactDist > 0.5 && artifactDist < 20 && shotInFlight && !ballOnPlanet) {
-      const pullDir = artPos.clone().sub(ball.position).normalize();
+      const pullDir = _vTemp2.copy(artPos).sub(ball.position).normalize();
       const force = 0.8 / (artifactDist * artifactDist + 0.5);
       ballVel.addScaledVector(pullDir, force * dt * 60);
     }
@@ -10516,48 +10586,38 @@ function animate() {
   }
 
   // Update hole timer display
+  let holeTimeText = '';
   if (holeStartTime > 0 && !gameWon && !holeScored) {
     const elapsed = (performance.now() - holeStartTime) / 1000;
-    document.getElementById('holeTime').textContent = elapsed.toFixed(1);
+    holeTimeText = elapsed.toFixed(1);
   } else if (holeScored && holeElapsed > 0) {
-    document.getElementById('holeTime').textContent = holeElapsed.toFixed(1);
+    holeTimeText = holeElapsed.toFixed(1);
+  }
+  if (holeTimeText && time - _lastHoleTimePaint >= 0.1 && holeTimeText !== _lastHoleTimeText) {
+    holeTimeEl.textContent = holeTimeText;
+    _lastHoleTimeText = holeTimeText;
+    _lastHoleTimePaint = time;
   }
 
   // === Persistent flight trail (shows full path since last shot) ===
   if (shotInFlight && !gameWon && !lostInSpace) {
-    flightTrailPositions.push(ball.position.clone());
-    if (flightTrailPositions.length > FLIGHT_TRAIL_MAX) flightTrailPositions.shift();
+    if (appendTrailPoint(flightTrailPositions, ball.position, FLIGHT_TRAIL_MAX, 0.0036)) {
+      updateDynamicLine(flightTrailLine, flightTrailPositions);
+    }
   }
-  if (flightTrailPositions.length > 1) {
-    const oldFtGeo = flightTrailLine.geometry;
-    flightTrailLine.geometry = new THREE.BufferGeometry().setFromPoints(flightTrailPositions);
-    oldFtGeo.dispose();
-    flightTrailLine.visible = true;
-  } else {
-    flightTrailLine.visible = false;
-  }
+  if (flightTrailPositions.length < 2) flightTrailLine.visible = false;
 
   // === Short tail trail (recent motion, fades when stopped) ===
   if (!ballOnPlanet && !gameWon && !lostInSpace) {
-    trailPositions.push(ball.position.clone());
-    if (trailPositions.length > trailMax) trailPositions.shift();
-    if (trailPositions.length > 1) {
-      const oldGeo = trailLine.geometry;
-      trailLine.geometry = new THREE.BufferGeometry().setFromPoints(trailPositions);
-      oldGeo.dispose();
+    if (appendTrailPoint(trailPositions, ball.position, trailMax, 0.0016)) {
+      updateDynamicLine(trailLine, trailPositions);
     }
-    trailLine.visible = true;
   } else {
     if (trailPositions.length > 0) {
       trailPositions.shift();
-      if (trailPositions.length > 1) {
-        const oldGeo = trailLine.geometry;
-        trailLine.geometry = new THREE.BufferGeometry().setFromPoints(trailPositions);
-        oldGeo.dispose();
-      } else {
-        trailLine.visible = false;
-      }
+      updateDynamicLine(trailLine, trailPositions);
     }
+    if (trailPositions.length < 2) trailLine.visible = false;
   }
 
   // Motion lines (speed streaks)
@@ -10595,13 +10655,13 @@ function animate() {
   for (const ml of motionLines) {
     if (ml.life > 0) {
       ml.life -= dt;
-      ml.pos.add(ml.vel.clone().multiplyScalar(dt));
+      ml.pos.addScaledVector(ml.vel, dt);
       const t = Math.max(ml.life / ml.maxLife, 0);
       // Fade in then out
       const fade = t < 0.3 ? t / 0.3 : (1 - t) < 0.3 ? (1 - t) / 0.3 : 1;
       ml.mat.opacity = fade * 0.5 * Math.min(ballSpeed / 8, 1); // brighter at higher speeds
       // Streak length scales with speed
-      const streakLen = ml.vel.clone().normalize().multiplyScalar(0.3 + ballSpeed * 0.06);
+      const streakLen = _vTemp1.copy(ml.vel).normalize().multiplyScalar(0.3 + ballSpeed * 0.06);
       const posArr = ml.geo.attributes.position.array;
       posArr[0] = ml.pos.x; posArr[1] = ml.pos.y; posArr[2] = ml.pos.z;
       posArr[3] = ml.pos.x + streakLen.x; posArr[4] = ml.pos.y + streakLen.y; posArr[5] = ml.pos.z + streakLen.z;
@@ -10636,46 +10696,41 @@ function animate() {
     valPwr.textContent = Math.round(lockedPowerNorm * 100) + '%';
     
     // Pulse fire button
-    const fireBtn = document.getElementById('fireBtn');
-    fireBtn.textContent = 'FIRE';
-    fireBtn.style.background = `rgb(${Math.round(255 - lockedPowerNorm * 55)},${Math.round(230 - lockedPowerNorm * 100)},${Math.round(120 - lockedPowerNorm * 80)})`;
+    fireBtnEl.textContent = 'FIRE';
+    fireBtnEl.style.background = `rgb(${Math.round(255 - lockedPowerNorm * 55)},${Math.round(230 - lockedPowerNorm * 100)},${Math.round(120 - lockedPowerNorm * 80)})`;
   } else if (aimLocked) {
-    const fireBtn = document.getElementById('fireBtn');
-    if (fireBtn.textContent === 'FIRE') {
-      fireBtn.textContent = 'FIRE';
-      fireBtn.style.background = '';
+    if (fireBtnEl.style.background) {
+      fireBtnEl.style.background = '';
     }
   }
 
   // Hide boost hint when not in flight & toggle boost button
-  const bottomBar = document.getElementById('gameBottomBar');
   if (shotInFlight && !ballOnPlanet && !gameWon && !lostInSpace) {
-    if (!bottomBar.classList.contains('in-flight')) bottomBar.classList.add('in-flight');
+    if (!bottomBarEl.classList.contains('in-flight')) bottomBarEl.classList.add('in-flight');
   } else {
-    if (bottomBar.classList.contains('in-flight')) bottomBar.classList.remove('in-flight');
+    if (bottomBarEl.classList.contains('in-flight')) bottomBarEl.classList.remove('in-flight');
   }
 
   // Trajectory preview
   updateTrajectoryPreview();
 
   // Position aim wrapper below ball in screen space
-  const aw = document.getElementById('aimWrapper');
-  if (aw && aw.classList.contains('visible')) {
+  if (aimWrapperEl && aimWrapperEl.classList.contains('visible')) {
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       // Fixed position at bottom-center on mobile
-      aw.style.left = '50%';
-      aw.style.top = '';
-      aw.style.bottom = '110px';
+      aimWrapperEl.style.left = '50%';
+      aimWrapperEl.style.top = '';
+      aimWrapperEl.style.bottom = '110px';
     } else {
-      const ballScreen = ball.position.clone().project(camera);
+      const ballScreen = _vTemp1.copy(ball.position).project(camera);
       const sx = (ballScreen.x * 0.5 + 0.5) * window.innerWidth - 80;
       const sy = (-ballScreen.y * 0.5 + 0.5) * window.innerHeight + 160;
       const clampedX = Math.max(180, Math.min(window.innerWidth - 180, sx));
       const clampedY = Math.max(10, Math.min(window.innerHeight - 380, sy));
-      aw.style.left = clampedX + 'px';
-      aw.style.top = clampedY + 'px';
-      aw.style.bottom = '';
+      aimWrapperEl.style.left = clampedX + 'px';
+      aimWrapperEl.style.top = clampedY + 'px';
+      aimWrapperEl.style.bottom = '';
     }
   }
 
@@ -10684,10 +10739,9 @@ function animate() {
     const dist = camera.position.distanceTo(p.pos);
     // Ramp: full brightness up to 80 units, fades to 0.3 at 300+ units
     const brightness = THREE.MathUtils.clamp(1.0 - (dist - 80) / 220, 0.3, 1.0);
-    const baseColor = new THREE.Color(p.mesh.userData.baseColor || p.mesh.material.color.getHex());
-    if (!p.mesh.userData.baseColor) p.mesh.userData.baseColor = p.mesh.material.color.getHex();
-    if (!p.mesh.userData.baseEmissive) p.mesh.userData.baseEmissive = p.emissiveColor;
-    p.mesh.material.color.set(baseColor).multiplyScalar(0.5 + brightness * 0.5);
+    if (p.mesh.userData.baseColor === undefined) p.mesh.userData.baseColor = p.mesh.material.color.getHex();
+    if (p.mesh.userData.baseEmissive === undefined) p.mesh.userData.baseEmissive = p.emissiveColor;
+    p.mesh.material.color.setHex(p.mesh.userData.baseColor).multiplyScalar(0.5 + brightness * 0.5);
     p.mesh.material.emissiveIntensity = 0.15 + brightness * 0.15;
   }
 
@@ -10734,10 +10788,8 @@ function animate() {
 
       // Show line up to current point with fade-in
       const showCount = Math.min(idx + 1, totalPts);
-      const subset = optimalPathPoints.slice(0, showCount);
-      if (subset.length > 1) {
-        optimalPathLine.geometry.dispose();
-        optimalPathLine.geometry = new THREE.BufferGeometry().setFromPoints(subset);
+      if (showCount > 1) {
+        updateDynamicLine(optimalPathLine, optimalPathPoints, showCount);
         optimalPathLine.material.opacity = 0.35;
       }
     } else {
@@ -10748,6 +10800,7 @@ function animate() {
   }
 
   // === UPDATE DUST PARTICLES ===
+  const hadDustParts = dustActiveParts.length > 0;
   for (let i = dustActiveParts.length - 1; i >= 0; i--) {
     const dp = dustActiveParts[i];
     if (!dp) continue;
@@ -10768,12 +10821,11 @@ function animate() {
       dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
     }
   }
-  if (dustActiveParts.length > 0 || dustInstanced.instanceMatrix.needsUpdate) {
-    dustInstanced.instanceMatrix.needsUpdate = true;
-  }
+  if (hadDustParts) dustInstanced.instanceMatrix.needsUpdate = true;
 
   // === UPDATE CELEBRATION INSTANCES ===
   // Stars
+  const hadCelebrationStars = celebActive.stars.length > 0;
   for (let i = celebActive.stars.length - 1; i >= 0; i--) {
     const p = celebActive.stars[i];
     _vTemp1.copy(p.vel).multiplyScalar(dt);
@@ -10796,9 +10848,10 @@ function animate() {
       starInstanced.setMatrixAt(p.idx, _dummy.matrix);
     }
   }
-  starInstanced.instanceMatrix.needsUpdate = true;
+  if (hadCelebrationStars) starInstanced.instanceMatrix.needsUpdate = true;
 
   // Dots
+  const hadCelebrationDots = celebActive.dots.length > 0;
   for (let i = celebActive.dots.length - 1; i >= 0; i--) {
     const p = celebActive.dots[i];
     _vTemp1.copy(p.vel).multiplyScalar(dt);
@@ -10819,9 +10872,10 @@ function animate() {
       dotInstanced.setMatrixAt(p.idx, _dummy.matrix);
     }
   }
-  dotInstanced.instanceMatrix.needsUpdate = true;
+  if (hadCelebrationDots) dotInstanced.instanceMatrix.needsUpdate = true;
 
   // Rings
+  const hadCelebrationRings = celebActive.rings.length > 0;
   for (let i = celebActive.rings.length - 1; i >= 0; i--) {
     const p = celebActive.rings[i];
     _vTemp1.copy(p.vel).multiplyScalar(dt);
@@ -10837,15 +10891,16 @@ function animate() {
       celebActive.rings.splice(i, 1);
     } else {
       _dummy.position.copy(p.pos);
-      _dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), p.dir);
+      _dummy.quaternion.setFromUnitVectors(_zAxis, p.dir);
       _dummy.scale.set(p.scale, p.scale, p.scale);
       _dummy.updateMatrix();
       ringInstanced.setMatrixAt(p.idx, _dummy.matrix);
     }
   }
-  ringInstanced.instanceMatrix.needsUpdate = true;
+  if (hadCelebrationRings) ringInstanced.instanceMatrix.needsUpdate = true;
 
   // === UPDATE BOOST INSTANCES ===
+  const hadBoostParts = boostActiveParts.length > 0;
   for (let i = boostActiveParts.length - 1; i >= 0; i--) {
     const p = boostActiveParts[i];
     p.life -= dt;
@@ -10862,7 +10917,7 @@ function animate() {
       boostInstanced.setMatrixAt(p.idx, _dummy.matrix);
     }
   }
-  boostInstanced.instanceMatrix.needsUpdate = true;
+  if (hadBoostParts) boostInstanced.instanceMatrix.needsUpdate = true;
 
   // === NINTENDO FUN: Planet gentle rotation + bob + moon orbits ===
   for (let i = 0; i < planetoids.length; i++) {
@@ -10872,7 +10927,7 @@ function animate() {
 
     if (p.radius < 0.8 && p.radius > 0.02 && currentLevel >= 5) {
       // Throttle orbit calc to ~30fps on mobile
-      if (('ontouchstart' in window) && (i % 2 !== Math.floor(time * 30) % 2)) {
+      if (isTouchDevice && (i % 2 !== Math.floor(time * 30) % 2)) {
         // Skip this frame for this moon (stagger across moons)
         p.mesh.position.copy(p.pos);
         if (p._gravField) p._gravField.position.copy(p.pos);
@@ -10956,18 +11011,13 @@ function animate() {
 
 
   // Auto-hide UI during flight on mobile
-  if (('ontouchstart' in window)) {
-    const bottomBar = document.getElementById('gameBottomBar');
-    const stats = document.getElementById('stats');
-    const topBtns = document.getElementById('topRightBtns');
-    if (shotInFlight && !ballOnPlanet && !gameWon) {
-      if (bottomBar) bottomBar.style.opacity = '0.15';
-      if (stats) stats.style.opacity = '0.3';
-      if (topBtns) topBtns.style.opacity = '0.3';
-    } else {
-      if (bottomBar) bottomBar.style.opacity = '1';
-      if (stats) stats.style.opacity = '1';
-      if (topBtns) topBtns.style.opacity = '1';
+  if (isTouchDevice) {
+    const shouldDimUi = shotInFlight && !ballOnPlanet && !gameWon;
+    if (_mobileUiDimmed !== shouldDimUi) {
+      _mobileUiDimmed = shouldDimUi;
+      bottomBarEl.style.opacity = shouldDimUi ? '0.15' : '1';
+      statsEl.style.opacity = shouldDimUi ? '0.3' : '1';
+      topRightBtnsEl.style.opacity = shouldDimUi ? '0.3' : '1';
     }
   }
 
@@ -10978,6 +11028,9 @@ function animate() {
 
 // Init ball picker and load first level (must be after all declarations)
 initBallPicker();
+
+// Auto-start: skip title screen, go straight to ball picker (1P mode)
+document.getElementById('mode1p').click();
 
 // Spawn title screen stars
 (function() {
