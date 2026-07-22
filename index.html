@@ -189,6 +189,7 @@
   #gameBottomBar.in-flight .flight-only { display: inline-block; }
   #gameBottomBar.in-flight .aim-only { display: none; }
   #gameBottomBar.in-flight #aimToggleBtn { display: none; }
+  #gameBottomBar.complete { display: none; }
 
   #aimHud {
     display: flex; align-items: center; justify-content: center;
@@ -244,7 +245,7 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
     filter: drop-shadow(0 0 30px rgba(255,200,40,0.5)) drop-shadow(0 0 60px rgba(255,180,0,0.2));
-    z-index: 20; display: none; pointer-events: auto;
+    z-index: 20; display: none; pointer-events: auto; isolation: isolate;
   }
   #message .sub {
     font-size: 14px; font-weight: 500; letter-spacing: 4px; margin-top: 12px;
@@ -252,6 +253,18 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
     filter: none;
+  }
+  #msgText {
+    background: linear-gradient(135deg, #ffcc00, #fff0a0, #ffad21);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #message::before {
+    content: ''; position: absolute; z-index: -1; inset: -24px -38px;
+    border-radius: 18px; border: 1px solid rgba(255,213,74,0.24);
+    background: linear-gradient(145deg, rgba(23,17,7,0.94), rgba(6,5,10,0.92));
+    box-shadow: 0 16px 55px rgba(0,0,0,0.5), inset 0 0 24px rgba(255,205,50,0.035);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
 
   /* === Ball picker screen === */
@@ -1149,114 +1162,6 @@
   }
   #instructions.visible { display: block; }
   
-  .guide-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 28px; font-weight: 900; letter-spacing: 6px;
-    color: #ffe566;
-    text-shadow: 0 0 30px rgba(255,220,60,0.4), 0 4px 0 #aa8800, 0 6px 0 #775500, 0 8px 20px rgba(0,0,0,0.5);
-    margin-bottom: 28px;
-    text-transform: uppercase;
-  }
-  
-  .guide-steps {
-    display: flex; gap: 16px; margin-bottom: 28px;
-    justify-content: center; flex-wrap: wrap;
-  }
-  
-  .guide-step {
-    flex: 1; min-width: 180px; max-width: 210px;
-    background: radial-gradient(ellipse at 50% 20%, rgba(40,30,10,0.95) 0%, rgba(14,10,5,0.97) 100%);
-    border: 3px solid rgba(200,170,60,0.4);
-    border-radius: 18px;
-    padding: 24px 16px 20px;
-    position: relative;
-    box-shadow: 0 6px 0 rgba(80,60,10,0.6), 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,220,80,0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .guide-step:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 9px 0 rgba(80,60,10,0.6), 0 14px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,220,80,0.12);
-  }
-  
-  .step-number {
-    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
-    width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, #ffdd44 0%, #ffaa00 100%);
-    border: 3px solid #fff8e0;
-    color: #4a3000; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 3px 0 rgba(120,90,10,0.8), 0 4px 12px rgba(0,0,0,0.4), 0 0 12px rgba(255,200,40,0.3);
-  }
-  
-  .step-emoji {
-    font-size: 36px; margin-bottom: 10px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  }
-  
-  .step-title {
-    font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 900;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: #ffe566; margin-bottom: 10px;
-    text-shadow: 0 0 10px rgba(255,220,60,0.3);
-  }
-  
-  .step-desc {
-    font-size: 12px; line-height: 1.7; color: rgba(220,200,140,0.7); letter-spacing: 0.3px;
-  }
-  .step-desc strong {
-    color: #ffe080; font-weight: 700;
-  }
-  
-  /* AIM panel — white/silver theme */
-  .guide-step.aim-step {
-    background: radial-gradient(ellipse at 50% 20%, rgba(50,50,55,0.95) 0%, rgba(20,20,24,0.97) 100%);
-    border-color: rgba(200,200,210,0.4);
-    box-shadow: 0 6px 0 rgba(60,60,70,0.6), 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .guide-step.aim-step:hover {
-    box-shadow: 0 9px 0 rgba(60,60,70,0.6), 0 14px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
-  }
-  .aim-step .step-number {
-    background: linear-gradient(135deg, #ffffff 0%, #ccccdd 100%);
-    border-color: #ffffff;
-    color: #333;
-    box-shadow: 0 3px 0 rgba(80,80,90,0.8), 0 4px 12px rgba(0,0,0,0.4), 0 0 12px rgba(200,200,220,0.3);
-  }
-  .aim-step .step-title { color: #e8e8f0; text-shadow: 0 0 10px rgba(200,200,220,0.3); }
-  .aim-step .step-desc { color: rgba(200,200,215,0.7); }
-  .aim-step .step-desc strong { color: #ffffff; }
-  
-  /* SCORE panel — green theme */
-  .guide-step.score-step {
-    background: radial-gradient(ellipse at 50% 20%, rgba(10,40,20,0.95) 0%, rgba(5,18,10,0.97) 100%);
-    border-color: rgba(60,200,100,0.4);
-    box-shadow: 0 6px 0 rgba(10,60,30,0.6), 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(80,255,120,0.08);
-  }
-  .guide-step.score-step:hover {
-    box-shadow: 0 9px 0 rgba(10,60,30,0.6), 0 14px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(80,255,120,0.12);
-  }
-  .score-step .step-number {
-    background: linear-gradient(135deg, #66ff99 0%, #33cc66 100%);
-    border-color: #ccffe0;
-    color: #0a3d1a;
-    box-shadow: 0 3px 0 rgba(10,80,30,0.8), 0 4px 12px rgba(0,0,0,0.4), 0 0 12px rgba(60,220,100,0.3);
-  }
-  .score-step .step-title { color: #66ff99; text-shadow: 0 0 10px rgba(60,220,100,0.3); }
-  .score-step .step-desc { color: rgba(140,220,170,0.7); }
-  .score-step .step-desc strong { color: #88ffaa; }
-
-  .guide-footer {
-    font-size: 10px; color: rgba(200,180,100,0.4); letter-spacing: 2px;
-    font-family: 'Orbitron', sans-serif; margin-bottom: 20px;
-  }
-  .guide-footer strong { color: rgba(255,220,100,0.6); }
-  #guideDots { display: none; margin-bottom: 16px; }
-  .guide-dot {
-    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(200,170,60,0.2); margin: 0 4px; transition: all 0.3s; cursor: pointer;
-  }
-  .guide-dot.active { background: #ffe566; box-shadow: 0 0 6px rgba(255,220,60,0.5); transform: scale(1.3); }
-  .guide-btns { display: flex; gap: 12px; justify-content: center; align-items: center; }
   #skipBtn {
     padding: 10px 28px; background: none; border: 2px solid rgba(200,170,60,0.25);
     border-radius: 10px; color: rgba(220,195,100,0.4); cursor: pointer;
@@ -1282,6 +1187,255 @@
   #startBtn:active {
     transform: translateY(2px);
     box-shadow: 0 1px 0 rgba(120,90,10,0.8), 0 3px 8px rgba(0,0,0,0.4);
+  }
+
+  /* === Launch Lab interactive onboarding === */
+  #instructions.launch-lab {
+    inset: 0; top: 0; left: 0; transform: none;
+    width: 100vw; max-width: none; max-height: none; overflow: hidden;
+    text-align: left; pointer-events: none;
+  }
+  #instructions.launch-lab.visible { display: block; }
+  #instructions.launch-lab::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 28% 40%, rgba(255,202,45,0.1), transparent 30%),
+      radial-gradient(circle at 76% 22%, rgba(73,255,177,0.06), transparent 28%),
+      rgba(2,1,6,0.76);
+    backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+    opacity: 1; transition: opacity 0.35s ease;
+  }
+  #instructions.launch-lab.training::before { opacity: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+  .trainer-card {
+    --trainer-gold: #ffe46b;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(760px, calc(100vw - 36px)); min-height: 390px;
+    display: grid; grid-template-columns: minmax(230px, 0.86fr) minmax(340px, 1.14fr);
+    gap: 30px; align-items: center; box-sizing: border-box; padding: 30px;
+    border: 1px solid rgba(255,218,88,0.36); border-radius: 24px;
+    background:
+      linear-gradient(120deg, rgba(255,213,70,0.06), transparent 34%),
+      radial-gradient(circle at 13% 5%, rgba(255,224,95,0.12), transparent 36%),
+      rgba(11,8,5,0.95);
+    box-shadow: 0 26px 90px rgba(0,0,0,0.72), 0 0 0 6px rgba(91,68,12,0.14), inset 0 1px 0 rgba(255,242,177,0.1);
+    overflow: hidden; pointer-events: auto;
+  }
+  .trainer-card::before {
+    content: ''; position: absolute; top: 0; left: 7%; right: 7%; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,226,100,0.9), transparent);
+    box-shadow: 0 0 24px rgba(255,210,50,0.52);
+  }
+  .trainer-card::after {
+    content: 'SIM // 01'; position: absolute; right: 22px; bottom: 16px;
+    font-family: 'Orbitron', sans-serif; font-size: 7px; letter-spacing: 3px;
+    color: rgba(255,224,105,0.23);
+  }
+
+  .trainer-visual {
+    position: relative; display: grid; place-items: center; min-height: 310px;
+    border-right: 1px solid rgba(255,220,90,0.12); padding-right: 24px;
+  }
+  .trainer-orbit { width: min(100%, 270px); overflow: visible; filter: drop-shadow(0 16px 28px rgba(0,0,0,0.5)); }
+  .trainer-grid-ring {
+    fill: none; stroke: rgba(255,225,125,0.18); stroke-width: 1;
+    stroke-dasharray: 4 9; transform-origin: 130px 130px;
+    animation: trainerOrbitDash 15s linear infinite;
+  }
+  .trainer-grid-ring.ring-b { stroke: rgba(86,242,181,0.2); animation-duration: 19s; animation-direction: reverse; }
+  .trainer-grid-ring.ring-c { stroke: rgba(255,235,170,0.12); animation-duration: 22s; }
+  .trainer-flight-path {
+    fill: none; stroke: url(#trainerPathStroke); stroke-width: 2; stroke-linecap: round;
+    stroke-dasharray: 3 7; opacity: 0.82; animation: trainerPathFlow 1.2s linear infinite;
+  }
+  .trainer-home { fill: url(#trainerPlanetFill); stroke: rgba(255,239,171,0.65); stroke-width: 1; }
+  .trainer-goal-glow { fill: rgba(77,255,174,0.08); stroke: rgba(77,255,174,0.34); animation: trainerGoalPulse 1.8s ease-in-out infinite; }
+  .trainer-goal { fill: #154f32; stroke: #57f3ad; stroke-width: 2; filter: url(#trainerGlow); }
+  .trainer-demo-ball { animation: trainerDemoFlight 4.4s cubic-bezier(0.42,0,0.25,1) infinite; }
+  .trainer-visual-copy {
+    position: absolute; bottom: 7px; left: 0; right: 24px; text-align: center;
+    font-family: 'Orbitron', sans-serif; font-size: 7px; font-weight: 700;
+    letter-spacing: 2.6px; color: rgba(255,228,122,0.46);
+  }
+  @keyframes trainerOrbitDash { to { stroke-dashoffset: -130; transform: rotate(360deg); } }
+  @keyframes trainerPathFlow { to { stroke-dashoffset: -20; } }
+  @keyframes trainerGoalPulse {
+    0%, 100% { transform: scale(0.88); transform-origin: 214px 116px; opacity: 0.45; }
+    50% { transform: scale(1.22); transform-origin: 214px 116px; opacity: 1; }
+  }
+  @keyframes trainerDemoFlight {
+    0%, 8% { transform: translate(54px, 174px) scale(0.8); opacity: 0; }
+    15% { opacity: 1; }
+    38% { transform: translate(91px, 89px) scale(1); }
+    68% { transform: translate(160px, 69px) scale(1); }
+    88%, 94% { transform: translate(214px, 117px) scale(0.8); opacity: 1; }
+    100% { transform: translate(214px, 117px) scale(0.5); opacity: 0; }
+  }
+
+  .trainer-content { position: relative; z-index: 1; }
+  .trainer-kicker {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    margin-bottom: 16px; font-family: 'Orbitron', sans-serif;
+    font-size: 8px; font-weight: 900; letter-spacing: 3px; color: var(--trainer-gold);
+  }
+  #trainerStatus {
+    padding: 5px 8px; border: 1px solid rgba(84,242,179,0.28); border-radius: 999px;
+    font-size: 6px; letter-spacing: 1.7px; color: rgba(106,255,198,0.76);
+    background: rgba(26,104,72,0.11); white-space: nowrap;
+  }
+  #trainerProgress { display: flex; gap: 6px; margin-bottom: 25px; }
+  #trainerProgress span {
+    flex: 1; height: 3px; border-radius: 3px; background: rgba(255,224,104,0.13);
+    box-shadow: inset 0 0 0 1px rgba(255,228,130,0.04); transition: background 0.25s, box-shadow 0.25s, transform 0.25s;
+  }
+  #trainerProgress span.active {
+    background: #ffe366; box-shadow: 0 0 12px rgba(255,217,66,0.55); transform: scaleY(1.6);
+  }
+  #trainerProgress span.done { background: #55e9aa; box-shadow: 0 0 9px rgba(78,233,169,0.28); }
+  #trainerStepLabel {
+    margin-bottom: 7px; font-family: 'Orbitron', sans-serif; font-size: 7px;
+    font-weight: 900; letter-spacing: 3.5px; color: rgba(255,225,116,0.5);
+  }
+  #trainerTitle {
+    margin-bottom: 12px; font-family: 'Orbitron', sans-serif; font-size: clamp(25px, 3.2vw, 37px);
+    line-height: 1.08; font-weight: 900; letter-spacing: 4px; color: #ffe56c;
+    text-shadow: 0 0 28px rgba(255,210,40,0.24);
+  }
+  #trainerBody {
+    max-width: 430px; min-height: 54px; font-size: 13px; line-height: 1.72;
+    color: rgba(236,221,175,0.77); letter-spacing: 0.25px;
+  }
+  #trainerBody strong { color: #fff0a5; font-weight: 800; }
+  #trainerHint {
+    min-height: 14px; margin-top: 14px; font-family: 'Orbitron', sans-serif;
+    font-size: 7px; line-height: 1.5; letter-spacing: 1.45px; color: rgba(108,239,190,0.56);
+  }
+  .trainer-actions { display: flex; align-items: center; gap: 10px; margin-top: 25px; }
+  .trainer-actions button { pointer-events: auto; white-space: nowrap; }
+  .trainer-actions #startBtn {
+    margin: 0 0 0 auto; padding: 13px 24px; border-radius: 10px;
+    font-size: 11px; letter-spacing: 3px;
+  }
+  .trainer-actions #skipBtn, .trainer-actions #trainerResetBtn {
+    margin: 0; padding: 10px 14px; border: 1px solid rgba(255,220,100,0.22); border-radius: 8px;
+    background: rgba(13,10,5,0.72); color: rgba(255,226,126,0.54);
+    font-family: 'Orbitron', sans-serif; font-size: 7px; font-weight: 800; letter-spacing: 1.7px;
+    cursor: pointer; transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .trainer-actions #skipBtn:hover, .trainer-actions #trainerResetBtn:hover {
+    color: #ffe88b; border-color: rgba(255,224,108,0.56); background: rgba(50,39,10,0.68);
+  }
+  #trainerResetBtn { display: none; }
+
+  #instructions.launch-lab.training .trainer-card {
+    top: auto; left: 18px; bottom: 18px; transform: none;
+    width: min(370px, calc(100vw - 36px)); min-height: 0; display: block;
+    padding: 17px 18px 15px; border-radius: 15px; pointer-events: none;
+    background: linear-gradient(120deg, rgba(255,214,70,0.07), transparent 42%), rgba(8,6,4,0.92);
+    box-shadow: 0 16px 54px rgba(0,0,0,0.62), 0 0 0 4px rgba(92,68,11,0.1), inset 0 1px 0 rgba(255,243,177,0.08);
+  }
+  #instructions.launch-lab.training .trainer-card::after { display: none; }
+  #instructions.launch-lab.training .trainer-visual { display: none; }
+  #instructions.launch-lab.training .trainer-kicker { margin-bottom: 9px; font-size: 7px; }
+  #instructions.launch-lab.training #trainerProgress { margin-bottom: 13px; }
+  #instructions.launch-lab.training #trainerStepLabel { margin-bottom: 4px; }
+  #instructions.launch-lab.training #trainerTitle { margin-bottom: 7px; font-size: 18px; line-height: 1.12; letter-spacing: 2.7px; }
+  #instructions.launch-lab.training #trainerBody { min-height: 0; font-size: 10px; line-height: 1.55; }
+  #instructions.launch-lab.training #trainerHint { min-height: 0; margin-top: 7px; font-size: 6px; }
+  #instructions.launch-lab.training .trainer-actions { margin-top: 11px; }
+  #instructions.launch-lab.training #startBtn { display: none; }
+  #instructions.launch-lab.training #trainerResetBtn { display: inline-block; }
+  #instructions.launch-lab.training #skipBtn { margin-left: auto; }
+
+  #instructions.launch-lab.complete::before { opacity: 1; }
+  #instructions.launch-lab.complete .trainer-visual { display: grid; }
+  #instructions.launch-lab.complete #trainerResetBtn,
+  #instructions.launch-lab.complete #skipBtn { display: none; }
+  #instructions.launch-lab.complete #startBtn { display: inline-block; }
+  #instructions.launch-lab.complete #trainerProgress span {
+    background: #55e9aa; box-shadow: 0 0 9px rgba(78,233,169,0.28); transform: none;
+  }
+
+  #trainerTargetRing {
+    --target-w: 74px; --target-h: 74px;
+    display: none; position: fixed; z-index: 32; width: var(--target-w); height: var(--target-h);
+    box-sizing: border-box; border: 2px solid rgba(255,229,112,0.94); border-radius: 50%;
+    pointer-events: none; transform: translate3d(-200px,-200px,0);
+    box-shadow: 0 0 0 7px rgba(255,220,64,0.1), 0 0 27px rgba(255,207,35,0.52), inset 0 0 16px rgba(255,226,95,0.1);
+    animation: trainerTargetPulse 1.15s ease-in-out infinite;
+  }
+  #trainerTargetRing.visible { display: block; }
+  #trainerTargetRing::before {
+    content: ''; position: absolute; inset: -8px; border: 1px dashed rgba(255,230,125,0.46);
+    border-radius: inherit; animation: trainerTargetSpin 7s linear infinite;
+  }
+  #trainerTargetLabel {
+    position: absolute; left: 50%; bottom: calc(100% + 12px); transform: translateX(-50%);
+    padding: 5px 8px; border: 1px solid rgba(255,226,110,0.32); border-radius: 6px;
+    background: rgba(10,7,3,0.88); color: #ffe678; white-space: nowrap;
+    font-family: 'Orbitron', sans-serif; font-size: 7px; font-weight: 900; letter-spacing: 2px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+  }
+  @keyframes trainerTargetPulse {
+    0%, 100% { box-shadow: 0 0 0 5px rgba(255,220,64,0.08), 0 0 21px rgba(255,207,35,0.38), inset 0 0 14px rgba(255,226,95,0.08); }
+    50% { box-shadow: 0 0 0 11px rgba(255,220,64,0.14), 0 0 38px rgba(255,207,35,0.72), inset 0 0 22px rgba(255,226,95,0.16); }
+  }
+  @keyframes trainerTargetSpin { to { transform: rotate(360deg); } }
+  .trainer-card.step-flash { animation: trainerStepFlash 0.34s ease; }
+  @keyframes trainerStepFlash {
+    0% { border-color: rgba(96,255,193,0.85); box-shadow: 0 0 36px rgba(75,242,178,0.32); }
+    100% { border-color: rgba(255,218,88,0.36); }
+  }
+  body.trainer-running #stats, body.trainer-running #topRightBtns { opacity: 0.48; transition: opacity 0.25s; }
+  body.trainer-running .trainer-focus {
+    filter: brightness(1.22); box-shadow: 0 0 0 2px rgba(255,230,116,0.34), 0 0 22px rgba(255,207,45,0.38) !important;
+  }
+
+  @media (max-width: 680px) {
+    #instructions.launch-lab { max-height: none; overflow: hidden; }
+    #instructions.launch-lab .trainer-card {
+      width: calc(100vw - 24px); min-height: 0; grid-template-columns: 126px 1fr;
+      gap: 16px; padding: 18px 17px; border-radius: 18px;
+    }
+    #instructions.launch-lab .trainer-visual { min-height: 220px; padding-right: 13px; }
+    #instructions.launch-lab .trainer-visual-copy { right: 13px; font-size: 5px; letter-spacing: 1.4px; }
+    #instructions.launch-lab .trainer-kicker { margin-bottom: 9px; font-size: 6px; letter-spacing: 2px; }
+    #instructions.launch-lab #trainerStatus { font-size: 5px; padding: 4px 6px; letter-spacing: 1px; }
+    #instructions.launch-lab #trainerProgress { margin-bottom: 14px; gap: 4px; }
+    #instructions.launch-lab #trainerStepLabel { font-size: 6px; }
+    #instructions.launch-lab #trainerTitle { margin-bottom: 8px; font-size: 20px; letter-spacing: 2.5px; }
+    #instructions.launch-lab #trainerBody { min-height: 0; font-size: 10px; line-height: 1.55; }
+    #instructions.launch-lab #trainerHint { margin-top: 8px; font-size: 5px; }
+    #instructions.launch-lab .trainer-actions { margin-top: 14px; gap: 6px; }
+    #instructions.launch-lab .trainer-actions #startBtn { padding: 10px 14px; font-size: 8px; letter-spacing: 2px; }
+    #instructions.launch-lab .trainer-actions #skipBtn,
+    #instructions.launch-lab .trainer-actions #trainerResetBtn { padding: 8px 9px; font-size: 6px; letter-spacing: 1px; }
+
+    #instructions.launch-lab.training .trainer-card {
+      top: 66px; left: 10px; right: 10px; bottom: auto; width: auto;
+      padding: 11px 12px 10px; border-radius: 12px;
+    }
+    #instructions.launch-lab.training .trainer-kicker { margin-bottom: 5px; }
+    #instructions.launch-lab.training #trainerProgress { margin-bottom: 8px; }
+    #instructions.launch-lab.training #trainerStepLabel { font-size: 5px; }
+    #instructions.launch-lab.training #trainerTitle { margin-bottom: 4px; font-size: 14px; letter-spacing: 2px; }
+    #instructions.launch-lab.training #trainerBody { font-size: 8px; line-height: 1.4; }
+    #instructions.launch-lab.training #trainerHint { margin-top: 4px; font-size: 5px; line-height: 1.3; }
+    #instructions.launch-lab.training .trainer-actions { margin-top: 7px; }
+    #trainerTargetLabel { font-size: 6px; bottom: calc(100% + 9px); }
+  }
+
+  @media (max-width: 430px) {
+    #instructions.launch-lab .trainer-card { display: block; padding: 16px; }
+    #instructions.launch-lab:not(.training) .trainer-visual { display: none; }
+    #instructions.launch-lab:not(.training) .trainer-card { max-width: 350px; }
+    #instructions.launch-lab:not(.training) #trainerTitle { font-size: 24px; }
+    #instructions.launch-lab:not(.training) #trainerBody { font-size: 11px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trainer-grid-ring, .trainer-flight-path, .trainer-goal-glow, .trainer-demo-ball,
+    #trainerTargetRing, #trainerTargetRing::before { animation: none !important; }
   }
 
   /* === Level Title Card (cinematic intro) === */
@@ -1893,19 +2047,6 @@
     #ballLoreText { font-size: 10px; }
     #playBtn { padding: 12px 40px; font-size: 13px; }
 
-    /* Guide / instructions */
-    #instructions { max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
-    .guide-steps { flex-direction: row; align-items: center; gap: 0; flex-wrap: nowrap; overflow: hidden; position: relative; }
-    .guide-step { max-width: 280px; min-width: 280px; padding: 20px 14px 16px; flex-shrink: 0;
-      display: none; }
-    .guide-step.carousel-active { display: block; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    #guideDots { display: block; }
-    .guide-title { font-size: 10px; margin-bottom: 16px; }
-    .guide-footer { font-size: 8px; letter-spacing: 1px; margin-bottom: 12px; }
-    #startBtn { padding: 12px 36px; font-size: 13px; margin-bottom: 20px; }
-    #skipBtn { font-size: 10px; padding: 8px 20px; }
-
     /* Live metrics */
     #liveMetrics { padding: 6px 12px; }
     .metric { padding: 0 8px; }
@@ -1974,15 +2115,6 @@
     #ballLoreText { font-size: 9px; }
     #playBtn { padding: 10px 32px; font-size: 12px; }
 
-    /* Guide */
-    .guide-step { max-width: 240px; min-width: 200px; padding: 18px 12px 14px; }
-    .step-emoji { font-size: 28px; margin-bottom: 8px; }
-    .step-title { font-size: 10px; letter-spacing: 2px; }
-    .step-desc { font-size: 11px; line-height: 1.6; }
-    #startBtn { padding: 10px 28px; font-size: 12px; }
-    #skipBtn { font-size: 8px; padding: 6px 14px; }
-    .guide-step { max-width: 240px; min-width: 240px; padding: 16px 12px 12px; }
-
     /* Metrics */
     #liveMetrics { padding: 4px 8px; bottom: 12px; }
     .metric-val { font-size: 12px; }
@@ -2032,6 +2164,108 @@
   #sessionStatsOverlay.visible { opacity: 1; }
   #sessionStatsOverlay .stat-line { margin: 4px 0; }
   #sessionStatsOverlay .stat-highlight { color: #ffe566; font-weight: 700; }
+
+  /* === Orbital mastery === */
+  #routeChip {
+    display: none; position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
+    z-index: 23; padding: 7px 12px; pointer-events: none;
+    border: 1px solid rgba(255,218,85,0.24); border-radius: 7px;
+    background: rgba(20,15,6,0.82); color: rgba(255,226,120,0.72);
+    font-family: 'Orbitron', sans-serif; font-size: 7px; font-weight: 800; letter-spacing: 2px;
+    white-space: nowrap; transition: color 0.2s, text-shadow 0.2s;
+  }
+  #routeChip.visible { display: block; }
+  #routeChip.pilot {
+    color: #77ffbd; text-shadow: 0 0 10px rgba(70,255,170,0.55);
+  }
+  #masteryHud {
+    display: none; position: fixed; top: 92px; left: 50%; transform: translateX(-50%);
+    z-index: 18; min-width: 220px; padding: 9px 16px 8px; pointer-events: none;
+    border: 1px solid rgba(255,211,75,0.26); border-radius: 10px;
+    background: linear-gradient(135deg, rgba(23,16,5,0.82), rgba(8,6,15,0.76));
+    box-shadow: 0 6px 24px rgba(0,0,0,0.38), inset 0 0 18px rgba(255,202,50,0.035);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    font-family: 'Orbitron', sans-serif; text-align: center;
+  }
+  #masteryHud.visible { display: block; animation: masteryHudIn 0.24s ease-out; }
+  #masteryHud.hot { border-color: rgba(99,255,187,0.58); box-shadow: 0 0 25px rgba(60,255,170,0.12); }
+  #comboLabel { color: #ffe078; font-size: 9px; font-weight: 800; letter-spacing: 3px; }
+  #comboMeta { margin-top: 4px; color: rgba(255,240,190,0.55); font-size: 7px; letter-spacing: 2px; }
+  #comboMeter { height: 2px; margin-top: 7px; overflow: hidden; border-radius: 2px; background: rgba(255,255,255,0.08); }
+  #comboMeterFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ffd23c, #58ffb4); box-shadow: 0 0 8px rgba(88,255,180,0.7); }
+  #styleBurst {
+    position: fixed; top: 40%; left: 50%; z-index: 30; pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.82); opacity: 0;
+    font-family: 'Orbitron', sans-serif; text-align: center;
+    color: var(--burst-color, #ffe16b); text-shadow: 0 0 20px currentColor;
+  }
+  #styleBurst.show { animation: styleBurst 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+  #styleBurstLabel { font-size: 19px; font-weight: 900; letter-spacing: 5px; white-space: nowrap; }
+  #styleBurstPoints { margin-top: 5px; font-size: 10px; font-weight: 800; letter-spacing: 3px; }
+  #abilityBtn {
+    --ability-color: #ffdd44;
+    background: linear-gradient(180deg, rgba(42,31,8,0.96), rgba(19,14,4,0.96));
+    border: 2px solid color-mix(in srgb, var(--ability-color) 58%, transparent);
+    border-radius: 9px; color: var(--ability-color); padding: 9px 16px; cursor: pointer;
+    font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 900; letter-spacing: 2px;
+    box-shadow: 0 3px 0 rgba(63,47,5,0.8), 0 0 14px color-mix(in srgb, var(--ability-color) 18%, transparent);
+    white-space: nowrap; transition: transform 0.15s, opacity 0.2s, border-color 0.2s;
+  }
+  #abilityBtn:hover { transform: translateY(-1px); border-color: var(--ability-color); }
+  #abilityBtn:active { transform: translateY(2px); }
+  #abilityBtn.used { opacity: 0.36; filter: saturate(0.25); cursor: default; }
+  #bestGhostLegend {
+    display: none; position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%);
+    z-index: 17; pointer-events: none; color: rgba(255,224,105,0.62);
+    font-family: 'Orbitron', sans-serif; font-size: 7px; font-weight: 700; letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255,210,70,0.35);
+  }
+  #bestGhostLegend.visible { display: block; }
+  #masteryMedals { display: none; justify-content: center; gap: 7px; margin: 12px 0 3px; }
+  #masteryMedals.visible { display: flex; }
+  .mastery-medal {
+    min-width: 65px; padding: 6px 8px; border-radius: 8px;
+    border: 1px solid rgba(255,215,75,0.28); background: rgba(35,26,7,0.72);
+    color: rgba(255,230,145,0.52); font-family: 'Orbitron', sans-serif;
+    font-size: 7px; font-weight: 800; letter-spacing: 1px;
+    -webkit-text-fill-color: rgba(255,230,145,0.52);
+  }
+  .mastery-medal.earned {
+    color: #ffe372; -webkit-text-fill-color: #ffe372;
+    border-color: rgba(255,220,85,0.64); box-shadow: 0 0 13px rgba(255,205,50,0.14);
+  }
+  #retryHoleBtn {
+    display: none; margin: 10px auto 0; padding: 9px 18px; min-width: 150px;
+    background: rgba(25,19,7,0.9); border: 2px solid rgba(255,210,65,0.34); border-radius: 8px;
+    color: rgba(255,225,125,0.9); -webkit-text-fill-color: rgba(255,225,125,0.9);
+    cursor: pointer; font-family: 'Orbitron', sans-serif;
+    font-size: 10px; font-weight: 900; letter-spacing: 3px;
+  }
+  #retryHoleBtn:hover { border-color: #ffdc58; color: #ffe98b; }
+  .sc-mastery { width: 58px; text-align: center; color: rgba(255,215,80,0.55); font-size: 9px; letter-spacing: 1px; }
+
+  @keyframes masteryHudIn { from { opacity: 0; transform: translateX(-50%) translateY(-5px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  @keyframes styleBurst {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.72); }
+    16% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+    68% { opacity: 0.95; transform: translate(-50%, -55%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -68%) scale(0.96); }
+  }
+  @media (max-width: 760px) {
+    #masteryHud { top: 72px; min-width: 175px; padding: 7px 11px; }
+    #comboLabel { font-size: 7px; }
+    #comboMeta { font-size: 6px; }
+    #styleBurstLabel { font-size: 13px; letter-spacing: 3px; }
+    #abilityBtn { padding: 8px 10px; font-size: 7px; letter-spacing: 1px; }
+    #bestGhostLegend { bottom: 64px; }
+    #routeChip { bottom: 63px; max-width: 82vw; overflow: hidden; text-overflow: ellipsis; }
+    #gameBottomBar.in-flight { bottom: 126px; opacity: 1 !important; }
+    #gameBottomBar.in-flight #findBallBtn { display: none; }
+    .mastery-medal { min-width: 52px; padding: 5px 6px; font-size: 6px; }
+  }
+  @media (max-width: 480px) {
+    #gameBottomBar.in-flight { bottom: 108px; }
+  }
 </style>
 </head>
 <body>
@@ -2094,6 +2328,16 @@
 <div id="nudgeFlash">BOOST!</div>
 <div id="boostChargeBar"><div id="boostChargeFill"></div></div>
 <div id="boostActiveGlow"></div>
+<div id="masteryHud">
+  <div id="comboLabel">ORBITAL MASTERY</div>
+  <div id="comboMeta">SKIM GRAVITY TO CHAIN</div>
+  <div id="comboMeter"><div id="comboMeterFill"></div></div>
+</div>
+<div id="styleBurst">
+  <div id="styleBurstLabel">GRAVITY GRAZE</div>
+  <div id="styleBurstPoints">+100 STYLE</div>
+</div>
+<div id="bestGhostLegend">PERSONAL BEST FLIGHT PATH</div>
 
 <div id="levelTitleCard">
   <div class="hole-num" id="titleHoleNum">HOLE 1</div>
@@ -2157,6 +2401,7 @@
     <div id="powerLabel">PWR</div>
   </div>
 </div>
+<div id="routeChip">ASSISTED ROUTE</div>
 
 <!-- Hidden PWR slider for JS compat -->
 <input type="range" id="aimPwr" style="display:none" min="0" max="100" value="50" step="1">
@@ -2165,7 +2410,9 @@
 <div id="message">
   <div id="msgText"></div>
   <div class="sub" id="msgSub"></div>
+  <div id="masteryMedals"></div>
   <button id="nextHoleBtn">NEXT HOLE</button>
+  <button id="retryHoleBtn">RETRY HOLE</button>
   <div id="unlockPrompt">
     <button id="unlockPromptBtn">★ UNLOCK HOLES 6-18</button>
   </div>
@@ -2353,52 +2600,57 @@
   </div>
 </div>
 
-<div id="instructions">
-  <div class="guide-title">HOW TO PLAY</div>
-  
-  <div class="guide-steps">
-    <div class="guide-step aim-step" data-step="0">
-      <div class="step-number">1</div>
-      <div class="step-emoji">🏌️</div>
-      <div class="step-title">AIM</div>
-      <div class="step-desc">
-        <strong>Drag the ball backward</strong> to aim slingshot-style. Release to lock your angle, then orbit the camera to check your shot. Drag ball again to re-aim.
-      </div>
+<div id="instructions" class="launch-lab">
+  <div class="trainer-card">
+    <div class="trainer-visual" aria-hidden="true">
+      <svg class="trainer-orbit" viewBox="0 0 260 260" role="presentation">
+        <defs>
+          <radialGradient id="trainerPlanetFill" cx="35%" cy="28%">
+            <stop offset="0" stop-color="#fff0a0"/>
+            <stop offset="0.38" stop-color="#d2a936"/>
+            <stop offset="1" stop-color="#493406"/>
+          </radialGradient>
+          <linearGradient id="trainerPathStroke" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff0a0"/>
+            <stop offset="1" stop-color="#54f2b3"/>
+          </linearGradient>
+          <filter id="trainerGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <circle class="trainer-grid-ring ring-a" cx="130" cy="130" r="104"/>
+        <ellipse class="trainer-grid-ring ring-b" cx="130" cy="130" rx="112" ry="54" transform="rotate(-24 130 130)"/>
+        <ellipse class="trainer-grid-ring ring-c" cx="130" cy="130" rx="70" ry="116" transform="rotate(38 130 130)"/>
+        <path class="trainer-flight-path" d="M54 174 C86 62 174 56 214 117"/>
+        <circle class="trainer-home" cx="52" cy="176" r="29"/>
+        <circle class="trainer-goal-glow" cx="214" cy="116" r="24"/>
+        <circle class="trainer-goal" cx="214" cy="116" r="16"/>
+        <g class="trainer-demo-ball" filter="url(#trainerGlow)">
+          <circle cx="0" cy="0" r="6" fill="#fff4b1"/>
+          <circle cx="-2" cy="-2" r="2" fill="#ffffff"/>
+        </g>
+      </svg>
+      <div class="trainer-visual-copy">REAL PHYSICS · ZERO STAKES</div>
     </div>
-    
-    <div class="guide-step fire-step" data-step="1">
-      <div class="step-number">2</div>
-      <div class="step-emoji">🚀</div>
-      <div class="step-title">FIRE</div>
-      <div class="step-desc">
-        Press <strong>Space</strong> or tap <strong>FIRE</strong> to launch! Adjust power with the slider. Mid-flight, hold <strong>Space</strong> or tap screen to boost (unlimited).
-      </div>
-    </div>
-    
-    <div class="guide-step score-step" data-step="2">
-      <div class="step-number">3</div>
-      <div class="step-emoji">⛳</div>
-      <div class="step-title">SCORE</div>
-      <div class="step-desc">
-        Land on the <strong>goal planet</strong> near the white flag. Use gravity to curve your shots! Fewer strokes = better score. Beat par on all 18 holes!
-      </div>
-    </div>
-  </div>
-  
-  <div id="guideDots">
-    <span class="guide-dot active" data-dot="0"></span>
-    <span class="guide-dot" data-dot="1"></span>
-    <span class="guide-dot" data-dot="2"></span>
-  </div>
 
-  <div class="guide-footer">
-    <strong>G</strong> gravity fields · <strong>Tab</strong> scorecard · <strong>R</strong> reset · <strong>W</strong>+drag pan
+    <div class="trainer-content">
+      <div class="trainer-kicker">
+        <span>LAUNCH LAB</span>
+        <span id="trainerStatus">PRACTICE FLIGHT</span>
+      </div>
+      <div id="trainerProgress" aria-label="Training progress">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div id="trainerStepLabel">ORIENTATION</div>
+      <div id="trainerTitle">LEARN BY FLYING</div>
+      <div id="trainerBody">Complete one guided practice shot using the actual controls, gravity, camera, and your selected ball.</div>
+      <div id="trainerHint">The drill does not affect strokes, medals, artifacts, or progression.</div>
+      <div class="trainer-actions">
+        <button id="skipBtn">SKIP TRAINING</button>
+        <button id="trainerResetBtn">RESET DRILL</button>
+        <button id="startBtn">START TRAINING</button>
+      </div>
+    </div>
   </div>
-  
-  <div class="guide-btns">
-    <button id="skipBtn">SKIP</button>
-    <button id="startBtn">LAUNCH</button>
-  </div>
+  <div id="trainerTargetRing" aria-hidden="true"><span id="trainerTargetLabel">BALL</span></div>
 </div>
 
 <!-- Unified bottom toolbar -->
@@ -2406,6 +2658,7 @@
 <div id="gameBottomBar">
   <button id="aimToggleBtn">⊕ AIM</button>
   <button id="findBallBtn">◎ FIND BALL</button>
+  <button id="abilityBtn" class="flight-only">Q · SOLAR MAGNET</button>
   <button id="fireBtn" class="aim-only">FIRE</button>
   <button id="cancelBtn" class="aim-only">CANCEL</button>
 </div>
@@ -2434,6 +2687,10 @@
   <div class="key-row">
     <span class="key-label">PATH</span>
     <div class="key-box" id="kA">A</div>
+  </div>
+  <div class="key-row">
+    <span class="key-label">ABILITY</span>
+    <div class="key-box" id="kQ">Q</div>
   </div>
   <div class="key-separator"></div>
   <div class="key-row">
@@ -2797,6 +3054,41 @@ function playNudgeSound() {
   hpf.type = 'highpass'; hpf.frequency.value = 3000;
   nSrc.connect(hpf); hpf.connect(ng); ng.connect(sfxGain);
   nSrc.start(t); nSrc.stop(t + nLen);
+}
+
+function playMasterySound(combo, isWormhole) {
+  if (!audioCtx || !soundEnabled) return;
+  const t = audioCtx.currentTime;
+  const root = (isWormhole ? 330 : 440) * Math.pow(2, Math.min(combo - 1, 5) / 12);
+  [1, 1.5].forEach((ratio, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = i === 0 ? 'sine' : 'triangle';
+    osc.frequency.setValueAtTime(root * ratio, t);
+    osc.frequency.exponentialRampToValueAtTime(root * ratio * 1.35, t + 0.16);
+    gain.gain.setValueAtTime(i === 0 ? 0.12 : 0.055, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.34);
+    osc.connect(gain); gain.connect(sfxGain);
+    osc.start(t + i * 0.025); osc.stop(t + 0.38);
+  });
+}
+
+function playAbilitySound(ballIndex) {
+  if (!audioCtx || !soundEnabled) return;
+  const t = audioCtx.currentTime;
+  const roots = [260, 390, 180, 310, 520, 440];
+  const root = roots[ballIndex] || 330;
+  [1, 1.25, 1.5].forEach((ratio, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = i === 0 ? 'sine' : 'triangle';
+    osc.frequency.setValueAtTime(root * ratio, t);
+    osc.frequency.exponentialRampToValueAtTime(root * ratio * 2, t + 0.24);
+    gain.gain.setValueAtTime(0.1 - i * 0.018, t + i * 0.035);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    osc.connect(gain); gain.connect(sfxGain);
+    osc.start(t + i * 0.035); osc.stop(t + 0.6);
+  });
 }
 
 // --- UI Sound Effects ---
@@ -3947,8 +4239,8 @@ function animateArtifact(time, dt) {
   // Magnetic attraction toward ball when within range
   const toBall = ball.position.clone().sub(orbitPos);
   const distToBall = toBall.length();
-  const ATTRACT_RANGE = 12.0;
-  const ATTRACT_STRENGTH = 2.4;
+  const ATTRACT_RANGE = 12.0 * artifactMagnetMultiplier;
+  const ATTRACT_STRENGTH = 2.4 * artifactMagnetMultiplier;
   if (distToBall < ATTRACT_RANGE && distToBall > 0.1) {
     const pull = Math.pow(1.0 - distToBall / ATTRACT_RANGE, 2) * ATTRACT_STRENGTH;
     orbitPos.add(toBall.normalize().multiplyScalar(pull * distToBall));
@@ -3984,12 +4276,15 @@ function animateArtifact(time, dt) {
 function collectArtifact() {
   if (!activeArtifact || activeArtifact.collected) return;
   activeArtifact.collected = true;
-  artifactsCollected++;
+  if (!levelArtifacts[currentLevel]) artifactsCollected++;
   levelArtifacts[currentLevel] = true;
   
   // GRANT INFINITE BOOST
   hasInfiniteBoost = true;
   boostsRemaining = 999;
+  if (shotInFlight && !gameWon) {
+    awardFlightStyle('ARTIFACT CAPTURE', 250, 0xcc88ff, false, false);
+  }
   
   // Hide artifact meshes
   activeArtifact.pyramidMat.opacity = 0;
@@ -6427,6 +6722,7 @@ function performUndo() {
   flightTrailPositions.length = 0;
   document.getElementById('message').style.display = 'none';
   document.getElementById('nextHoleBtn').style.display = 'none';
+  document.getElementById('gameBottomBar').classList.remove('complete');
   hideOptimalPath();
   cancelLockedAim();
   controls.target.copy(ball.position);
@@ -6507,6 +6803,7 @@ function startBoostCharge() {
   if (!hasInfiniteBoost) boostsRemaining--;
   playNudgeSound();
   updateNudgeUI();
+  registerTrainerEvent('boost');
 
   const flash = document.getElementById('nudgeFlash');
   flash.textContent = 'BOOST!';
@@ -6600,6 +6897,7 @@ function updateBackgroundIntensity(levelIdx) {
 
 function loadLevel(idx) {
   clearLevel();
+  resetOrbitalMastery();
   // Hide game complete screen if open
   const gcScreen = document.getElementById('gameCompleteScreen');
   if (gcScreen) gcScreen.classList.remove('visible');
@@ -6777,6 +7075,7 @@ function loadLevel(idx) {
   document.getElementById('titleHoleName').textContent = lvl.name;
   document.getElementById('titleHolePar').textContent = 'PAR ' + lvl.par;
   titleCard.classList.add('visible');
+  showBestShotGhost(idx);
 }
 
 // ===================== GOLF BALL =====================
@@ -6848,6 +7147,30 @@ const boostRing = new THREE.Mesh(boostRingGeo, boostRingMat);
 boostRing.visible = false;
 scene.add(boostRing);
 
+// Reused mastery visuals. Effects borrow these meshes instead of allocating per graze.
+const masteryRingGeo = new THREE.TorusGeometry(0.9, 0.055, 8, 40);
+const masteryRings = [];
+for (let i = 0; i < 7; i++) {
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffdd55, transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const mesh = new THREE.Mesh(masteryRingGeo, material);
+  mesh.visible = false;
+  scene.add(mesh);
+  masteryRings.push({ mesh, material, life: 0, duration: 0.8, intensity: 1 });
+}
+
+const bestShotGhostGeo = new THREE.BufferGeometry();
+const bestShotGhostMat = new THREE.LineBasicMaterial({
+  color: 0xffd95c, transparent: true, opacity: 0.2,
+  blending: THREE.AdditiveBlending, depthWrite: false,
+});
+const bestShotGhostLine = new THREE.Line(bestShotGhostGeo, bestShotGhostMat);
+bestShotGhostLine.frustumCulled = false;
+bestShotGhostLine.visible = false;
+scene.add(bestShotGhostLine);
+
 // ===================== BALL COLOR PICKER =====================
 const BALL_COLORS = [
   { name: 'Classic', lore: 'Standard issue for all Gravity Golf cadets. No frills, all skill.', color: 0xeeeeff, emissive: 0x8899cc, glow: 0x88ccff, trail: 0x88ccff },
@@ -6858,7 +7181,312 @@ const BALL_COLORS = [
   { name: 'Sol', lore: 'The legendary golden orb. Said to carry the blessing of the cosmos itself.', color: 0xffcc00, emissive: 0xddaa00, glow: 0xffdd44, trail: 0xffcc33 },
 ];
 
+const BALL_ABILITIES = [
+  { name: 'STABILIZE', short: 'STABILIZE', description: 'Dampens speed and gently corrects toward the goal.' },
+  { name: 'PLASMA DRIVE', short: 'OVERDRIVE', description: 'Adds sustained thrust for 1.6 seconds.' },
+  { name: 'NOVA BURST', short: 'NOVA BURST', description: 'Detonates an instant forward velocity burst.' },
+  { name: 'GRAVITY BEND', short: 'BEND', description: 'Curves the flight toward the goal for 2.4 seconds.' },
+  { name: 'CRYO STASIS', short: 'STASIS', description: 'Slows the ball and weakens gravity for 1.8 seconds.' },
+  { name: 'SOLAR MAGNET', short: 'MAGNET', description: 'Greatly strengthens artifact attraction for 4 seconds.' },
+];
+
 let selectedBallColor = 5;
+
+// ===================== LAUNCH LAB TRAINER =====================
+const TRAINER_STEPS = [
+  {
+    event: 'aim', title: 'SELECT THE BALL', target: 'ball', targetLabel: 'YOUR BALL',
+    body: () => '<strong>' + (isTouchDevice ? 'Tap' : 'Click') + ' the glowing ball</strong> to load the guided route.',
+    hint: () => 'The gold path is a safe starting line, not a locked solution.',
+  },
+  {
+    event: 'adjust', title: 'SHAPE THE ROUTE', target: 'ball', targetLabel: 'DRAG TO ADJUST',
+    body: () => '<strong>Drag the ball again</strong> to change the shot. ' + (isTouchDevice ? 'A short pull is enough.' : 'You can also fine-tune power in AIM.'),
+    hint: () => 'Any deliberate adjustment unlocks the launch control.',
+  },
+  {
+    event: 'fire', title: 'COMMIT THE SHOT', target: 'fireBtn', targetLabel: isTouchDevice ? 'TAP FIRE' : 'SPACE / FIRE',
+    body: () => (isTouchDevice ? 'Tap <strong>FIRE</strong>' : 'Press <strong>Space</strong> or click <strong>FIRE</strong>') + ' to release the ball into live gravity.',
+    hint: () => 'The camera will follow automatically while still allowing orbit control.',
+  },
+  {
+    event: 'boost', title: 'BEND MOMENTUM', target: 'boostBtn', targetLabel: isTouchDevice ? 'HOLD BOOST' : 'HOLD SPACE',
+    body: () => (isTouchDevice ? 'Press and briefly hold <strong>BOOST</strong>' : 'Hold <strong>Space</strong> briefly') + ' to add thrust along the current flight direction.',
+    hint: () => 'Boost changes speed, so nearby gravity will bend the route differently.',
+  },
+  {
+    event: 'ability', title: 'DEPLOY ' + BALL_ABILITIES[selectedBallColor].short, target: 'abilityBtn', targetLabel: isTouchDevice ? 'TAP ABILITY' : 'PRESS Q',
+    body: () => (isTouchDevice ? 'Tap the ability control' : 'Press <strong>Q</strong>') + ' to use <strong>' + BALL_ABILITIES[selectedBallColor].name + '</strong> once during this flight.',
+    hint: () => BALL_ABILITIES[selectedBallColor].description,
+  },
+  {
+    event: 'land', title: 'FIND THE GREEN', target: 'goal', targetLabel: 'GREEN WORLD',
+    body: () => 'Flight controls are complete. <strong>Let gravity finish the approach</strong> and land in the beacon.',
+    hint: () => 'Missed the line? RESET DRILL starts another zero-stakes attempt.',
+  },
+];
+
+let trainerActive = false;
+let trainerCompleted = false;
+let trainerStep = -1;
+let trainerResetPending = false;
+let trainerResetTimer = null;
+let trainerTargetLayout = '';
+let trainerFocusTarget = null;
+const trainerScreenPoint = new THREE.Vector3();
+const instructionsEl = document.getElementById('instructions');
+const trainerCardEl = instructionsEl.querySelector('.trainer-card');
+const trainerStatusEl = document.getElementById('trainerStatus');
+const trainerStepLabelEl = document.getElementById('trainerStepLabel');
+const trainerTitleEl = document.getElementById('trainerTitle');
+const trainerBodyEl = document.getElementById('trainerBody');
+const trainerHintEl = document.getElementById('trainerHint');
+const trainerProgressEls = [...document.querySelectorAll('#trainerProgress span')];
+const trainerTargetEl = document.getElementById('trainerTargetRing');
+const trainerTargetLabelEl = document.getElementById('trainerTargetLabel');
+
+function clearTrainerFocus() {
+  if (!trainerFocusTarget) return;
+  trainerFocusTarget.classList.remove('trainer-focus');
+  trainerFocusTarget = null;
+}
+
+function hideTrainerTarget() {
+  if (!trainerTargetEl.classList.contains('visible') && !trainerFocusTarget && !trainerTargetLayout) return;
+  trainerTargetEl.classList.remove('visible');
+  trainerTargetLayout = '';
+  clearTrainerFocus();
+}
+
+function flashTrainerCard() {
+  trainerCardEl.classList.remove('step-flash');
+  void trainerCardEl.offsetWidth;
+  trainerCardEl.classList.add('step-flash');
+}
+
+function renderTrainerStep(flash = false) {
+  if (!trainerActive || trainerStep < 0 || trainerStep >= TRAINER_STEPS.length) return;
+  const step = TRAINER_STEPS[trainerStep];
+  if (trainerStep === 4) step.title = 'DEPLOY ' + BALL_ABILITIES[selectedBallColor].short;
+  trainerStatusEl.textContent = 'STEP ' + (trainerStep + 1) + ' / ' + TRAINER_STEPS.length;
+  trainerStepLabelEl.textContent = 'FLIGHT DRILL // 0' + (trainerStep + 1);
+  trainerTitleEl.textContent = step.title;
+  trainerBodyEl.innerHTML = step.body();
+  trainerHintEl.textContent = step.hint();
+  trainerProgressEls.forEach((el, index) => {
+    el.classList.toggle('done', index < trainerStep);
+    el.classList.toggle('active', index === trainerStep);
+  });
+  trainerTargetLabelEl.textContent = step.targetLabel;
+  trainerTargetLayout = '';
+  clearTrainerFocus();
+  if (step.target !== 'ball' && step.target !== 'goal') {
+    const target = document.getElementById(step.target);
+    if (target) {
+      target.classList.add('trainer-focus');
+      trainerFocusTarget = target;
+    }
+  }
+  if (flash) flashTrainerCard();
+}
+
+function showTrainerBriefing() {
+  clearTimeout(trainerResetTimer);
+  trainerActive = false;
+  trainerCompleted = false;
+  trainerResetPending = false;
+  trainerStep = -1;
+  document.body.classList.remove('trainer-running');
+  instructionsEl.className = 'launch-lab visible';
+  trainerStatusEl.textContent = 'PRACTICE FLIGHT';
+  trainerStepLabelEl.textContent = 'ORIENTATION';
+  trainerTitleEl.textContent = 'LEARN BY FLYING';
+  trainerBodyEl.textContent = 'Complete one guided practice shot using the actual controls, gravity, camera, and your selected ball.';
+  trainerHintEl.textContent = 'The drill does not affect strokes, medals, artifacts, or progression.';
+  trainerProgressEls.forEach(el => el.classList.remove('active', 'done'));
+  document.getElementById('startBtn').textContent = 'START TRAINING';
+  document.getElementById('skipBtn').textContent = 'SKIP TRAINING';
+  hideTrainerTarget();
+}
+
+function labelTrainerLevel() {
+  document.getElementById('subtitle').innerHTML = 'LAUNCH LAB &middot; ZERO STAKES';
+  document.getElementById('titleHoleNum').textContent = 'TRAINING FLIGHT';
+  document.getElementById('titleHoleName').textContent = 'LAUNCH LAB';
+  document.getElementById('titleHolePar').textContent = 'REAL PHYSICS · NO SCORE';
+}
+
+function loadTrainerDrill() {
+  clearTimeout(trainerResetTimer);
+  trainerResetPending = false;
+  trainerCompleted = false;
+  trainerStep = 0;
+  instructionsEl.className = 'launch-lab visible training';
+  document.body.classList.add('trainer-running');
+  currentLevel = 0;
+  loadLevel(0);
+  labelTrainerLevel();
+  document.getElementById('holeTime').textContent = '0.0';
+  document.getElementById('skipBtn').textContent = 'EXIT TRAINING';
+  renderTrainerStep(false);
+}
+
+function beginInteractiveTrainer() {
+  ensureAudio();
+  trainerActive = true;
+  instructionsEl.className = 'launch-lab visible training';
+  document.body.classList.add('trainer-running');
+  loadTrainerDrill();
+}
+
+function exitInteractiveTrainer() {
+  clearTimeout(trainerResetTimer);
+  trainerActive = false;
+  trainerCompleted = false;
+  trainerResetPending = false;
+  trainerStep = -1;
+  document.body.classList.remove('trainer-running');
+  instructionsEl.className = 'launch-lab';
+  hideTrainerTarget();
+  currentLevel = 0;
+  loadLevel(0);
+  document.getElementById('holeTime').textContent = '0.0';
+}
+
+function restartTrainerDrill(message, delay = 0) {
+  if (!trainerActive || trainerResetPending) return;
+  trainerResetPending = true;
+  hideTrainerTarget();
+  ballVel.set(0, 0, 0);
+  shotInFlight = false;
+  boostActive = false;
+  gameWon = true;
+  holeScored = true;
+  trainerTitleEl.textContent = 'RESETTING FLIGHT';
+  trainerBodyEl.textContent = message || 'Returning to the launch planet.';
+  trainerHintEl.textContent = 'No stroke or progression data was recorded.';
+  trainerResetTimer = setTimeout(loadTrainerDrill, delay);
+}
+
+function nudgeTrainer(message) {
+  if (!trainerActive) return;
+  trainerHintEl.textContent = message;
+  flashTrainerCard();
+  haptic(5);
+}
+
+function registerTrainerEvent(eventName) {
+  if (!trainerActive || trainerCompleted || trainerResetPending || trainerStep < 0) return false;
+  const expected = TRAINER_STEPS[trainerStep];
+  if (!expected || expected.event !== eventName) return false;
+
+  if (eventName === 'land') {
+    completeInteractiveTrainer();
+    return true;
+  }
+
+  trainerStep++;
+  renderTrainerStep(true);
+  haptic(7);
+  return true;
+}
+
+function completeInteractiveTrainer() {
+  if (!trainerActive || trainerCompleted) return;
+  trainerCompleted = true;
+  trainerStep = TRAINER_STEPS.length;
+  holeScored = true;
+  gameWon = true;
+  shotInFlight = false;
+  ball.position.copy(holePos);
+  ballVel.set(0, 0, 0);
+  playHoleSinkSound();
+  spawnCelebration(1.35);
+  document.body.classList.remove('trainer-running');
+  instructionsEl.className = 'launch-lab visible complete';
+  trainerStatusEl.textContent = 'DRILL COMPLETE';
+  trainerStepLabelEl.textContent = 'SYSTEMS VERIFIED';
+  trainerTitleEl.textContent = 'CLEARED TO LAUNCH';
+  trainerBodyEl.innerHTML = 'You aimed, adjusted, fired, boosted, deployed <strong>' + BALL_ABILITIES[selectedBallColor].name + '</strong>, and reached the green.';
+  trainerHintEl.textContent = 'Hole 1 will begin with a clean score and a fresh ability charge.';
+  trainerProgressEls.forEach(el => {
+    el.classList.remove('active');
+    el.classList.add('done');
+  });
+  _firstFlightShown = true;
+  try { localStorage.setItem('gg_firstFlight', '1'); } catch (e) {}
+  document.getElementById('startBtn').textContent = 'PLAY HOLE 1';
+  hideTrainerTarget();
+  hapticPattern([12, 32, 20, 32, 35]);
+}
+
+function handleTrainerLanding() {
+  if (!trainerActive) return false;
+  if (trainerStep === TRAINER_STEPS.length - 1) {
+    registerTrainerEvent('land');
+  } else {
+    holeScored = true;
+    gameWon = true;
+    restartTrainerDrill('Great landing. Run it once more and complete Boost plus Ability before entering the beacon.', 900);
+  }
+  return true;
+}
+
+function updateTrainerTarget() {
+  if (!trainerActive || trainerCompleted || trainerResetPending || introPlaying || trainerStep < 0) {
+    hideTrainerTarget();
+    return;
+  }
+
+  const step = TRAINER_STEPS[trainerStep];
+  let left = 0;
+  let top = 0;
+  let width = 74;
+  let height = 74;
+  let radius = '50%';
+
+  if (step.target === 'ball' || step.target === 'goal') {
+    trainerScreenPoint.copy(step.target === 'ball' ? ball.position : holePos).project(camera);
+    if (trainerScreenPoint.z < -1 || trainerScreenPoint.z > 1 || Math.abs(trainerScreenPoint.x) > 1.12 || Math.abs(trainerScreenPoint.y) > 1.12) {
+      hideTrainerTarget();
+      return;
+    }
+    const x = (trainerScreenPoint.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-trainerScreenPoint.y * 0.5 + 0.5) * window.innerHeight;
+    left = x - width / 2;
+    top = y - height / 2;
+  } else {
+    if (trainerTargetLayout) {
+      trainerTargetEl.classList.add('visible');
+      return;
+    }
+    const target = document.getElementById(step.target);
+    if (!target || getComputedStyle(target).display === 'none') {
+      hideTrainerTarget();
+      return;
+    }
+    target.classList.add('trainer-focus');
+    trainerFocusTarget = target;
+    const rect = target.getBoundingClientRect();
+    width = Math.max(74, rect.width + 18);
+    height = Math.max(54, rect.height + 18);
+    left = rect.left - 9;
+    top = rect.top - 9;
+    radius = '15px';
+  }
+
+  const layout = [Math.round(left), Math.round(top), Math.round(width), Math.round(height), radius].join(':');
+  if (layout !== trainerTargetLayout) {
+    trainerTargetLayout = layout;
+    trainerTargetEl.style.left = Math.round(left) + 'px';
+    trainerTargetEl.style.top = Math.round(top) + 'px';
+    trainerTargetEl.style.width = Math.round(width) + 'px';
+    trainerTargetEl.style.height = Math.round(height) + 'px';
+    trainerTargetEl.style.borderRadius = radius;
+    trainerTargetEl.style.transform = 'translate3d(0,0,0)';
+  }
+  trainerTargetEl.classList.add('visible');
+}
 
 let buildBallGrid; // declared here so mode handlers can access
 
@@ -6911,6 +7539,7 @@ function initBallPicker() {
         document.querySelectorAll('.ball-option').forEach(el => el.classList.remove('selected'));
         opt.classList.add('selected');
         selectedBallColor = idx;
+        updateAbilityUI();
       });
       opt.addEventListener('mouseenter', () => {
         const loreName = document.getElementById('ballLoreName');
@@ -6918,7 +7547,7 @@ function initBallPicker() {
         loreName.textContent = bc.name.toUpperCase();
         loreName.style.color = ballColorHex;
         lorePanel.style.borderColor = ballColorHex + '44';
-        document.getElementById('ballLoreText').textContent = bc.lore;
+        document.getElementById('ballLoreText').textContent = bc.lore + ' Ability: ' + BALL_ABILITIES[idx].description;
         lorePanel.classList.add('visible');
       });
       opt.addEventListener('mouseleave', () => {
@@ -7004,80 +7633,31 @@ function initBallPicker() {
     }
 
     document.getElementById('ballPicker').classList.add('hidden');
-    document.getElementById('instructions').classList.add('visible');
+    if (gameMode === '1p' && !dailyMode && !onlineMode) {
+      showTrainerBriefing();
+    } else {
+      instructionsEl.className = 'launch-lab';
+    }
   });
 
-  // Start button -> hide instructions and begin
+  // Start the drill, or leave its completion screen for a clean Hole 1.
   document.getElementById('startBtn').addEventListener('click', () => {
-    document.getElementById('instructions').classList.remove('visible');
+    if (trainerCompleted) {
+      exitInteractiveTrainer();
+    } else if (!trainerActive) {
+      beginInteractiveTrainer();
+    }
   });
 
-  // Skip button -> same as start
+  // Skipping still reloads Hole 1 so no background practice state leaks into the round.
   document.getElementById('skipBtn').addEventListener('click', () => {
     sfxClick();
-    document.getElementById('instructions').classList.remove('visible');
+    exitInteractiveTrainer();
   });
-
-  // === Mobile carousel for guide steps ===
-  let guideStep = 0;
-  const guideSteps = document.querySelectorAll('.guide-step');
-  const guideDots = document.querySelectorAll('.guide-dot');
-  const isMobileGuide = () => window.innerWidth <= 680;
-
-  function showGuideStep(idx) {
-    guideStep = Math.max(0, Math.min(2, idx));
-    guideSteps.forEach((s, i) => {
-      s.classList.toggle('carousel-active', i === guideStep);
-    });
-    guideDots.forEach((d, i) => {
-      d.classList.toggle('active', i === guideStep);
-    });
-    // Show LAUNCH on last step, NEXT on others
-    const startBtn = document.getElementById('startBtn');
-    if (isMobileGuide()) {
-      startBtn.textContent = guideStep === 2 ? 'LAUNCH' : 'NEXT';
-    } else {
-      startBtn.textContent = 'LAUNCH';
-    }
-  }
-
-  // Override start button on mobile to advance carousel
-  document.getElementById('startBtn').addEventListener('click', (e) => {
-    if (isMobileGuide() && guideStep < 2) {
-      e.stopImmediatePropagation();
-      showGuideStep(guideStep + 1);
-    }
-  }, true); // capture phase so it fires first
-
-  // Dot clicks
-  guideDots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      showGuideStep(parseInt(dot.dataset.dot));
-    });
+  document.getElementById('trainerResetBtn').addEventListener('click', () => {
+    sfxClick();
+    restartTrainerDrill('Returning to the launch planet.');
   });
-
-  // Swipe support
-  let guideSwipeX = 0;
-  const instrEl = document.getElementById('instructions');
-  instrEl.addEventListener('touchstart', (e) => {
-    guideSwipeX = e.touches[0].clientX;
-  }, { passive: true });
-  instrEl.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - guideSwipeX;
-    if (Math.abs(dx) > 50 && isMobileGuide()) {
-      if (dx < 0 && guideStep < 2) showGuideStep(guideStep + 1);
-      if (dx > 0 && guideStep > 0) showGuideStep(guideStep - 1);
-    }
-  }, { passive: true });
-
-  // Initialize carousel on show
-  const instrObserver = new MutationObserver(() => {
-    if (instrEl.classList.contains('visible') && isMobileGuide()) {
-      guideStep = 0;
-      showGuideStep(0);
-    }
-  });
-  instrObserver.observe(instrEl, { attributes: true, attributeFilter: ['class'] });
 }
 
 let ballPickPhase = 0; // 0 = P1 picking, 1 = P2 picking, 2 = done
@@ -7242,6 +7822,7 @@ function applyBallColor(idx) {
   for (const ml of motionLines) {
     ml.mat.color.setHex(bc.trail);
   }
+  updateAbilityUI();
 }
 
 // initBallPicker called at bottom after all declarations
@@ -7324,6 +7905,113 @@ function appendTrailPoint(points, position, maxPoints, minDistanceSq) {
   return true;
 }
 
+const MASTERY_STORAGE_KEY = 'gg_orbital_mastery_v1';
+let masteryData = { holes: {} };
+try {
+  const savedMastery = JSON.parse(localStorage.getItem(MASTERY_STORAGE_KEY) || 'null');
+  if (savedMastery && savedMastery.holes) masteryData = savedMastery;
+} catch (e) {}
+
+function masteryHoleKey(index) {
+  const level = LEVELS[index];
+  return level ? level.name : String(index);
+}
+
+function saveMasteryData() {
+  try { localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(masteryData)); } catch (e) {}
+}
+
+function sampleFlightPath(points, maxPoints = 96) {
+  if (!points || points.length < 2) return [];
+  const sampled = [];
+  const step = Math.max(1, Math.ceil(points.length / maxPoints));
+  for (let i = 0; i < points.length; i += step) {
+    const p = points[i];
+    sampled.push([
+      Math.round(p.x * 10) / 10,
+      Math.round(p.y * 10) / 10,
+      Math.round(p.z * 10) / 10,
+    ]);
+  }
+  const last = points[points.length - 1];
+  const roundedLast = [
+    Math.round(last.x * 10) / 10,
+    Math.round(last.y * 10) / 10,
+    Math.round(last.z * 10) / 10,
+  ];
+  const sampledLast = sampled[sampled.length - 1];
+  if (!sampledLast || sampledLast.some((value, index) => value !== roundedLast[index])) {
+    sampled.push(roundedLast);
+  }
+  return sampled;
+}
+
+function recordHoleMastery(holeIndex, strokeCount, par) {
+  const medals = {
+    precision: strokeCount <= par,
+    relic: !!levelArtifacts[holeIndex],
+    pilot: holePilotQualified || bestFlightCombo >= 2 || holeStyleScore >= 250,
+  };
+  if (dailyMode || gameMode !== '1p') return medals;
+
+  const key = masteryHoleKey(holeIndex);
+  const previous = masteryData.holes[key] || {};
+  const isBestAttempt = previous.bestStrokes === undefined
+    || strokeCount < previous.bestStrokes
+    || (strokeCount === previous.bestStrokes && holeStyleScore > (previous.bestStyle || 0));
+  const record = {
+    bestStrokes: previous.bestStrokes === undefined ? strokeCount : Math.min(previous.bestStrokes, strokeCount),
+    bestStyle: Math.max(previous.bestStyle || 0, holeStyleScore),
+    bestCombo: Math.max(previous.bestCombo || 0, bestFlightCombo),
+    medals: {
+      precision: !!(previous.medals && previous.medals.precision) || medals.precision,
+      relic: !!(previous.medals && previous.medals.relic) || medals.relic,
+      pilot: !!(previous.medals && previous.medals.pilot) || medals.pilot,
+    },
+    path: previous.path || [],
+  };
+  if (isBestAttempt && flightTrailPositions.length > 1) {
+    record.path = sampleFlightPath(flightTrailPositions);
+  }
+  masteryData.holes[key] = record;
+  saveMasteryData();
+  return medals;
+}
+
+function renderHoleMastery(medals) {
+  const el = document.getElementById('masteryMedals');
+  const entries = [
+    ['PRECISION', medals.precision],
+    ['RELIC', medals.relic],
+    ['PILOT', medals.pilot],
+  ];
+  el.innerHTML = entries.map(([label, earned]) =>
+    '<span class="mastery-medal' + (earned ? ' earned' : '') + '">' + (earned ? '◆ ' : '◇ ') + label + '</span>'
+  ).join('');
+  el.classList.add('visible');
+}
+
+function masterySymbols(index) {
+  const record = masteryData.holes[masteryHoleKey(index)];
+  if (!record || !record.medals) return '◇◇◇';
+  return ['precision', 'relic', 'pilot'].map(key => record.medals[key] ? '◆' : '◇').join('');
+}
+
+function showBestShotGhost(index) {
+  const legend = document.getElementById('bestGhostLegend');
+  bestShotGhostLine.visible = false;
+  legend.classList.remove('visible');
+  if (dailyMode || gameMode !== '1p') return;
+
+  const record = masteryData.holes[masteryHoleKey(index)];
+  if (!record || !record.path || record.path.length < 2) return;
+  const points = record.path.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+  updateDynamicLine(bestShotGhostLine, points);
+  bestShotGhostLine.visible = true;
+  legend.textContent = 'PERSONAL BEST · ' + record.bestStrokes + (record.bestStrokes === 1 ? ' STROKE' : ' STROKES') + ' · GOLD PATH';
+  legend.classList.add('visible');
+}
+
 // ===================== GAME STATE =====================
 let ballVel = new THREE.Vector3();
 let ballOnPlanet = null;
@@ -7404,6 +8092,304 @@ const POWER_OSC_DECAY = 0.8; // each bounce peak = previous * this
 let lockedWorldDir = new THREE.Vector3();
 let lockedNormal = new THREE.Vector3();
 
+// ===================== ORBITAL MASTERY =====================
+let holeStyleScore = 0;
+let flightCombo = 0;
+let bestFlightCombo = 0;
+let flightComboTimer = 0;
+let grazeCooldowns = new Map();
+let assistedLaunchDir = new THREE.Vector3();
+let assistedPowerNorm = 0;
+let assistBaselineReady = false;
+let manualAimDeviation = 0;
+let shotUsesPilotRoute = false;
+let holePilotQualified = false;
+let abilityUsed = false;
+let abilityMode = -1;
+let abilityTimer = 0;
+let abilityGravityScale = 1;
+let artifactMagnetMultiplier = 1;
+let _styleBurstTimer = null;
+let _lastMasteryMeterPct = -1;
+let _lastAbilityBallIndex = -1;
+
+const masteryHudEl = document.getElementById('masteryHud');
+const comboLabelEl = document.getElementById('comboLabel');
+const comboMetaEl = document.getElementById('comboMeta');
+const comboMeterFillEl = document.getElementById('comboMeterFill');
+const routeChipEl = document.getElementById('routeChip');
+const abilityBtnEl = document.getElementById('abilityBtn');
+
+function hexCss(color) {
+  return '#' + new THREE.Color(color).getHexString();
+}
+
+function spawnMasteryRing(position, color, intensity = 1) {
+  const ring = masteryRings.find(r => r.life <= 0) || masteryRings[0];
+  ring.life = ring.duration = intensity > 1.2 ? 1.05 : 0.78;
+  ring.intensity = intensity;
+  ring.mesh.position.copy(position);
+  ring.mesh.scale.setScalar(intensity > 1.2 ? 0.32 : 0.48);
+  ring.mesh.lookAt(camera.position);
+  ring.material.color.setHex(color);
+  ring.material.opacity = 0.65;
+  ring.mesh.visible = true;
+}
+
+function updateMasteryEffects(dt) {
+  for (const ring of masteryRings) {
+    if (ring.life <= 0) continue;
+    ring.life -= dt;
+    const progress = 1 - Math.max(0, ring.life) / ring.duration;
+    const scale = (0.45 + progress * 4.2) * ring.intensity;
+    ring.mesh.scale.setScalar(scale);
+    ring.mesh.lookAt(camera.position);
+    ring.mesh.rotateZ(dt * (3 + ring.intensity));
+    ring.material.opacity = Math.max(0, 1 - progress) * 0.62;
+    if (ring.life <= 0) {
+      ring.mesh.visible = false;
+      ring.material.opacity = 0;
+    }
+  }
+}
+
+function showStyleBurst(label, detail, color) {
+  const el = document.getElementById('styleBurst');
+  document.getElementById('styleBurstLabel').textContent = label;
+  document.getElementById('styleBurstPoints').textContent = detail;
+  el.style.setProperty('--burst-color', hexCss(color));
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  if (_styleBurstTimer) clearTimeout(_styleBurstTimer);
+  _styleBurstTimer = setTimeout(() => el.classList.remove('show'), 950);
+}
+
+function paintMasteryHud(label) {
+  masteryHudEl.classList.add('visible');
+  masteryHudEl.classList.toggle('hot', flightCombo >= 3);
+  const labelText = label || (flightCombo > 1 ? 'ORBITAL CHAIN ×' + flightCombo : 'ORBITAL MASTERY');
+  const metaText = holeStyleScore.toLocaleString() + ' STYLE · BEST CHAIN ×' + Math.max(1, bestFlightCombo);
+  const meterPct = Math.round(Math.max(0, flightComboTimer) / 4 * 100);
+  if (comboLabelEl.textContent !== labelText) comboLabelEl.textContent = labelText;
+  if (comboMetaEl.textContent !== metaText) comboMetaEl.textContent = metaText;
+  if (_lastMasteryMeterPct !== meterPct) {
+    _lastMasteryMeterPct = meterPct;
+    comboMeterFillEl.style.width = meterPct + '%';
+  }
+}
+
+function awardFlightStyle(label, basePoints, color, rechargeBoost = false, isWormhole = false) {
+  const chained = flightComboTimer > 0;
+  flightCombo = chained ? Math.min(flightCombo + 1, 8) : 1;
+  bestFlightCombo = Math.max(bestFlightCombo, flightCombo);
+  flightComboTimer = 4;
+  const points = basePoints * flightCombo;
+  holeStyleScore += points;
+
+  let detail = '+' + points + ' STYLE · CHAIN ×' + flightCombo;
+  if (rechargeBoost && !hasInfiniteBoost && boostsRemaining < BOOSTS_PER_TURN) {
+    boostsRemaining++;
+    detail += ' · +1 BOOST';
+    updateNudgeUI();
+  }
+
+  paintMasteryHud(label + (flightCombo > 1 ? ' ×' + flightCombo : ''));
+  showStyleBurst(label, detail, color);
+  spawnMasteryRing(ball.position, color, isWormhole ? 1.35 : 1);
+  playMasterySound(flightCombo, isWormhole);
+  haptic(flightCombo >= 3 ? 18 : 9);
+}
+
+function maybeAwardGravityGraze(planet, clearance, speed) {
+  if (speed < 4 || planet === homePlanet || planet === goalPlanet || planet.radius <= 0.1) return;
+  const grazeRange = Math.max(1.5, Math.min(5, planet.radius * 1.65));
+  if (clearance <= 0.22 || clearance >= grazeRange) return;
+  const now = performance.now();
+  if ((grazeCooldowns.get(planet) || 0) > now) return;
+
+  grazeCooldowns.set(planet, now + 2200);
+  const blackHoleGraze = isBlackHole(planet);
+  awardFlightStyle(
+    blackHoleGraze ? 'DARK GRAZE' : 'GRAVITY GRAZE',
+    blackHoleGraze ? 180 : 100,
+    blackHoleGraze ? 0xc56cff : BALL_COLORS[selectedBallColor].trail,
+    true,
+    false
+  );
+}
+
+function updateFlightMastery(dt) {
+  if (flightComboTimer > 0) {
+    flightComboTimer = Math.max(0, flightComboTimer - dt);
+    paintMasteryHud();
+    if (flightComboTimer === 0) {
+      flightCombo = 0;
+      masteryHudEl.classList.remove('hot');
+      comboLabelEl.textContent = 'CHAIN BANKED';
+      comboMeterFillEl.style.width = '0%';
+    }
+  }
+}
+
+function updateRouteChip() {
+  if (!assistBaselineReady) {
+    routeChipEl.textContent = 'CALCULATING ASSIST';
+    routeChipEl.classList.remove('pilot');
+    return;
+  }
+  const qualifies = manualAimDeviation >= 5;
+  shotUsesPilotRoute = qualifies;
+  routeChipEl.classList.toggle('pilot', qualifies);
+  routeChipEl.textContent = qualifies
+    ? 'PILOT ROUTE · +' + Math.round(manualAimDeviation * 12) + ' STYLE'
+    : 'ASSISTED ROUTE';
+}
+
+function captureAssistBaseline() {
+  assistedLaunchDir.copy(lockedLaunchDir);
+  assistedPowerNorm = lockedPowerNorm;
+  assistBaselineReady = true;
+  manualAimDeviation = 0;
+  shotUsesPilotRoute = false;
+  updateRouteChip();
+}
+
+function updateManualRouteState() {
+  if (!assistBaselineReady || assistedLaunchDir.lengthSq() === 0) return;
+  const angleDegrees = THREE.MathUtils.radToDeg(assistedLaunchDir.angleTo(lockedLaunchDir));
+  const powerDelta = Math.abs(assistedPowerNorm - lockedPowerNorm) * 32;
+  manualAimDeviation = angleDegrees + powerDelta;
+  updateRouteChip();
+}
+
+function updateAbilityUI() {
+  if (!abilityBtnEl || !BALL_ABILITIES[selectedBallColor]) return;
+  const ability = BALL_ABILITIES[selectedBallColor];
+  if (_lastAbilityBallIndex !== selectedBallColor) {
+    _lastAbilityBallIndex = selectedBallColor;
+    abilityBtnEl.style.setProperty('--ability-color', hexCss(BALL_COLORS[selectedBallColor].glow));
+  }
+  const display = dailyMode ? 'none' : '';
+  if (abilityBtnEl.style.display !== display) abilityBtnEl.style.display = display;
+  if (abilityBtnEl.classList.contains('used') !== abilityUsed) abilityBtnEl.classList.toggle('used', abilityUsed);
+  const disabled = abilityUsed || dailyMode;
+  if (abilityBtnEl.disabled !== disabled) abilityBtnEl.disabled = disabled;
+  let text;
+  if (abilityTimer > 0) {
+    text = ability.short + ' · ' + abilityTimer.toFixed(1) + 's';
+  } else if (abilityUsed) {
+    text = 'USED · ' + ability.short;
+  } else {
+    text = (isTouchDevice ? 'ABILITY · ' : 'Q · ') + ability.short;
+  }
+  if (abilityBtnEl.textContent !== text) abilityBtnEl.textContent = text;
+}
+
+function activateBallAbility() {
+  if (dailyMode || abilityUsed || !shotInFlight || ballOnPlanet || gameWon || lostInSpace) return;
+  if (trainerActive && trainerStep < 4) {
+    nudgeTrainer('Use Boost first. The trainer will unlock your ball ability on the next step.');
+    return;
+  }
+  ensureAudio();
+  abilityUsed = true;
+  abilityMode = selectedBallColor;
+  abilityTimer = 0;
+  const speed = ballVel.length();
+  const color = BALL_COLORS[selectedBallColor].glow;
+
+  if (selectedBallColor === 0) {
+    if (speed > 0.05) {
+      _vTemp1.copy(goalPlanet.pos).sub(ball.position).normalize();
+      ballVel.lerp(_vTemp1.multiplyScalar(speed * 0.82), 0.24);
+    }
+  } else if (selectedBallColor === 1) {
+    abilityTimer = 1.6;
+  } else if (selectedBallColor === 2) {
+    if (speed > 0.05) ballVel.multiplyScalar(1.34);
+  } else if (selectedBallColor === 3) {
+    abilityTimer = 2.4;
+  } else if (selectedBallColor === 4) {
+    ballVel.multiplyScalar(0.64);
+    abilityGravityScale = 0.28;
+    abilityTimer = 1.8;
+  } else {
+    artifactMagnetMultiplier = 3.5;
+    abilityTimer = 4;
+  }
+
+  holeStyleScore += 75;
+  paintMasteryHud(BALL_ABILITIES[selectedBallColor].name);
+  showStyleBurst(BALL_ABILITIES[selectedBallColor].name, '+75 STYLE · ABILITY DEPLOYED', color);
+  spawnMasteryRing(ball.position, color, 1.55);
+  spawnMasteryRing(ball.position, color, 1.15);
+  playAbilitySound(selectedBallColor);
+  hapticPattern([16, 25, 28]);
+  updateAbilityUI();
+  registerTrainerEvent('ability');
+}
+
+function updateBallAbility(dt) {
+  if (abilityTimer <= 0 || abilityMode < 0) return;
+  abilityTimer = Math.max(0, abilityTimer - dt);
+  const speed = ballVel.length();
+
+  if (abilityMode === 1 && speed > 0.05) {
+    _vTemp1.copy(ballVel).normalize();
+    ballVel.addScaledVector(_vTemp1, 10 * dt);
+    spawnBoostTrail();
+  } else if (abilityMode === 3 && goalPlanet) {
+    _vTemp1.copy(holePos).sub(ball.position).normalize();
+    ballVel.addScaledVector(_vTemp1, 4.2 * dt);
+  } else if (abilityMode === 5 && !activeArtifact && goalPlanet) {
+    _vTemp1.copy(goalPlanet.pos).sub(ball.position).normalize();
+    ballVel.addScaledVector(_vTemp1, 1.1 * dt);
+  }
+
+  if (abilityTimer <= 0) {
+    abilityGravityScale = 1;
+    artifactMagnetMultiplier = 1;
+    abilityMode = -1;
+  }
+  updateAbilityUI();
+}
+
+function resetOrbitalMastery() {
+  holeStyleScore = 0;
+  flightCombo = 0;
+  bestFlightCombo = 0;
+  flightComboTimer = 0;
+  grazeCooldowns = new Map();
+  assistBaselineReady = false;
+  manualAimDeviation = 0;
+  shotUsesPilotRoute = false;
+  holePilotQualified = false;
+  abilityUsed = false;
+  abilityMode = -1;
+  abilityTimer = 0;
+  abilityGravityScale = 1;
+  artifactMagnetMultiplier = 1;
+  currentAimPreviewPoints = [];
+  masteryHudEl.classList.remove('visible', 'hot');
+  _lastMasteryMeterPct = -1;
+  comboMeterFillEl.style.width = '0%';
+  routeChipEl.textContent = 'ASSISTED ROUTE';
+  routeChipEl.classList.remove('pilot', 'visible');
+  document.getElementById('gameBottomBar').classList.remove('complete', 'aiming', 'in-flight');
+  document.getElementById('gameBottomBar').style.display = '';
+  document.getElementById('masteryMedals').classList.remove('visible');
+  document.getElementById('retryHoleBtn').style.display = 'none';
+  bestShotGhostLine.visible = false;
+  document.getElementById('bestGhostLegend').classList.remove('visible');
+  for (const ring of masteryRings) {
+    ring.life = 0;
+    ring.mesh.visible = false;
+    ring.material.opacity = 0;
+  }
+  updateAbilityUI();
+}
+
 // Position ball on starting planet surface
 function placeBallOnPlanet(planet, dirOverride) {
   const dir = dirOverride || new THREE.Vector3(0, 1, 0).normalize();
@@ -7420,6 +8406,7 @@ function placeBallOnPlanet(planet, dirOverride) {
 
 // 1. Curved aim arrow — gravity-bent trajectory line + arrowhead
 const ARROW_SEGMENTS = 48;
+let currentAimPreviewPoints = [];
 
 // Thick glowing arc - DOTTED style
 const ARC_DOT_COUNT = 18;
@@ -7748,6 +8735,7 @@ scene.add(ballHitTarget);
 
 function isBallHit(e) {
   ballHitTarget.position.copy(ball.position);
+  ballHitTarget.updateMatrixWorld(true);
   const m = getMousePos(e);
   raycaster.setFromCamera(m, camera);
   const hits = raycaster.intersectObject(ballHitTarget);
@@ -7891,6 +8879,8 @@ renderer.domElement.addEventListener('pointerup', (e) => {
 
   // Show the fire/cancel HUD
   aimHud.classList.add('visible');
+  registerTrainerEvent('aim');
+  registerTrainerEvent('adjust');
 });
 
 // Right-click to cancel locked aim (only on quick click, not drag)
@@ -7960,8 +8950,12 @@ window.addEventListener('keydown', (e) => {
     updateKeyHud('kA', true);
     toggleOptimalPath();
   }
+  if (e.key === 'q' || e.key === 'Q') {
+    updateKeyHud('kQ', true);
+    activateBallAbility();
+  }
   // Number keys 1-9 = jump to level
-  if (e.key >= '1' && e.key <= '9') {
+  if (!trainerActive && e.key >= '1' && e.key <= '9') {
     const lvl = parseInt(e.key) - 1;
     if (lvl < LEVELS.length) {
       currentLevel = lvl;
@@ -7971,10 +8965,11 @@ window.addEventListener('keydown', (e) => {
   // R = reset current hole
   if (e.key === 'r' || e.key === 'R') {
     updateKeyHud('kR', true);
-    loadLevel(currentLevel);
+    if (trainerActive) restartTrainerDrill('Returning to the launch planet.');
+    else loadLevel(currentLevel);
   }
   // U = undo last shot
-  if (e.key === 'u' || e.key === 'U') {
+  if (!trainerActive && (e.key === 'u' || e.key === 'U')) {
     updateKeyHud('kU', true);
     performUndo();
   }
@@ -8017,6 +9012,9 @@ window.addEventListener('keyup', (e) => {
   if (e.key === 'a' || e.key === 'A') {
     updateKeyHud('kA', false);
   }
+  if (e.key === 'q' || e.key === 'Q') {
+    updateKeyHud('kQ', false);
+  }
   if (e.key === 'r' || e.key === 'R') {
     updateKeyHud('kR', false);
   }
@@ -8047,12 +9045,24 @@ renderer.domElement.addEventListener('wheel', () => {
 });
 
 function fireLockedShot() {
+  if (trainerActive && trainerStep < 2) {
+    nudgeTrainer('Make one route adjustment before launching. Drag the ball or change an AIM control.');
+    return;
+  }
   ensureAudio();
   haptic(15);
+  const firedPilotRoute = shotUsesPilotRoute;
+  if (firedPilotRoute) holePilotQualified = true;
+  flightCombo = 0;
+  flightComboTimer = 0;
+  grazeCooldowns.clear();
   // Start hole timer on first shot
   if (strokes === 0) holeStartTime = performance.now();
   document.getElementById('fireBtn').textContent = 'FIRE';
   document.getElementById('fireBtn').style.background = '';
+  document.getElementById('gameBottomBar').classList.remove('aiming');
+  document.getElementById('aimToggleBtn').style.display = '';
+  routeChipEl.classList.remove('visible');
   saveUndoState(); // Save state before shot for undo
   playSwingSound(lockedPowerNorm);
   // Unlimited boosts - no reset needed
@@ -8070,12 +9080,20 @@ function fireLockedShot() {
   if (!hasInfiniteBoost) boostsRemaining = BOOSTS_PER_TURN;
   // Clear trail for new shot
   flightTrailPositions.length = 0;
+  bestShotGhostLine.visible = false;
+  document.getElementById('bestGhostLegend').classList.remove('visible');
   hideOptimalPath();
 
   if (lockedPower > 3.2) {
     ballOnPlanet = null;
   }
   shotInFlight = true;
+  registerTrainerEvent('fire');
+  if (firedPilotRoute) {
+    const pilotPoints = Math.max(60, Math.round(manualAimDeviation * 12));
+    awardFlightStyle('PILOT ROUTE', pilotPoints, 0x66ffb5, false, false);
+  }
+  updateAbilityUI();
   // Show first-flight boost tutorial
   showBoostTutorialIfFirst();
   // Show tap-to-boost hint on mobile
@@ -8087,6 +9105,7 @@ function fireLockedShot() {
   aimLocked = false;
   aimHud.classList.remove('visible');
   aimWrapper.classList.remove('visible');
+  routeChipEl.classList.remove('visible');
   sliderAimActive = false;
   unfreezeAimFrame();
  
@@ -8101,6 +9120,7 @@ function cancelLockedAim() {
   document.getElementById('fireBtn').style.background = '';
   aimHud.classList.remove('visible');
   aimWrapper.classList.remove('visible');
+  routeChipEl.classList.remove('visible');
   sliderAimActive = false;
   unfreezeAimFrame();
  
@@ -8121,6 +9141,9 @@ document.getElementById('cancelBtn').addEventListener('click', () => {
   sfxCancel();
   powerOscillating = false;
   if (aimLocked) cancelLockedAim();
+});
+abilityBtnEl.addEventListener('click', () => {
+  activateBallAbility();
 });
 
 // === Mobile tap-to-boost ===
@@ -8236,13 +9259,14 @@ function snapToOptimal(sourceBtn) {
         valZ.textContent = '0°';
       }
     }
+
+    captureAssistBaseline();
     
     // Also show the optimal path preview
     lastOptimalLaunchDir = result.launchDir.clone();
     lastOptimalPower = result.power;
     optimalPathPoints = result.points;
-    optimalPathLine.geometry.dispose();
-    optimalPathLine.geometry = new THREE.BufferGeometry().setFromPoints(optimalPathPoints);
+    updateDynamicLine(optimalPathLine, optimalPathPoints);
     optimalPathLine.material.opacity = 0.5;
     optimalPathLine.visible = true;
     optimalAnimating = true;
@@ -8379,9 +9403,15 @@ function updateAimFromSliders() {
 // We intercept the pointerup to show the panel
 function showAimPanel() {
   sliderAimActive = true;
+  document.getElementById('gameBottomBar').classList.add('aiming');
+  assistBaselineReady = false;
+  manualAimDeviation = 0;
+  shotUsesPilotRoute = false;
+  updateRouteChip();
   freezeAimFrame(); // lock the reference frame so sliders stay consistent
   // Don't show aimWrapper by default - user toggles with button
   aimHud.classList.add('visible');
+  routeChipEl.classList.add('visible');
   document.getElementById('aimToggleBtn').style.display = 'inline-block';
  
   
@@ -8398,7 +9428,9 @@ function showAimPanel() {
   // Compute initial aim and lock it
   aimLocked = true;
   updateAimFromSliders();
+  showBestShotGhost(currentLevel);
   snapToOptimal('auto');
+  registerTrainerEvent('aim');
 }
 
 function hideAimPanel() {
@@ -8410,6 +9442,7 @@ function hideAimPanel() {
   atb.style.display = 'none';
   atb.classList.remove('open');
   atb.textContent = '⊕ AIM';
+  routeChipEl.classList.remove('visible');
 }
 
 // Slider input handlers
@@ -8421,6 +9454,8 @@ function onSliderInput() {
   
   if (sliderAimActive && aimLocked) {
     updateAimFromSliders();
+    updateManualRouteState();
+    registerTrainerEvent('adjust');
   }
 }
 
@@ -8440,7 +9475,8 @@ aimPanel.addEventListener('touchend', (e) => e.stopPropagation());
 // Reset button — restarts current hole
 document.getElementById('resetBtn').addEventListener('click', () => {
   sfxClick();
-  loadLevel(currentLevel);
+  if (trainerActive) restartTrainerDrill('Returning to the launch planet.');
+  else loadLevel(currentLevel);
 });
 
 document.getElementById('gravToggleBtn').addEventListener('click', () => {
@@ -8601,7 +9637,7 @@ function renderScorecard() {
     // 1P scorecard (original)
     const header = document.createElement('div');
     header.className = 'sc-row header';
-    header.innerHTML = '<span class="sc-hole">#</span><span class="sc-name">HOLE</span><span class="sc-par">PAR</span><span class="sc-score">SCORE</span><span class="sc-diff">+/-</span><span class="sc-time">TIME</span><span class="sc-art">✦</span>';
+    header.innerHTML = '<span class="sc-hole">#</span><span class="sc-name">HOLE</span><span class="sc-par">PAR</span><span class="sc-score">SCORE</span><span class="sc-diff">+/-</span><span class="sc-time">TIME</span><span class="sc-art">✦</span><span class="sc-mastery">MASTERY</span>';
     body.appendChild(header);
 
     let totalStrokes = 0;
@@ -8627,7 +9663,7 @@ function renderScorecard() {
       if (ht) totalTime += ht;
       const artStr = levelArtifacts[i] ? '✦' : '·';
       const artClass = levelArtifacts[i] ? 'sc-art-yes' : 'sc-art-no';
-      row.innerHTML = `<span class="sc-hole">${i+1}</span><span class="sc-name">${lvl.name}</span><span class="sc-par">${lvl.par}</span><span class="sc-score ${hasScore ? (diff < 0 ? 'sc-under' : diff > 0 ? 'sc-over' : 'sc-even') : 'sc-none'}">${hasScore ? score : '—'}</span><span class="sc-diff ${diffClass}">${diffText}</span><span class="sc-time">${timeStr}</span><span class="sc-art ${artClass}">${artStr}</span>`;
+      row.innerHTML = `<span class="sc-hole">${i+1}</span><span class="sc-name">${lvl.name}</span><span class="sc-par">${lvl.par}</span><span class="sc-score ${hasScore ? (diff < 0 ? 'sc-under' : diff > 0 ? 'sc-over' : 'sc-even') : 'sc-none'}">${hasScore ? score : '—'}</span><span class="sc-diff ${diffClass}">${diffText}</span><span class="sc-time">${timeStr}</span><span class="sc-art ${artClass}">${artStr}</span><span class="sc-mastery" title="Precision · Relic · Pilot">${masterySymbols(i)}</span>`;
       body.appendChild(row);
     });
 
@@ -8701,7 +9737,7 @@ function showGameComplete(title, isFreeEnd) {
   body.innerHTML = '';
   const header = document.createElement('div');
   header.className = 'sc-row header';
-  header.innerHTML = '<span class="sc-hole">#</span><span class="sc-name">HOLE</span><span class="sc-par">PAR</span><span class="sc-score">SCORE</span><span class="sc-diff">+/−</span>';
+  header.innerHTML = '<span class="sc-hole">#</span><span class="sc-name">HOLE</span><span class="sc-par">PAR</span><span class="sc-score">SCORE</span><span class="sc-diff">+/−</span><span class="sc-mastery">MASTERY</span>';
   body.appendChild(header);
 
   LEVELS.forEach((lvl, i) => {
@@ -8715,7 +9751,7 @@ function showGameComplete(title, isFreeEnd) {
       diffClass = d < 0 ? 'sc-under' : d > 0 ? 'sc-over' : 'sc-even';
       diffText = d === 0 ? 'E' : (d > 0 ? '+' + d : '' + d);
     }
-    row.innerHTML = '<span class="sc-hole">' + (i+1) + '</span><span class="sc-name">' + lvl.name + '</span><span class="sc-par">' + lvl.par + '</span><span class="sc-score ' + diffClass + '">' + (has ? s : '—') + '</span><span class="sc-diff ' + diffClass + '">' + diffText + '</span>';
+    row.innerHTML = '<span class="sc-hole">' + (i+1) + '</span><span class="sc-name">' + lvl.name + '</span><span class="sc-par">' + lvl.par + '</span><span class="sc-score ' + diffClass + '">' + (has ? s : '—') + '</span><span class="sc-diff ' + diffClass + '">' + diffText + '</span><span class="sc-mastery">' + masterySymbols(i) + '</span>';
     body.appendChild(row);
   });
 
@@ -8830,10 +9866,28 @@ document.getElementById('gcHome').addEventListener('click', () => {
   loadLevel(0);
 });
 
+document.getElementById('retryHoleBtn').addEventListener('click', () => {
+  if (dailyMode || gameMode !== '1p') return;
+  sfxClick();
+  delete levelScores[currentLevel];
+  delete holeTimes[currentLevel];
+  totalScore = levelScores.reduce((sum, score) => sum + (score || 0), 0);
+  document.getElementById('totalScore').textContent = totalScore;
+  resetSessionStats();
+  levelScores.forEach((score, index) => {
+    if (score !== undefined) recordSessionHole(index, score, LEVELS[index].par);
+  });
+  document.getElementById('message').style.display = 'none';
+  document.getElementById('nextHoleBtn').style.display = 'none';
+  document.getElementById('retryHoleBtn').style.display = 'none';
+  loadLevel(currentLevel);
+});
+
 // Next hole button
 document.getElementById('nextHoleBtn').addEventListener('click', () => {
   document.getElementById('message').style.display = 'none';
   document.getElementById('nextHoleBtn').style.display = 'none';
+  document.getElementById('retryHoleBtn').style.display = 'none';
 
   if (gameMode === '2p') {
     if (onlineMode) {
@@ -9061,11 +10115,13 @@ function physicsStep(dt) {
 
     } else {
       // Space physics - gravity from all planetoids
+      const flightSpeed = ballVel.length();
       for (const p of planetoids) {
         _vToCenter.subVectors(p.pos, ball.position);
         const dist = _vToCenter.length();
+        maybeAwardGravityGraze(p, dist - p.radius - ballRadius, flightSpeed);
         _vNormal.copy(_vToCenter).normalize();
-        const force = p.gravityStrength / Math.pow(dist, 1.7);
+        const force = (p.gravityStrength / Math.pow(dist, 1.7)) * abilityGravityScale;
         _vTemp1.copy(_vNormal).multiplyScalar(force * subDt * 60);
         ballVel.add(_vTemp1);
       }
@@ -9113,12 +10169,14 @@ function physicsStep(dt) {
             ball.position.copy(wh.b.pos).add(_vTemp1);
             wormholeCooldown = WORMHOLE_COOLDOWN;
             playWormholeSound();
+            awardFlightStyle('WORMHOLE THREAD', 160, wh.colorA || 0x66ddff, true, true);
             break;
           } else if (distB < wh.radius) {
             _vTemp1.copy(ballVel).normalize().multiplyScalar(wh.radius + 0.5);
             ball.position.copy(wh.a.pos).add(_vTemp1);
             wormholeCooldown = WORMHOLE_COOLDOWN;
             playWormholeSound();
+            awardFlightStyle('WORMHOLE THREAD', 160, wh.colorB || 0xff66cc, true, true);
             break;
           }
         }
@@ -9138,9 +10196,20 @@ function physicsStep(dt) {
       }
       const speed = ballVel.length();
       if (minDist > MAX_DIST || (minDist > 200 && speed > 12 && movingAway)) {
+        if (trainerActive) {
+          restartTrainerDrill('Trajectory escaped the practice field. Re-centering for another attempt.', 750);
+          return;
+        }
         lostInSpace = true;
         shotInFlight = false;
         ballJustSettled = false;
+        flightCombo = 0;
+        flightComboTimer = 0;
+        abilityTimer = 0;
+        abilityMode = -1;
+        abilityGravityScale = 1;
+        artifactMagnetMultiplier = 1;
+        updateAbilityUI();
         lostTimer = 0.6;
         _lostSkipRequested = false;
         strokes++;
@@ -9156,6 +10225,10 @@ function physicsStep(dt) {
     const distToHole = ball.position.distanceTo(holePos);
     const needsWin = !gameWon && distToHole < 1.1 && ballVel.length() < 7;
     if (gameWon || needsWin) {
+      if (trainerActive) {
+        handleTrainerLanding();
+        return;
+      }
       holeScored = true;
       // Record hole completion time
       holeElapsed = holeStartTime > 0 ? (performance.now() - holeStartTime) / 1000 : 0;
@@ -9169,6 +10242,8 @@ function physicsStep(dt) {
         controls.update();
       }
       playHoleSinkSound();
+      document.getElementById('gameBottomBar').classList.add('complete');
+      routeChipEl.classList.remove('visible');
       const par = LEVELS[currentLevel].par;
       const diff = strokes - par;
       let label = '';
@@ -9259,10 +10334,14 @@ function physicsStep(dt) {
         saveHoleProgress(); // Save after each hole
         const isLast = currentLevel >= LEVELS.length - 1;
         const isFreeEnd = !dailyMode && currentLevel === 7 && !proUnlocked;
-        const sub = strokes + (strokes === 1 ? ' STROKE' : ' STROKES') + consolationSub;
+        const medals = recordHoleMastery(currentLevel, strokes, par);
+        const styleSub = holeStyleScore > 0 ? ' · ' + holeStyleScore.toLocaleString() + ' STYLE' : '';
+        const sub = strokes + (strokes === 1 ? ' STROKE' : ' STROKES') + styleSub + consolationSub;
         showMessage(label, sub);
+        renderHoleMastery(medals);
         spawnCelebration(celebMult);
         const btn = document.getElementById('nextHoleBtn');
+        document.getElementById('retryHoleBtn').style.display = dailyMode ? 'none' : 'inline-block';
 
         if (dailyMode) {
           // Daily challenge scoring
@@ -9530,6 +10609,7 @@ let _boostTutorialTimeout = null;
 try { _firstFlightShown = localStorage.getItem('gg_firstFlight') === '1'; } catch(e) {}
 
 function showBoostTutorialIfFirst() {
+  if (trainerActive) return;
   if (_firstFlightShown) return;
   _firstFlightShown = true;
   try { localStorage.setItem('gg_firstFlight', '1'); } catch(e) {}
@@ -9684,6 +10764,7 @@ function updateTrajectoryPreview() {
       }
       if (hit) { arcPoints.push(aPos.clone()); break; }
     }
+    currentAimPreviewPoints = arcPoints;
     
     // Build dotted arc
     if (arcPoints.length >= 3) {
@@ -10353,6 +11434,8 @@ function animate() {
     } else {
       physicsStep(dt);
       updateBoost(dt);
+      updateBallAbility(dt);
+      updateFlightMastery(dt);
       // Cancel boost if ball landed
       if (ballOnPlanet && boostActive) {
         boostActive = false;
@@ -10360,6 +11443,13 @@ function animate() {
       }
       if (ballOnPlanet && boostCharging) {
         boostCharging = false;
+      }
+      if (ballOnPlanet && abilityTimer > 0) {
+        abilityTimer = 0;
+        abilityMode = -1;
+        abilityGravityScale = 1;
+        artifactMagnetMultiplier = 1;
+        updateAbilityUI();
       }
     }
   }
@@ -10569,6 +11659,7 @@ function animate() {
   animateSentinelFields(time);
   animateAccretionDisks(time, dt);
   animateArtifact(time, dt);
+  updateMasteryEffects(dt);
 
   // Artifact gravity pull + collision check
   if (activeArtifact && !activeArtifact.collected && !gameWon) {
@@ -10576,9 +11667,9 @@ function animate() {
     const artifactDist = _vTemp1.copy(ball.position).sub(artPos).length();
     
     // Small gravity pull toward artifact (attracts the ball)
-    if (artifactDist > 0.5 && artifactDist < 20 && shotInFlight && !ballOnPlanet) {
+    if (artifactDist > 0.5 && artifactDist < 20 * artifactMagnetMultiplier && shotInFlight && !ballOnPlanet) {
       const pullDir = _vTemp2.copy(artPos).sub(ball.position).normalize();
-      const force = 0.8 / (artifactDist * artifactDist + 0.5);
+      const force = (0.8 * artifactMagnetMultiplier) / (artifactDist * artifactDist + 0.5);
       ballVel.addScaledVector(pullDir, force * dt * 60);
     }
     
@@ -11021,10 +12112,79 @@ function animate() {
     }
   }
 
+  updateTrainerTarget();
+
   // Update orbit controls
   controls.update();
   composer.render();
 }
+
+window.render_game_to_text = () => JSON.stringify({
+  coordinateSystem: 'Three.js world coordinates; +Y is up.',
+  mode: gameWon ? 'hole_complete' : aimLocked ? 'aiming' : shotInFlight ? 'flight' : 'ready',
+  introPlaying,
+  hole: currentLevel + 1,
+  strokes,
+  par: LEVELS[currentLevel].par,
+  timeDisplay: document.getElementById('holeTime').textContent,
+  ball: {
+    x: Number(ball.position.x.toFixed(2)),
+    y: Number(ball.position.y.toFixed(2)),
+    z: Number(ball.position.z.toFixed(2)),
+    speed: Number(ballVel.length().toFixed(2)),
+    onPlanet: !!ballOnPlanet,
+    onPlanetIndex: ballOnPlanet ? planetoids.indexOf(ballOnPlanet) : -1,
+    onPlanetType: ballOnPlanet ? ballOnPlanet.name : null,
+    screen: (() => {
+      const projected = ball.position.clone().project(camera);
+      return {
+        x: Math.round((projected.x * 0.5 + 0.5) * window.innerWidth),
+        y: Math.round((-projected.y * 0.5 + 0.5) * window.innerHeight),
+      };
+    })(),
+  },
+  aim: {
+    assisted: assistBaselineReady,
+    pilotRoute: shotUsesPilotRoute,
+    deviation: Number(manualAimDeviation.toFixed(1)),
+    previewClosestHazard: (() => {
+      const previewPoints = currentAimPreviewPoints.length >= 2 ? currentAimPreviewPoints : optimalPathPoints;
+      if (!previewPoints || previewPoints.length < 2) return null;
+      let closest = Infinity;
+      for (let i = 0; i < previewPoints.length; i += 2) {
+        const point = previewPoints[i];
+        for (const planet of planetoids) {
+          if (planet === homePlanet || planet === goalPlanet || planet.radius <= 0.1) continue;
+          closest = Math.min(closest, point.distanceTo(planet.pos) - planet.radius - ballRadius);
+        }
+      }
+      return Number.isFinite(closest) ? Number(closest.toFixed(2)) : null;
+    })(),
+  },
+  mastery: {
+    style: holeStyleScore,
+    combo: flightCombo,
+    bestCombo: bestFlightCombo,
+    bestGhostVisible: bestShotGhostLine.visible,
+  },
+  ability: {
+    name: BALL_ABILITIES[selectedBallColor].name,
+    used: abilityUsed,
+    activeSeconds: Number(abilityTimer.toFixed(1)),
+    disabledForDaily: dailyMode,
+  },
+  trainer: {
+    visible: instructionsEl.classList.contains('visible'),
+    active: trainerActive,
+    complete: trainerCompleted,
+    step: trainerStep,
+    expected: trainerActive && !trainerCompleted && TRAINER_STEPS[trainerStep]
+      ? TRAINER_STEPS[trainerStep].event
+      : null,
+  },
+  artifactAvailable: !!(activeArtifact && !activeArtifact.collected),
+  boosts: hasInfiniteBoost ? 'infinite' : boostsRemaining,
+});
 
 // Init ball picker and load first level (must be after all declarations)
 initBallPicker();
@@ -11055,6 +12215,7 @@ animate();
 
 // Resize handler
 window.addEventListener('resize', () => {
+  trainerTargetLayout = '';
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -11062,9 +12223,6 @@ window.addEventListener('resize', () => {
 });
 </script>
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
-}
 // PWA install prompt
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
