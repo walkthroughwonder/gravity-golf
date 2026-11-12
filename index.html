@@ -2701,10 +2701,6 @@
   </div>
   <div class="key-separator"></div>
   <div class="key-row">
-    <span class="key-label">UNDO</span>
-    <div class="key-box" id="kU">U</div>
-  </div>
-  <div class="key-row">
     <span class="key-label">RESET</span>
     <div class="key-box" id="kR">R</div>
   </div>
@@ -3860,8 +3856,6 @@ let holeDir = new THREE.Vector3();
 // ===================== WORMHOLES =====================
 const wormholes = []; // array of { a: {pos, mesh, ring, particles}, b: {pos, mesh, ring, particles}, radius }
 const WORMHOLE_RADIUS = 1.8; // trigger radius
-const WORMHOLE_COOLDOWN = 0.5; // seconds before ball can re-enter
-let wormholeCooldown = 0;
 
 function createWormholePortal(pos, colorA, colorB) {
   const group = new THREE.Group();
@@ -3934,7 +3928,6 @@ function clearWormholes() {
     wh.b.portal.group.traverse(c => { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); });
   }
   wormholes.length = 0;
-  wormholeCooldown = 0;
 }
 
 function animateWormholes(time) {
@@ -4098,14 +4091,19 @@ function clearSentinelFields() {
 const BLACK_HOLE_COLORS = [0x110011, 0x220022, 0x110022, 0x050005, 0x0a000a, 0x050010];
 const accretionDisks = [];
 
-function isBlackHole(planet) {
-  const hex = planet.mesh.material.color.getHex();
+function isBlackHoleColor(hex) {
   return BLACK_HOLE_COLORS.some(bh => {
     const dr = Math.abs(((hex >> 16) & 0xff) - ((bh >> 16) & 0xff));
     const dg = Math.abs(((hex >> 8) & 0xff) - ((bh >> 8) & 0xff));
     const db = Math.abs((hex & 0xff) - (bh & 0xff));
     return dr + dg + db < 30;
   });
+}
+
+// The invisible sentinel markers (radius 0.01) are black as well, but they are not black holes:
+// no orbit, no accretion disk, no artifact, no dark-graze bonus.
+function isBlackHole(planet) {
+  return planet.radius > 0.1 && isBlackHoleColor(planet.mesh.material.color.getHex());
 }
 
 function createAccretionDisk(planet) {
@@ -5145,11 +5143,6 @@ async function validateUnlockCode(code) {
   const hash = await sha256(code);
   // Check against stored hashes
   if (UNLOCK_HASHES.includes(hash)) {
-    unlockPro();
-    return true;
-  }
-  // Also accept master key for testing (remove in production)
-  if (hash === await sha256('GRAVITYGOLF-MASTER-2026')) {
     unlockPro();
     return true;
   }
@@ -6285,7 +6278,7 @@ document.getElementById('authEmailSignUp').addEventListener('click', async () =>
 });
 
 // ===================== GAME HISTORY =====================
-async function saveGameHistory(mode, scores, totalScore, totalPar) {
+async function saveGameHistory(mode, scores, totalScore, totalPar, complete) {
   if (!currentUser || !db) return;
   try {
     const ref = db.ref('users/' + currentUser.uid + '/games');
@@ -6297,7 +6290,7 @@ async function saveGameHistory(mode, scores, totalScore, totalPar) {
       par: totalPar,
       diff: totalScore - totalPar,
       holes: scores.filter(s => s !== undefined).length,
-      complete: true,
+      complete: complete,
     });
     // Clear current round marker
     await db.ref('users/' + currentUser.uid + '/currentRound').remove();
@@ -6816,46 +6809,14 @@ function clearLevel() {
   boostInstanced.instanceMatrix.needsUpdate = true;
 }
 
-// ===================== UNDO SYSTEM =====================
-let undoStack = []; // Array of { ballPos, ballVel, onPlanet, strokes }
+// ===================== SHOT START (lost-in-space reset point) =====================
+// Where the current shot was fired from: the body and the direction from its centre, so the reset
+// lands on the right spot even when that body has moved in the meantime.
+let shotStart = null; // { planet, dir }
 
-function saveUndoState() {
-  undoStack.push({
-    ballPos: ball.position.clone(),
-    ballVel: ballVel.clone(),
-    onPlanet: ballOnPlanet,
-    strokes: strokes
-  });
-  // undo removed
-}
-
-function performUndo() {
-  if (undoStack.length === 0) return;
-  const state = undoStack.pop();
-  ball.position.copy(state.ballPos);
-  ballVel.copy(state.ballVel);
-  ballOnPlanet = state.onPlanet;
-  // Don't reduce stroke count — undo preserves penalty
-  strokes = state.strokes;
-  document.getElementById('strokeCount').textContent = strokes;
-  gameWon = false;
-  holeScored = false;
-  lostInSpace = false;
-  shotInFlight = false;
-  ballJustSettled = false;
-  settleTimer = 0;
-  settleComplete = false;
-  trailPositions.length = 0;
-  flightTrailPositions.length = 0;
-  document.getElementById('message').style.display = 'none';
-  document.getElementById('nextHoleBtn').style.display = 'none';
-  document.getElementById('gameBottomBar').classList.remove('complete');
-  hideOptimalPath();
-  cancelLockedAim();
-  controls.target.copy(ball.position);
-  controls.enabled = true;
-  ballGlow.position.copy(ball.position);
-  // undo removed
+function recordShotStart() {
+  const planet = ballOnPlanet || homePlanet;
+  shotStart = { planet, dir: ball.position.clone().sub(planet.pos).normalize() };
 }
 
 // ===================== BOOST SYSTEM (Hold-to-Charge) =====================
@@ -7057,9 +7018,7 @@ function loadLevel(idx) {
   for (const p of planetoids) {
     if (p.radius > 0.1) createGravityField(p);
     else if (p.radius <= 0.1 && p.gravityStrength > 1.0) createSentinelField(p);
-    // Invisible sentinel bodies (radius 0.01) match the black-hole colour test: their disk would be
-    // 40 sub-pixel quads each, drawn and animated every frame for nothing.
-    if (isBlackHole(p) && p.radius > 0.1) createAccretionDisk(p);
+    if (isBlackHole(p)) createAccretionDisk(p);
   }
   // Restore visibility state
   gravityFieldMeshes.forEach(g => g.visible = gravityFieldsVisible);
@@ -7067,10 +7026,11 @@ function loadLevel(idx) {
   // Create alien artifact orbiting a random black hole (1 per level)
   clearArtifact();
   const blackHoles = planetoids.filter(p => isBlackHole(p));
+  // Only holes with a real black hole carry an artifact, so the counter can actually be completed
+  totalArtifacts = LEVELS.filter(l => l.planets.some(pd => pd.r > 0.1 && isBlackHoleColor(pd.color))).length;
   if (blackHoles.length > 0) {
     const bh = blackHoles[Math.floor(Math.random() * blackHoles.length)];
     activeArtifact = createArtifact(bh);
-    totalArtifacts = LEVELS.length;
   }
   updateArtifactUI();
 
@@ -7096,9 +7056,7 @@ function loadLevel(idx) {
   // Goal beacon
   createGoalBeacon(goalPlanet.pos, goalPlanet.radius, holeDir);
 
-  // Reset undo stack
-  undoStack = [];
-  // undo removed
+  shotStart = null;
 
   // Compute power multiplier based on level size
   // Measure max distance from origin (start planet) to farthest planet
@@ -7111,6 +7069,9 @@ function loadLevel(idx) {
   // Scale: 30 units = 1.0x, 115 units = 1.6x, linear
   const t = Math.max(0, Math.min(1, (maxSpan - 30) / 85));
   levelPowerMult = 1.8 + t * 1.459; // 30.5 at hole 1 → 75 at hole 9
+
+  // Hand the finished level to the physics engine (moving bodies take their starting positions)
+  buildPhysicsWorld(idx);
 
   // Scale background visual intensity with level progression
   updateBackgroundIntensity(idx);
@@ -8593,7 +8554,6 @@ for (let i = 0; i < ARC_DOT_COUNT; i++) {
 // Reusable vectors for billboard math
 const _arcDir = new THREE.Vector3();
 const _arcCamDir = new THREE.Vector3();
-const _arcToCenter = new THREE.Vector3();
 const _arcRight = new THREE.Vector3();
 const _arcFwd = new THREE.Vector3();
 const _arcBasisMat = new THREE.Matrix4();
@@ -8705,7 +8665,6 @@ scene.add(arrowHeadGlow);
 // 2. Trajectory dots — short, punchy, animated
 const TRAJ_COUNT = 6;
 const trajDots = [];
-const trajSpeeds = []; // store simulated speed at each dot
 for (let i = 0; i < TRAJ_COUNT; i++) {
   const dotGeo = new THREE.SphereGeometry(1, 12, 12); // unit sphere, scaled per-frame
   const dotMat = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
@@ -8713,7 +8672,6 @@ for (let i = 0; i < TRAJ_COUNT; i++) {
   dot.visible = false;
   scene.add(dot);
   trajDots.push(dot);
-  trajSpeeds.push(0);
 }
 
 // 3. Gravity pull lines (from trajectory to nearby planet centers)
@@ -9153,12 +9111,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'r' || e.key === 'R') {
     updateKeyHud('kR', true);
     if (trainerActive) restartTrainerDrill('Returning to the launch planet.');
-    else loadLevel(currentLevel);
-  }
-  // U = undo last shot
-  if (!trainerActive && !dailyMode && (e.key === 'u' || e.key === 'U')) {
-    updateKeyHud('kU', true);
-    performUndo();
+    else if (!dailyMode) loadLevel(currentLevel); // the daily is one attempt: no free retries
   }
   // G = toggle gravity fields
   if (e.key === 'g' || e.key === 'G') {
@@ -9211,9 +9164,6 @@ window.addEventListener('keyup', (e) => {
   if (e.key === 'r' || e.key === 'R') {
     updateKeyHud('kR', false);
   }
-  if (e.key === 'u' || e.key === 'U') {
-    updateKeyHud('kU', false);
-  }
   if (e.key === 'g' || e.key === 'G') {
     updateKeyHud('kG', false);
   }
@@ -9262,7 +9212,7 @@ function fireLockedShot() {
   document.getElementById('gameBottomBar').classList.remove('aiming');
   document.getElementById('aimToggleBtn').style.display = '';
   routeChipEl.classList.remove('visible');
-  saveUndoState(); // Save state before shot for undo
+  recordShotStart(); // where a lost ball is put back
   playSwingSound(lockedPowerNorm);
   // Unlimited boosts - no reset needed
   boostActive = false;
@@ -9283,7 +9233,7 @@ function fireLockedShot() {
   document.getElementById('bestGhostLegend').classList.remove('visible');
   hideOptimalPath();
 
-  if (lockedPower > 3.2) {
+  if (lockedPower > golfPhysics.ROLL_LAUNCH_POWER) {
     ballOnPlanet = null;
   }
   shotInFlight = true;
@@ -9411,17 +9361,17 @@ function snapToOptimal(sourceBtn) {
   const allBtns = [document.getElementById('panelSnapBtn')].filter(Boolean);
   allBtns.forEach(b => { b.classList.add('computing'); b.textContent = '⟡ COMPUTING...'; });
   
-  requestAnimationFrame(() => {
-    const result = findOptimalPath();
-    
+  solveOptimalPath().then((result) => {
     allBtns.forEach(b => { b.classList.remove('computing'); b.textContent = '⟡ SNAP OPTIMAL'; });
-    
-    if (!result.launchDir || result.points.length < 2) {
+    // Cancelled, or the aim was released or fired while the search ran
+    if (!result || !aimLocked || !ballOnPlanet) return;
+
+    if (result.points.length < 2) {
       allBtns.forEach(b => { b.textContent = '⟡ NO PATH'; });
       setTimeout(() => allBtns.forEach(b => { b.textContent = '⟡ SNAP OPTIMAL'; }), 1200);
       return;
     }
-    
+
     // Apply optimal aim to locked state
     lockedLaunchDir.copy(result.launchDir);
     lockedPower = result.power;
@@ -9673,6 +9623,7 @@ aimPanel.addEventListener('touchend', (e) => e.stopPropagation());
 
 // Reset button — restarts current hole
 document.getElementById('resetBtn').addEventListener('click', () => {
+  if (dailyMode && !trainerActive) { sfxCancel(); return; } // the daily is one attempt: no free retries
   sfxClick();
   if (trainerActive) restartTrainerDrill('Returning to the launch planet.');
   else loadLevel(currentLevel);
@@ -9762,8 +9713,6 @@ document.getElementById('findBallBtn').addEventListener('click', () => {
   findBall();
 });
 
-// Undo button
-// undo button removed
 
 // --- Wire hover + click SFX to all game buttons ---
 (function wireUISounds() {
@@ -9867,7 +9816,7 @@ function renderScorecard() {
 
     const totalDiff = totalStrokes - totalPar;
     const scTotal = document.getElementById('scTotal');
-    const timeLabel = totalTime > 0 ? ' · ' + totalTime.toFixed(1) + 's · ✦ ' + artifactsCollected + '/' + LEVELS.length : '';
+    const timeLabel = totalTime > 0 ? ' · ' + totalTime.toFixed(1) + 's · ✦ ' + artifactsCollected + '/' + totalArtifacts : '';
     if (totalStrokes > 0) {
       const diffLabel = totalDiff === 0 ? 'E' : (totalDiff > 0 ? '+' + totalDiff : '' + totalDiff);
       scTotal.textContent = totalStrokes + ' (' + diffLabel + ')' + timeLabel;
@@ -9957,8 +9906,13 @@ function showGameComplete(title, isFreeEnd) {
 
   gc.classList.add('visible');
 
-  // Save game history (marks as complete, or creates new if no current round)
+  // Save game history (creates a new entry if there is no current round).
+  // Jumping to a hole with the number keys leaves gaps: such a round is saved as incomplete.
   const mode = dailyMode ? 'daily' : (LEVELS.length > 9 ? '1p-pro' : '1p');
+  const courseHoles = isFreeEnd ? Math.min(8, LEVELS.length) : LEVELS.length;
+  let holesPlayed = 0;
+  for (let i = 0; i < courseHoles; i++) if (levelScores[i] !== undefined) holesPlayed++;
+  const roundComplete = holesPlayed === courseHoles;
   if (_currentRoundKey && currentUser && db) {
     // Update existing round entry to complete
     db.ref('users/' + currentUser.uid + '/games/' + _currentRoundKey).update({
@@ -9967,13 +9921,13 @@ function showGameComplete(title, isFreeEnd) {
       par: totalPar,
       diff: totalScore - totalPar,
       holes: levelScores.filter(s => s !== undefined).length,
-      complete: true,
+      complete: roundComplete,
       date: firebase.database.ServerValue.TIMESTAMP,
     }).catch(e => console.error('Failed to mark round complete:', e));
     db.ref('users/' + currentUser.uid + '/currentRound').remove();
     _currentRoundKey = null;
   } else {
-    saveGameHistory(mode, [...levelScores], totalScore, totalPar);
+    saveGameHistory(mode, [...levelScores], totalScore, totalPar, roundComplete);
   }
 }
 
@@ -10182,10 +10136,9 @@ document.getElementById('nextHoleBtn').addEventListener('click', () => {
 
 
 
-// Swipe-up gesture to fire (mobile)
+// Touch gesture tracking (for double-tap; firing is the FIRE button only)
 let _swipeStartY = 0;
 let _swipeStartX = 0;
-let _wasAiming = false;
 // Tap-to-skip lost-in-space reset
 renderer.domElement.addEventListener('pointerdown', () => {
   if (lostInSpace) _lostSkipRequested = true;
@@ -10197,27 +10150,12 @@ renderer.domElement.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1) {
     _swipeStartY = e.touches[0].clientY;
     _swipeStartX = e.touches[0].clientX;
-    _wasAiming = aiming; // track if we started during aim drag
     _gestureMultiTouch = false;
     _gestureStartTime = Date.now();
   } else {
     _gestureMultiTouch = true;
   }
 }, { passive: true });
-renderer.domElement.addEventListener('touchend', (e) => {
-  // Only fire on swipe-up if aim was already locked AND we weren't just aiming
-  if (aimLocked && !_wasAiming && !aiming && !_gestureMultiTouch && e.touches.length === 0 && e.changedTouches.length === 1) {
-    const dy = _swipeStartY - e.changedTouches[0].clientY;
-    const dx = Math.abs(e.changedTouches[0].clientX - _swipeStartX);
-    // Swipe up: dy > 80px, mostly vertical
-    if (dy > 80 && dy > dx * 2) {
-      haptic(15);
-      sfxFire();
-      fireLockedShot();
-    }
-  }
-}, { passive: true });
-
 // Double-tap to find ball (mobile)
 let _lastTapTime = 0;
 renderer.domElement.addEventListener('touchend', (e) => {
@@ -10238,201 +10176,677 @@ renderer.domElement.addEventListener('touchend', (e) => {
 }, { passive: true });
 
 // ===================== PHYSICS =====================
-const PHYSICS_STEPS = ('ontouchstart' in window) ? 4 : 8;
-const FRICTION = 0.985;
-const SURFACE_FRICTION = 0.9975;
-const CAPTURE_SPEED = 2.0;  // lowered: ball must be slower to land, encouraging orbits
-const MAX_DIST = 400;
+// <golf-physics>
+// One fixed-step engine drives the real ball, the aim preview and the path solver, so the three
+// cannot drift apart. It is self-contained (plain numbers; no THREE, no DOM, no page state) because
+// the solver runs it inside a Web Worker that is built from this function's own source text.
+function createGolfPhysics() {
+  'use strict';
+  const H = 1 / 480;               // fixed step: 8 steps per 60 Hz frame (the original desktop tuning)
+  const BODY_TICK = 8;             // moving bodies advance on every 8th step, 60 times a second
+  const DRAG = 0.9991;             // per step, in flight
+  const SURFACE_FRICTION = 0.9975; // per step, rolling
+  const GRAVITY_EXPONENT = 1.7;
+  const CAPTURE_SPEED = 2.0;       // slower than this near a surface: the ball lands
+  const CAPTURE_REACH = 0.1;
+  const CAPTURE_PENETRATION = -0.05;
+  const CAPTURE_DAMP = 0.825;
+  const LIFTOFF_SPEED = 6;         // rolling faster than this leaves the surface
+  const REST_SPEED = 0.05;
+  const ROLL_LAUNCH_POWER = 3.2;   // shots at or below this power roll instead of flying
+  const HOLE_RADIUS = 1.1;
+  const HOLE_MAX_SPEED = 7;
+  const HOLE_PULL_RANGE = 3.0;
+  const MAX_DIST = 400;
+  const WORMHOLE_COOLDOWN = 0.5;   // seconds before the ball can re-enter a wormhole
+  const SENTINEL_RADIUS = 0.1;     // bodies this small are invisible markers: no surface to land on
+  const EV = { NONE: 0, CAPTURE: 1, SUNK: 2, LIFTOFF: 3, REST: 4, WORMHOLE: 5, LOST: 6 };
 
-// Reusable physics vectors (Object Pooling to prevent GC stutters)
-const _vToCenter = new THREE.Vector3();
-const _vNormal = new THREE.Vector3();
-const _vTemp1 = new THREE.Vector3();
-const _vTemp2 = new THREE.Vector3();
+  // Coarse solver steps (k > 1) are approximate by nature, so they also use a cheaper force:
+  // dist^0.3 from a table (16 entries per unit, linear in between; error under 0.03%).
+  const POW03_STEP = 16, POW03_MAX = 1024;
+  let pow03 = null;
+  function initPow03() {
+    pow03 = new Float64Array(POW03_MAX * POW03_STEP + 2);
+    for (let i = 0; i < pow03.length; i++) pow03[i] = Math.pow(i / POW03_STEP, 0.3);
+  }
 
-function physicsStep(dt) {
-  if (gameWon || lostInSpace) return;
+  // ---- Moving bodies: positions are a pure function of time since the level started ----
+  function motionFor(i, spec) {
+    const b = spec.bodies[i];
+    if (i === spec.home || i === spec.goal) return null;
+    if (b.radius < 0.8 && b.radius > 0.02 && spec.levelIndex >= 5) {
+      // Small moons: Lissajous drift around their base position
+      return {
+        kind: 1, bx: b.x, by: b.y, bz: b.z,
+        s1: (i * 137.5) % 6.28, s2: (i * 241.3) % 6.28, s3: (i * 89.7) % 6.28,
+        r: 1.2 + (i % 5) * 0.4,
+        wx: 0.3 + (i % 7) * 0.06, wy: 0.25 + (i % 5) * 0.07, wz: 0.35 + (i % 3) * 0.05,
+      };
+    }
+    if (b.blackHole) {
+      // Black holes circle the goal planet
+      const g = spec.bodies[spec.goal];
+      return {
+        kind: 2, cx: g.x, cz: g.z, by: b.y,
+        a0: Math.atan2(b.z - g.z, b.x - g.x),
+        dist: Math.hypot(b.x - g.x, b.y - g.y, b.z - g.z),
+        speed: 0.02 + (i % 3) * 0.01, tilt: (i * 0.7) % 1.0 - 0.5,
+      };
+    }
+    if (b.radius >= 0.8 && spec.levelIndex >= 7) {
+      // Medium planets circle their base position from hole 8 on
+      return {
+        kind: 3, bx: b.x, by: b.y, bz: b.z,
+        a0: (i * 2.37) % 6.28, r: 2.0 + (i % 4) * 0.8,
+        speed: 0.04 + (i % 5) * 0.015, tilt: 0.3 + (i % 3) * 0.2,
+      };
+    }
+    return null;
+  }
 
-  const subDt = dt / PHYSICS_STEPS;
+  // spec: { levelIndex, home, goal, hole:[x,y,z], ballRadius,
+  //         bodies:[{x,y,z,radius,gravity,blackHole}], wormholes:[{a:[x,y,z], b:[x,y,z], radius}] }
+  function buildWorld(spec) {
+    const world = {
+      spec,
+      bodies: spec.bodies.map((b, i) => ({
+        x: b.x, y: b.y, z: b.z, radius: b.radius, gravity: b.gravity,
+        solid: b.radius > SENTINEL_RADIUS, motion: motionFor(i, spec),
+      })),
+      moving: [],
+      home: spec.home, goal: spec.goal,
+      hx: spec.hole[0], hy: spec.hole[1], hz: spec.hole[2],
+      wormholes: (spec.wormholes || []).map(w => ({
+        ax: w.a[0], ay: w.a[1], az: w.a[2], bx: w.b[0], by: w.b[1], bz: w.b[2], radius: w.radius,
+      })),
+      ballRadius: spec.ballRadius,
+      gravityScale: 1, // ball abilities change this during a real flight
+    };
+    world.bodies.forEach((b, i) => { if (b.motion) world.moving.push(i); });
+    placeBodies(world, 0, null);
+    return world;
+  }
 
-  for (let step = 0; step < PHYSICS_STEPS; step++) {
-    if (ballOnPlanet) {
-      const planet = ballOnPlanet;
-      
-      _vToCenter.subVectors(planet.pos, ball.position);
-      const dist = _vToCenter.length();
-      _vNormal.copy(_vToCenter).normalize();
+  function newState() {
+    return { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, on: -1, tick: 0, whCooldown: 0, whIndex: -1, whExit: 0, near: null, fresh: false };
+  }
 
-      const targetDist = planet.radius + ballRadius;
-      _vTemp1.copy(_vNormal).negate().multiplyScalar(targetDist);
-      ball.position.copy(planet.pos).add(_vTemp1);
-
-      // Project velocity onto tangent plane
-      const dotProd = ballVel.dot(_vNormal);
-      _vTemp1.copy(_vNormal).multiplyScalar(dotProd);
-      ballVel.sub(_vTemp1);
-
-      ballVel.multiplyScalar(SURFACE_FRICTION);
-
-      // Hole attraction: pull ball toward hole when on goal planet (like a real cup)
-      if (planet === goalPlanet) {
-        const toHole = _vTemp2.copy(holePos).sub(ball.position);
-        const holeDist = toHole.length();
-        if (holeDist > 0.01 && holeDist < 3.0) {
-          // Strong pull that increases as ball gets closer
-          const pullStrength = 1.5 / (holeDist * holeDist + 0.3);
-          toHole.normalize().multiplyScalar(pullStrength * subDt);
-          // Project onto tangent plane so pull stays on surface
-          const normalDot = toHole.dot(_vNormal);
-          _vTemp1.copy(_vNormal).multiplyScalar(normalDot);
-          toHole.sub(_vTemp1);
-          ballVel.add(toHole);
-        }
+  // Move every moving body to where it is at step number `tick`. A ball resting or rolling on one is
+  // carried along. The solver precomputes these positions once (world.track) instead of per shot.
+  function placeBodies(world, tick, s) {
+    const bodies = world.bodies, moving = world.moving, track = world.track;
+    let row = -1;
+    if (track) {
+      const r = (tick - track.tick0) / BODY_TICK;
+      if (r >= 0 && r < track.rows && r === Math.floor(r)) row = r * moving.length * 3;
+    }
+    const t = tick * H;
+    for (let m = 0; m < moving.length; m++) {
+      const i = moving[m], b = bodies[i], mo = b.motion;
+      let x, y, z;
+      if (row >= 0) {
+        x = track.data[row++]; y = track.data[row++]; z = track.data[row++];
+      } else if (mo.kind === 1) {
+        x = mo.bx + Math.sin(t * mo.wx + mo.s1) * mo.r;
+        y = mo.by + Math.sin(t * mo.wy + mo.s2) * mo.r * 0.6;
+        z = mo.bz + Math.cos(t * mo.wz + mo.s3) * mo.r * 0.8;
+      } else if (mo.kind === 2) {
+        const a = mo.a0 + mo.speed * t;
+        x = mo.cx + Math.cos(a) * mo.dist;
+        y = mo.by + Math.sin(a * 0.7) * mo.dist * 0.05 * mo.tilt;
+        z = mo.cz + Math.sin(a) * mo.dist;
+      } else {
+        const a = mo.a0 + mo.speed * t;
+        x = mo.bx + Math.cos(a) * mo.r;
+        y = mo.by + Math.sin(a * 0.6) * mo.r * mo.tilt;
+        z = mo.bz + Math.sin(a) * mo.r;
       }
+      if (s && s.on === i) { s.x += x - b.x; s.y += y - b.y; s.z += z - b.z; }
+      b.x = x; b.y = y; b.z = z;
+    }
+  }
 
-      // Move along surface
-      _vTemp1.copy(ballVel).multiplyScalar(subDt);
-      ball.position.add(_vTemp1);
+  // Precompute where the moving bodies are for the next `seconds`, starting at step tick0
+  function buildTrack(world, tick0, seconds) {
+    const rows = Math.ceil(seconds / (H * BODY_TICK)) + 2, n = world.moving.length;
+    const data = new Float64Array(rows * n * 3);
+    world.track = null;
+    for (let r = 0, o = 0; r < rows; r++) {
+      placeBodies(world, tick0 + r * BODY_TICK, null);
+      for (let m = 0; m < n; m++) { const b = world.bodies[world.moving[m]]; data[o++] = b.x; data[o++] = b.y; data[o++] = b.z; }
+    }
+    world.track = { tick0, rows, data };
+  }
 
-      // Re-project onto surface
-      _vToCenter.subVectors(planet.pos, ball.position);
-      _vNormal.copy(_vToCenter).normalize();
-      _vTemp1.copy(_vNormal).negate().multiplyScalar(targetDist);
-      ball.position.copy(planet.pos).add(_vTemp1);
+  // Advance the level clock by k steps without touching the ball's own motion (ball sunk or lost).
+  function tickBodies(world, s, k) {
+    if (world.moving.length && (s.tick % BODY_TICK) === 0) placeBodies(world, s.tick, s);
+    s.tick += k;
+  }
 
-      // Check hole inside substep (so fast-rolling balls can't skip over it)
-      if (planet === goalPlanet && !gameWon) {
-        const distToHole = ball.position.distanceTo(holePos);
-        if (distToHole < 1.1 && ballVel.length() < 7) {
-          gameWon = true;
-          ball.position.copy(holePos);
-          ballVel.set(0, 0, 0);
-          controls.target.copy(holePos);
-          controls.enabled = true;
-          controls.update();
-          break; // exit substep loop
-        }
+  function launch(s, dx, dy, dz, power) {
+    s.vx = dx * power; s.vy = dy * power; s.vz = dz * power;
+    if (power > ROLL_LAUNCH_POWER) { s.on = -1; s.fresh = true; }
+  }
+
+  // One step of k * H seconds. k = 1 is the real game; the solver's first passes use larger k as an
+  // approximation (same forces and decay per second) and confirm their result at k = 1.
+  function step(world, s, k) {
+    tickBodies(world, s, k);
+    return s.on >= 0 ? rollStep(world, s, k) : flightStep(world, s, k);
+  }
+
+  function flightStep(world, s, k) {
+    const bodies = world.bodies, n = bodies.length, dt = H * k;
+    const near = s.near;
+    let pull = dt * 60 * world.gravityScale;
+    if (s.fresh) {
+      // First step of a flight. This integrator's velocity runs half a step ahead of its position, so a
+      // coarse step would start the flight with a bigger head start than the exact step does; trimming
+      // the first pull to (1 + 1/k) / 2 makes coarse flights follow the exact ones closely.
+      s.fresh = false;
+      if (k > 1) pull *= (1 + 1 / k) / 2;
+    }
+    const ex = (GRAVITY_EXPONENT + 1) / 2;
+    if (k === 1) {
+      for (let i = 0; i < n; i++) {
+        const b = bodies[i];
+        const tx = b.x - s.x, ty = b.y - s.y, tz = b.z - s.z;
+        const d2 = tx * tx + ty * ty + tz * tz;
+        if (near) near[i] = Math.sqrt(d2);
+        const f = b.gravity * pull / Math.pow(d2, ex); // gravity / dist^1.7, along the unit vector
+        s.vx += tx * f; s.vy += ty * f; s.vz += tz * f;
       }
-
-      if (ballVel.length() > 6) {
-        ballOnPlanet = null;
-      }
-
-      if (ballVel.length() < 0.05) {
-        ballVel.set(0, 0, 0);
-        ballSettled = true;
-        if (shotInFlight && !gameWon && ballOnPlanet) {
-          ballJustSettled = true;
-        }
-      }
-
     } else {
-      // Space physics - gravity from all planetoids
-      const flightSpeed = ballVel.length();
-      for (const p of planetoids) {
-        _vToCenter.subVectors(p.pos, ball.position);
-        const dist = _vToCenter.length();
-        maybeAwardGravityGraze(p, dist - p.radius - ballRadius, flightSpeed);
-        _vNormal.copy(_vToCenter).normalize();
-        const force = (p.gravityStrength / Math.pow(dist, 1.7)) * abilityGravityScale;
-        _vTemp1.copy(_vNormal).multiplyScalar(force * subDt * 60);
-        ballVel.add(_vTemp1);
-      }
-
-      ballVel.multiplyScalar(0.9991);
-
-      _vTemp1.copy(ballVel).multiplyScalar(subDt);
-      ball.position.add(_vTemp1);
-
-      // Check for planet capture
-      for (const p of planetoids) {
-        const dist = ball.position.distanceTo(p.pos);
-        const surfaceDist = dist - p.radius - ballRadius;
-        if (surfaceDist <= 0.1) {
-          const speed = ballVel.length();
-          if (speed < CAPTURE_SPEED || surfaceDist <= -0.05) {
-            ballOnPlanet = p;
-            _vNormal.subVectors(ball.position, p.pos).normalize();
-            _vTemp1.copy(_vNormal).multiplyScalar(p.radius + ballRadius);
-            ball.position.copy(p.pos).add(_vTemp1);
-            
-            // Remove velocity component toward planet
-            _vNormal.subVectors(ball.position, p.pos).normalize();
-            const velNormal = ballVel.dot(_vNormal);
-            if (velNormal < 0) {
-              _vTemp1.copy(_vNormal).multiplyScalar(velNormal);
-              ballVel.sub(_vTemp1);
-            }
-            ballVel.multiplyScalar(0.825);
-            ballSettled = false;
-            playLandingSound();
-            spawnLandingDust(p);
-            break;
-          }
+      if (!pow03) initPow03();
+      for (let i = 0; i < n; i++) {
+        const b = bodies[i];
+        const tx = b.x - s.x, ty = b.y - s.y, tz = b.z - s.z;
+        const d2 = tx * tx + ty * ty + tz * tz, d = Math.sqrt(d2);
+        let f;
+        if (d < POW03_MAX) {
+          const u = d * POW03_STEP, j = u | 0;
+          f = b.gravity * pull * (pow03[j] + (pow03[j + 1] - pow03[j]) * (u - j)) / (d2 * d);
+        } else {
+          f = b.gravity * pull / Math.pow(d2, ex);
         }
+        s.vx += tx * f; s.vy += ty * f; s.vz += tz * f;
       }
+    }
+    const drag = k === 1 ? DRAG : Math.pow(DRAG, k);
+    s.vx *= drag; s.vy *= drag; s.vz *= drag;
+    s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
 
-      // Check wormhole teleportation
-      if (wormholeCooldown <= 0) {
-        for (const wh of wormholes) {
-          const distA = ball.position.distanceTo(wh.a.pos);
-          const distB = ball.position.distanceTo(wh.b.pos);
-          if (distA < wh.radius) {
-            _vTemp1.copy(ballVel).normalize().multiplyScalar(wh.radius + 0.5);
-            ball.position.copy(wh.b.pos).add(_vTemp1);
-            wormholeCooldown = WORMHOLE_COOLDOWN;
-            playWormholeSound();
-            awardFlightStyle('WORMHOLE THREAD', 160, wh.colorA || 0x66ddff, true, true);
-            break;
-          } else if (distB < wh.radius) {
-            _vTemp1.copy(ballVel).normalize().multiplyScalar(wh.radius + 0.5);
-            ball.position.copy(wh.a.pos).add(_vTemp1);
-            wormholeCooldown = WORMHOLE_COOLDOWN;
-            playWormholeSound();
-            awardFlightStyle('WORMHOLE THREAD', 160, wh.colorB || 0xff66cc, true, true);
-            break;
+    const speed2 = s.vx * s.vx + s.vy * s.vy + s.vz * s.vz;
+    let minD2 = Infinity;
+    for (let i = 0; i < n; i++) {
+      const b = bodies[i];
+      const dx = s.x - b.x, dy = s.y - b.y, dz = s.z - b.z;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 < minD2) minD2 = d2;
+      if (!b.solid) continue;
+      const reach = b.radius + world.ballRadius + CAPTURE_REACH;
+      if (d2 > reach * reach) continue;
+      const dist = Math.sqrt(d2);
+      const surfaceDist = dist - b.radius - world.ballRadius;
+      if (speed2 < CAPTURE_SPEED * CAPTURE_SPEED || surfaceDist <= CAPTURE_PENETRATION) {
+        const nx = dx / dist, ny = dy / dist, nz = dz / dist;
+        const rest = b.radius + world.ballRadius;
+        s.x = b.x + nx * rest; s.y = b.y + ny * rest; s.z = b.z + nz * rest;
+        const vn = s.vx * nx + s.vy * ny + s.vz * nz;
+        if (vn < 0) { s.vx -= nx * vn; s.vy -= ny * vn; s.vz -= nz * vn; }
+        s.vx *= CAPTURE_DAMP; s.vy *= CAPTURE_DAMP; s.vz *= CAPTURE_DAMP;
+        s.on = i;
+        if (i === world.goal && trySink(world, s)) return EV.SUNK;
+        return EV.CAPTURE;
+      }
+    }
+
+    if (world.wormholes.length) {
+      if (s.whCooldown <= 0) {
+        for (let w = 0; w < world.wormholes.length; w++) {
+          const wh = world.wormholes[w], r2 = wh.radius * wh.radius;
+          const ax = s.x - wh.ax, ay = s.y - wh.ay, az = s.z - wh.az;
+          const bx = s.x - wh.bx, by = s.y - wh.by, bz = s.z - wh.bz;
+          const inA = ax * ax + ay * ay + az * az < r2;
+          if (inA || bx * bx + by * by + bz * bz < r2) {
+            const speed = Math.sqrt(speed2) || 1, out = wh.radius + 0.5;
+            const ox = inA ? wh.bx : wh.ax, oy = inA ? wh.by : wh.ay, oz = inA ? wh.bz : wh.az;
+            s.x = ox + s.vx / speed * out; s.y = oy + s.vy / speed * out; s.z = oz + s.vz / speed * out;
+            s.whCooldown = WORMHOLE_COOLDOWN;
+            s.whIndex = w; s.whExit = inA ? 1 : 0; // exit side: 1 = b, 0 = a
+            return EV.WORMHOLE;
           }
         }
       } else {
-        wormholeCooldown -= subDt;
-      }
-
-      // Check lost in space
-      let minDist = Infinity;
-      let movingAway = true;
-      for (const p of planetoids) {
-        const d = ball.position.distanceTo(p.pos);
-        minDist = Math.min(minDist, d);
-        _vTemp1.subVectors(p.pos, ball.position).normalize();
-        _vTemp2.copy(ballVel).normalize();
-        if (_vTemp2.dot(_vTemp1) > 0.1) movingAway = false;
-      }
-      const speed = ballVel.length();
-      if (minDist > MAX_DIST || (minDist > 200 && speed > 12 && movingAway)) {
-        if (trainerActive) {
-          restartTrainerDrill('Trajectory escaped the practice field. Re-centering for another attempt.', 750);
-          return;
-        }
-        lostInSpace = true;
-        shotInFlight = false;
-        ballJustSettled = false;
-        flightCombo = 0;
-        flightComboTimer = 0;
-        abilityTimer = 0;
-        abilityMode = -1;
-        abilityGravityScale = 1;
-        artifactMagnetMultiplier = 1;
-        updateAbilityUI();
-        lostTimer = 0.6;
-        _lostSkipRequested = false;
-        strokes++;
-        document.getElementById('strokeCount').textContent = strokes;
-        playLostSound();
-        showMessage('LOST IN SPACE', '+1 Stroke Penalty · Resetting...');
-        break; // one penalty: stop simulating this frame
+        s.whCooldown -= dt;
       }
     }
+
+    // Lost in space: far from everything, or far, fast and heading away from every body
+    if (minD2 > MAX_DIST * MAX_DIST) return EV.LOST;
+    if (minD2 > 200 * 200 && speed2 > 12 * 12) {
+      const speed = Math.sqrt(speed2);
+      let movingAway = true;
+      for (let i = 0; i < n && movingAway; i++) {
+        const b = bodies[i];
+        const tx = b.x - s.x, ty = b.y - s.y, tz = b.z - s.z;
+        const d = Math.sqrt(tx * tx + ty * ty + tz * tz);
+        if ((s.vx * tx + s.vy * ty + s.vz * tz) / (speed * d) > 0.1) movingAway = false;
+      }
+      if (movingAway) return EV.LOST;
+    }
+    return EV.NONE;
   }
+
+  function trySink(world, s) {
+    const dx = s.x - world.hx, dy = s.y - world.hy, dz = s.z - world.hz;
+    if (dx * dx + dy * dy + dz * dz >= HOLE_RADIUS * HOLE_RADIUS) return false;
+    if (s.vx * s.vx + s.vy * s.vy + s.vz * s.vz >= HOLE_MAX_SPEED * HOLE_MAX_SPEED) return false;
+    s.x = world.hx; s.y = world.hy; s.z = world.hz;
+    s.vx = 0; s.vy = 0; s.vz = 0;
+    return true;
+  }
+
+  function rollStep(world, s, k) {
+    const b = world.bodies[s.on], dt = H * k;
+    const rest = b.radius + world.ballRadius;
+    // Unit vector from the ball toward the body's centre
+    let cx = b.x - s.x, cy = b.y - s.y, cz = b.z - s.z;
+    let len = Math.sqrt(cx * cx + cy * cy + cz * cz) || 1;
+    let nx = cx / len, ny = cy / len, nz = cz / len;
+    s.x = b.x - nx * rest; s.y = b.y - ny * rest; s.z = b.z - nz * rest;
+
+    // Keep the velocity in the tangent plane, then apply rolling friction
+    const vn = s.vx * nx + s.vy * ny + s.vz * nz;
+    s.vx -= nx * vn; s.vy -= ny * vn; s.vz -= nz * vn;
+    const fr = k === 1 ? SURFACE_FRICTION : Math.pow(SURFACE_FRICTION, k);
+    s.vx *= fr; s.vy *= fr; s.vz *= fr;
+
+    // The cup pulls a nearby ball in, along the surface
+    const onGoal = s.on === world.goal;
+    if (onGoal) {
+      let hx = world.hx - s.x, hy = world.hy - s.y, hz = world.hz - s.z;
+      const hd = Math.sqrt(hx * hx + hy * hy + hz * hz);
+      if (hd > 0.01 && hd < HOLE_PULL_RANGE) {
+        const p = 1.5 / (hd * hd + 0.3) * dt / hd;
+        hx *= p; hy *= p; hz *= p;
+        const hn = hx * nx + hy * ny + hz * nz;
+        s.vx += hx - nx * hn; s.vy += hy - ny * hn; s.vz += hz - nz * hn;
+      }
+    }
+
+    s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
+    cx = b.x - s.x; cy = b.y - s.y; cz = b.z - s.z;
+    len = Math.sqrt(cx * cx + cy * cy + cz * cz) || 1;
+    s.x = b.x - cx / len * rest; s.y = b.y - cy / len * rest; s.z = b.z - cz / len * rest;
+
+    if (onGoal && trySink(world, s)) return EV.SUNK;
+    const speed2 = s.vx * s.vx + s.vy * s.vy + s.vz * s.vz;
+    if (speed2 > LIFTOFF_SPEED * LIFTOFF_SPEED) { s.on = -1; s.fresh = true; return EV.LIFTOFF; }
+    if (speed2 < REST_SPEED * REST_SPEED) { s.vx = 0; s.vy = 0; s.vz = 0; return EV.REST; }
+    return EV.NONE;
+  }
+
+  // ---- Whole-shot simulation (aim preview and solver) ----
+  // start: { x, y, z, on, tick, whCooldown }. trace (optional): { every, points: [], stopOnCapture }
+  // collects x,y,z triples and can end the run at the first landing.
+  const simState = newState();
+  function simulate(world, start, dx, dy, dz, power, maxTime, k, trace) {
+    const s = simState;
+    if (world.moving.length) placeBodies(world, start.tick, null);
+    s.x = start.x; s.y = start.y; s.z = start.z;
+    s.on = start.on; s.tick = start.tick; s.whCooldown = start.whCooldown || 0; s.near = null;
+    launch(s, dx, dy, dz, power);
+
+    const goal = world.bodies[world.goal];
+    const steps = Math.ceil(maxTime / (H * k));
+    let sunk = false, lost = false, landed = false, landedOnGoal = s.on === world.goal;
+    let bestHoleDist = Infinity, bestGoalSurfDist = Infinity, i = 0;
+    if (trace) trace.points.push(s.x, s.y, s.z);
+    for (; i < steps; i++) {
+      const ev = step(world, s, k);
+      if (trace && (i + 1) % trace.every === 0) trace.points.push(s.x, s.y, s.z);
+      if (ev === EV.SUNK) { sunk = true; landedOnGoal = true; bestHoleDist = 0; break; }
+      if (ev === EV.LOST) { lost = true; break; }
+      if (ev === EV.CAPTURE) {
+        landedOnGoal = s.on === world.goal;
+        if (trace && trace.stopOnCapture) { landed = true; break; }
+      } else if (ev === EV.LIFTOFF) landedOnGoal = false;
+      if (s.on < 0) {
+        const gx = s.x - goal.x, gy = s.y - goal.y, gz = s.z - goal.z;
+        const d = Math.sqrt(gx * gx + gy * gy + gz * gz) - goal.radius;
+        if (d < bestGoalSurfDist) bestGoalSurfDist = d;
+      } else if (s.on === world.goal) {
+        const hx = s.x - world.hx, hy = s.y - world.hy, hz = s.z - world.hz;
+        const d = Math.sqrt(hx * hx + hy * hy + hz * hz);
+        if (d < bestHoleDist) bestHoleDist = d;
+      }
+      if (ev === EV.REST) break;
+    }
+    if (trace) trace.points.push(s.x, s.y, s.z);
+    return {
+      sunk, lost, landed, landedOnGoal, bestHoleDist, bestGoalSurfDist, time: (i + 1) * H * k,
+      end: { x: s.x, y: s.y, z: s.z, on: s.on, tick: s.tick, whCooldown: s.whCooldown },
+    };
+  }
+
+  const SUNK_SCORE = -9000; // any score at or below this is a sunk shot
+  const SEED_BODIES = 4;
+  // Lower is better. A shot is judged by where the ball ends up, as the next shot starts from there.
+  function scoreResult(world, r) {
+    if (r.sunk) return -10000 + r.time;                  // sank it: prefer the quicker route
+    if (r.lost) return 1e6;
+    const e = r.end;
+    const hx = world.hx - e.x, hy = world.hy - e.y, hz = world.hz - e.z;
+    const holeDist = Math.sqrt(hx * hx + hy * hy + hz * hz);
+    if (r.landedOnGoal) return -5000 + holeDist;         // on the goal planet: closer to the cup is better
+    if (e.on < 0) return holeDist;                       // still flying when the simulation ended
+    // At rest on another body: distance to the cup, plus a penalty for sitting on the side that faces
+    // away from the goal (from there the body itself, and its gravity, are in the way)
+    const b = world.bodies[e.on];
+    const nx = e.x - b.x, ny = e.y - b.y, nz = e.z - b.z, nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+    const gx = world.hx - b.x, gy = world.hy - b.y, gz = world.hz - b.z, gl = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
+    const facing = (nx * gx + ny * gy + nz * gz) / (nl * gl); // 1 = facing the cup, -1 = far side
+    const pass = r.bestGoalSurfDist < holeDist ? r.bestGoalSurfDist : holeDist;
+    return holeDist + (1 - facing) * 3 * b.radius + 0.25 * pass;
+  }
+
+  // ---- Path solver ----
+  // Searches launch angle, elevation and power for the shot that scores best, starting from `start`
+  // (a ball at rest on body start.on). The search runs on coarse steps; the winners are re-checked and
+  // polished on the exact step, so the returned shot is what the real ball does when fired now.
+  function findOptimalPath(world, start, maxPower) {
+    const planet = world.bodies[start.on >= 0 ? start.on : world.home];
+    let nx = start.x - planet.x, ny = start.y - planet.y, nz = start.z - planet.z;
+    const nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+    nx /= nl; ny /= nl; nz /= nl;
+
+    // Tangent frame on the surface
+    let ax = 1, ay = 0, az = 0;
+    if (Math.abs(nx) > 0.9) { ax = 0; ay = 1; }
+    let t1x = ay * nz - az * ny, t1y = az * nx - ax * nz, t1z = ax * ny - ay * nx;
+    const t1l = Math.sqrt(t1x * t1x + t1y * t1y + t1z * t1z);
+    t1x /= t1l; t1y /= t1l; t1z /= t1l;
+    const t2x = ny * t1z - nz * t1y, t2y = nz * t1x - nx * t1z, t2z = nx * t1y - ny * t1x;
+
+    const dir = [0, 0, 0];
+    function setDir(angle, elevation) {
+      const cosA = Math.cos(angle), sinA = Math.sin(angle), cosE = Math.cos(elevation), sinE = Math.sin(elevation);
+      const tx = t1x * cosA + t2x * sinA, ty = t1y * cosA + t2y * sinA, tz = t1z * cosA + t2z * sinA;
+      const rx = tx * cosE + nx * sinE, ry = ty * cosE + ny * sinE, rz = tz * cosE + nz * sinE;
+      const len = Math.sqrt(rx * rx + ry * ry + rz * rz);
+      dir[0] = rx / len; dir[1] = ry / len; dir[2] = rz / len;
+    }
+    function paramsToward(px, py, pz) {
+      let dx = px - start.x, dy = py - start.y, dz = pz - start.z;
+      const dl = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+      dx /= dl; dy /= dl; dz /= dl;
+      const nComp = dx * nx + dy * ny + dz * nz;
+      const elevation = Math.asin(Math.max(-1, Math.min(1, nComp)));
+      const qx = dx - nx * nComp, qy = dy - ny * nComp, qz = dz - nz * nComp;
+      const ql = Math.sqrt(qx * qx + qy * qy + qz * qz);
+      if (ql < 0.001) return [0, elevation];
+      return [Math.atan2((qx * t2x + qy * t2y + qz * t2z) / ql, (qx * t1x + qy * t1y + qz * t1z) / ql), elevation];
+    }
+    function run(a, e, p, maxTime, k, trace) {
+      setDir(a, e);
+      return simulate(world, start, dir[0], dir[1], dir[2], p, maxTime, k, trace);
+    }
+    function keepBest(list, cand, size) {
+      if (list.length < size || cand.s < list[list.length - 1].s) {
+        list.push(cand);
+        list.sort((x, y) => x.s - y.s);
+        if (list.length > size) list.length = size;
+      }
+    }
+
+    if (world.moving.length) buildTrack(world, start.tick, 28);
+
+    // Seed directions: the goal, the cup, and the bodies closest to the straight line to the goal
+    const goal = world.bodies[world.goal];
+    const seeds = [paramsToward(goal.x, goal.y, goal.z), paramsToward(world.hx, world.hy, world.hz)];
+    {
+      const lx = goal.x - start.x, ly = goal.y - start.y, lz = goal.z - start.z, l2 = lx * lx + ly * ly + lz * lz || 1;
+      const near = [];
+      for (let i = 0; i < world.bodies.length; i++) {
+        const b = world.bodies[i];
+        if (b === planet || i === world.goal || !b.solid) continue;
+        const u = Math.max(0, Math.min(1, ((b.x - start.x) * lx + (b.y - start.y) * ly + (b.z - start.z) * lz) / l2));
+        near.push({ b, d: Math.hypot(b.x - start.x - lx * u, b.y - start.y - ly * u, b.z - start.z - lz * u) });
+      }
+      near.sort((p, q) => p.d - q.d);
+      for (const c of near.slice(0, SEED_BODIES)) seeds.push(paramsToward(c.b.x, c.b.y, c.b.z));
+    }
+
+    // Pass 1: coarse sweep of the whole sphere plus the neighbourhood of every seed direction
+    const COARSE_T = 6.3, COARSE_K = 8;
+    const top = [];
+    const coarse = (a, e, p) => keepBest(top, { a, e, p, s: scoreResult(world, run(a, e, p, COARSE_T, COARSE_K)) }, 15);
+    for (let ai = 0; ai < 60; ai++) {
+      for (let pi = 1; pi < 14; pi++) {
+        for (let ei = 0; ei < 5; ei++) coarse((ai / 60) * Math.PI * 2, 0.1 + (ei / 4) * 1.05, (pi / 14) * maxPower);
+      }
+    }
+    for (const [sa, se] of seeds) {
+      for (let ai = 0; ai < 8; ai++) {
+        for (let pi = 0; pi < 8; pi++) {
+          for (let ei = 0; ei < 4; ei++) {
+            coarse(sa - 0.3 + (ai / 7) * 0.6, Math.max(0.05, se - 0.3 + (ei / 3) * 0.6), Math.max(1, (pi / 7) * maxPower));
+          }
+        }
+      }
+    }
+
+    const aStep = (Math.PI * 2 / 60) * 1.2, pStep = maxPower / 14 * 1.5, eStep = 0.2;
+    const EXACT_T = 16.2;
+    // Polish one candidate on the exact step; stops as soon as it really sinks
+    function polish(c, iterations) {
+      const cur = { a: c.a, e: c.e, p: c.p, s: scoreResult(world, run(c.a, c.e, c.p, EXACT_T, 1)) };
+      let sA = aStep * 0.3, sP = pStep * 0.4, sE = 0.06;
+      for (let iter = 0; iter < iterations && cur.s > SUNK_SCORE; iter++) {
+        let improved = false;
+        for (const [da, dp, de] of [[sA, 0, 0], [-sA, 0, 0], [0, sP, 0], [0, -sP, 0], [0, 0, sE], [0, 0, -sE]]) {
+          const a = cur.a + da, p = Math.min(maxPower, Math.max(0.5, cur.p + dp)), e = Math.max(0.05, cur.e + de);
+          const s = scoreResult(world, run(a, e, p, EXACT_T, 1));
+          if (s < cur.s) { cur.a = a; cur.e = e; cur.p = p; cur.s = s; improved = true; }
+        }
+        const shrink = improved ? 0.65 : 0.35;
+        sA *= shrink; sP *= shrink; sE *= shrink;
+      }
+      return cur;
+    }
+    function finish(best) {
+      // The winner's full path, on the exact step (one point every 9 steps = 0.01875 s)
+      const trace = { every: 9, points: [] };
+      const final = run(best.a, best.e, best.p, 27, 1, trace);
+      world.track = null;
+      return { dir: [dir[0], dir[1], dir[2]], power: best.p, points: trace.points, sunk: final.sunk, landedOnGoal: final.landedOnGoal };
+    }
+
+    // Shortcut: if the coarse sweep already found sinking shots, confirm the best few on the exact step
+    let best = null;
+    for (let i = 0; i < top.length && i < 4 && top[i].s <= SUNK_SCORE; i++) {
+      const cur = polish(top[i], 3);
+      if (!best || cur.s < best.s) best = cur;
+      if (cur.s <= SUNK_SCORE) return finish(cur);
+    }
+
+    // Pass 2: finer grid around each of the best 15, on half the coarse step and for longer
+    const fine = [];
+    for (const c of top.slice(0, 10)) {
+      for (let ai = 0; ai < 5; ai++) {
+        for (let pi = 0; pi < 5; pi++) {
+          for (let ei = 0; ei < 4; ei++) {
+            const a = c.a - aStep + (ai / 4) * aStep * 2;
+            const p = Math.min(maxPower, Math.max(0.5, c.p - pStep + (pi / 4) * pStep * 2));
+            const e = Math.max(0.05, c.e - eStep + (ei / 3) * eStep * 2);
+            keepBest(fine, { a, e, p, s: scoreResult(world, run(a, e, p, 12.6, 4)) }, 4);
+          }
+        }
+      }
+    }
+
+    // Pass 3: polish the leaders on the exact step. Stops at the first shot that really sinks.
+    for (const c of fine) {
+      const cur = polish(c, 5);
+      if (!best || cur.s < best.s) best = cur;
+      if (best.s <= SUNK_SCORE) break;
+    }
+    return finish(best || { a: 0, e: 0.4, p: maxPower * 0.5, s: Infinity });
+  }
+
+  return {
+    H, BODY_TICK, EV, ROLL_LAUNCH_POWER, CAPTURE_SPEED, MAX_DIST, SENTINEL_RADIUS,
+    buildWorld, newState, placeBodies, tickBodies, launch, step, simulate, scoreResult, findOptimalPath,
+  };
+}
+// </golf-physics>
+
+const golfPhysics = createGolfPhysics();
+const PHYS_EV = golfPhysics.EV;
+let physWorld = null;       // the level as the engine sees it (rebuilt by loadLevel)
+let aimWorld = null;        // a second copy for aim previews, so they never disturb the live one
+const physState = golfPhysics.newState(); // the live ball; also carries the level clock (tick)
+let physAccumulator = 0;
+
+function buildPhysicsWorld(levelIdx) {
+  const spec = {
+    levelIndex: levelIdx,
+    home: planetoids.indexOf(homePlanet),
+    goal: planetoids.indexOf(goalPlanet),
+    hole: holePos.toArray(),
+    ballRadius,
+    bodies: planetoids.map(p => ({
+      x: p.pos.x, y: p.pos.y, z: p.pos.z, radius: p.radius, gravity: p.gravityStrength, blackHole: isBlackHole(p),
+    })),
+    wormholes: wormholes.map(w => ({ a: w.a.pos.toArray(), b: w.b.pos.toArray(), radius: w.radius })),
+  };
+  physWorld = golfPhysics.buildWorld(spec);
+  aimWorld = golfPhysics.buildWorld(spec);
+  physState.tick = 0;
+  physState.whCooldown = 0;
+  physState.near = new Float64Array(planetoids.length);
+  physAccumulator = 0;
+  planetoids.forEach((p, i) => { p.isMoving = !!physWorld.bodies[i].motion; });
+  syncMovingBodies();
+}
+
+// Copy the engine's body positions onto the meshes (only bodies that move)
+function syncMovingBodies() {
+  for (const i of physWorld.moving) {
+    const b = physWorld.bodies[i], p = planetoids[i];
+    p.pos.set(b.x, b.y, b.z);
+    p.mesh.position.copy(p.pos);
+    if (p._gravField) p._gravField.position.copy(p.pos);
+  }
+}
+
+// Where an aim preview or a solver run starts: the resting ball, at the current level time
+function aimStartState() {
+  return {
+    x: ball.position.x, y: ball.position.y, z: ball.position.z,
+    on: planetoids.indexOf(ballOnPlanet),
+    tick: physState.tick - (physState.tick % golfPhysics.BODY_TICK),
+    whCooldown: 0,
+  };
+}
+
+function writeBallFromPhysics() {
+  const s = physState;
+  ball.position.set(s.x, s.y, s.z);
+  ballVel.set(s.vx, s.vy, s.vz);
+  ballOnPlanet = s.on >= 0 ? planetoids[s.on] : null;
+}
+
+// Runs the engine in fixed steps of 1/480 s, however long the frame took, so a shot plays out the
+// same on every device and refresh rate. While the ball is sunk or lost only the bodies keep moving.
+function physicsStep(dt) {
+  if (!physWorld) return;
+  const s = physState, H = golfPhysics.H;
+  // Frame times jitter around the display rate; snapping to it keeps the step count per frame steady
+  if (Math.abs(dt - 1 / 60) < 0.001) dt = 1 / 60;
+  else if (Math.abs(dt - 1 / 120) < 0.0005) dt = 1 / 120;
+  physAccumulator += dt;
+
+  let live = !gameWon && !lostInSpace;
+  const liveAtStart = live;
+  if (live) {
+    s.x = ball.position.x; s.y = ball.position.y; s.z = ball.position.z;
+    s.vx = ballVel.x; s.vy = ballVel.y; s.vz = ballVel.z;
+    s.on = ballOnPlanet ? planetoids.indexOf(ballOnPlanet) : -1;
+    physWorld.gravityScale = abilityGravityScale;
+  } else {
+    s.on = -1;
+  }
+
+  while (physAccumulator >= H) {
+    physAccumulator -= H;
+    if (!live) { golfPhysics.tickBodies(physWorld, s, 1); continue; }
+
+    const flying = s.on < 0;
+    const flightSpeed = flying ? Math.sqrt(s.vx * s.vx + s.vy * s.vy + s.vz * s.vz) : 0;
+    const ev = golfPhysics.step(physWorld, s, 1);
+    if (flying) {
+      const near = s.near;
+      for (let i = 0; i < planetoids.length; i++) {
+        const p = planetoids[i];
+        maybeAwardGravityGraze(p, near[i] - p.radius - ballRadius, flightSpeed);
+      }
+    }
+    if (ev === PHYS_EV.NONE || ev === PHYS_EV.LIFTOFF) continue;
+    if (ev === PHYS_EV.REST) {
+      ballSettled = true;
+      if (shotInFlight) ballJustSettled = true;
+      continue;
+    }
+
+    writeBallFromPhysics(); // the effects below read the ball's position
+    if (ev === PHYS_EV.CAPTURE) {
+      ballSettled = false;
+      playLandingSound();
+      spawnLandingDust(ballOnPlanet);
+    } else if (ev === PHYS_EV.WORMHOLE) {
+      const wh = wormholes[s.whIndex];
+      playWormholeSound();
+      awardFlightStyle('WORMHOLE THREAD', 160, s.whExit === 1 ? (wh.colorA || 0x66ddff) : (wh.colorB || 0xff66cc), true, true);
+    } else if (ev === PHYS_EV.SUNK) {
+      gameWon = true;
+      controls.target.copy(holePos);
+      controls.enabled = true;
+      controls.update();
+      live = false;
+      s.on = -1;
+    } else if (ev === PHYS_EV.LOST) {
+      if (trainerActive) {
+        physAccumulator = 0;
+        syncMovingBodies();
+        restartTrainerDrill('Trajectory escaped the practice field. Re-centering for another attempt.', 750);
+        return;
+      }
+      lostInSpace = true;
+      shotInFlight = false;
+      ballJustSettled = false;
+      flightCombo = 0;
+      flightComboTimer = 0;
+      abilityTimer = 0;
+      abilityMode = -1;
+      abilityGravityScale = 1;
+      artifactMagnetMultiplier = 1;
+      updateAbilityUI();
+      lostTimer = 0.6;
+      _lostSkipRequested = false;
+      strokes++;
+      document.getElementById('strokeCount').textContent = strokes;
+      playLostSound();
+      showMessage('LOST IN SPACE', '+1 Stroke Penalty · Resetting...');
+      live = false; // one penalty; only the bodies keep moving for the rest of this frame
+    }
+  }
+  if (live) writeBallFromPhysics();
+  syncMovingBodies();
+  if (!liveAtStart) return;
 
   // Check hole (scoring and celebration — gameWon may already be set by substep)
   if (!holeScored && (ballOnPlanet === goalPlanet || gameWon)) {
@@ -10902,6 +11316,56 @@ function hideAimVisuals() {
   ballMat.emissive.setHex(bc.emissive);
 }
 
+// The aim arc is the first part of the shot exactly as the engine will fly it (a rolling putt
+// included). It is recomputed only when the aim, the ball or the moving bodies have changed.
+const aimPreview = { key: '', points: [], gravCandidates: [], impactPos: null, impactNormal: null, impactPlanet: null };
+function computeAimPreview(launchDir, power, powerNorm) {
+  const start = aimStartState();
+  const bodyClock = physWorld.moving.length ? (start.tick >> 5) : 0; // moving bodies: refresh 15 times a second
+  const key = start.x + ',' + start.y + ',' + start.z + ',' + start.on + ',' + bodyClock + ','
+    + launchDir.x + ',' + launchDir.y + ',' + launchDir.z + ',' + power;
+  if (key === aimPreview.key) return aimPreview;
+  aimPreview.key = key;
+
+  // Same arc length as before: low-power shots get more time per point
+  const every = Math.max(1, Math.round(0.0148 * (1 + (1 - powerNorm) * 1.2) / golfPhysics.H));
+  const trace = { every, points: [], stopOnCapture: true };
+  const res = golfPhysics.simulate(aimWorld, start, launchDir.x, launchDir.y, launchDir.z, power,
+    ARROW_SEGMENTS * every * golfPhysics.H, 1, trace);
+
+  const points = aimPreview.points = [];
+  for (let i = 0; i < trace.points.length; i += 3) {
+    const p = new THREE.Vector3(trace.points[i], trace.points[i + 1], trace.points[i + 2]);
+    if (points.length === 0 || points[points.length - 1].distanceToSquared(p) > 1e-10) points.push(p);
+  }
+
+  // Gravity pull lines: the strongest pull at each of the first few points
+  const grav = aimPreview.gravCandidates = [];
+  for (let i = 1; i < points.length && i <= TRAJ_COUNT && grav.length < GRAV_LINE_COUNT; i++) {
+    let strongestPull = 0, strongestPlanetIdx = -1;
+    for (let pi = 0; pi < planetoids.length; pi++) {
+      const force = planetoids[pi].gravityStrength / Math.pow(planetoids[pi].pos.distanceTo(points[i]), 1.7);
+      if (force > strongestPull) { strongestPull = force; strongestPlanetIdx = pi; }
+    }
+    if (strongestPull > 0.15 && !grav.some(c => c.pos.distanceTo(points[i]) < 2)) {
+      grav.push({ pos: points[i].clone(), planetIdx: strongestPlanetIdx, strength: Math.min(strongestPull / 0.8, 1) });
+    }
+  }
+
+  // Landing marker: where the previewed stretch touches down (or drops into the cup)
+  aimPreview.impactPlanet = null;
+  aimPreview.impactPos = null;
+  aimPreview.impactNormal = null;
+  if ((res.landed || res.sunk) && res.end.on >= 0) {
+    const planet = planetoids[res.end.on];
+    const n = new THREE.Vector3(res.end.x, res.end.y, res.end.z).sub(planet.pos).normalize();
+    aimPreview.impactPlanet = planet;
+    aimPreview.impactNormal = n;
+    aimPreview.impactPos = planet.pos.clone().add(n.clone().multiplyScalar(planet.radius + 0.02));
+  }
+  return aimPreview;
+}
+
 function updateTrajectoryPreview() {
   if (!aiming && !aimLocked) {
     hideAimVisuals();
@@ -10945,48 +11409,16 @@ function updateTrajectoryPreview() {
   ballGlowMat.color.copy(pColor);
   ballGlowMat.opacity = pulseGlow + Math.sin(time * 4) * 0.05;
 
-  // === 1. Curved gravity arrow ===
+  // === 1. Curved gravity arrow: the opening stretch of the shot, flown by the game's own engine ===
+  const preview = computeAimPreview(launchDir, power, powerNorm);
+  const arcPoints = preview.points;
+  currentAimPreviewPoints = arcPoints;
   {
     const onGoal = ballOnPlanet === goalPlanet;
-    const ARC_SUBSTEPS = 4;
-    const arcBaseDt = 0.0037;
-    const arcTimeScale = 1.0 + (1.0 - powerNorm) * 1.2;
-    const arcSubDt = arcBaseDt * arcTimeScale;
-    const arcSteps = ARROW_SEGMENTS;
-    const arcPoints = [];
-    let aPos = ball.position.clone();
-    let aVel = launchDir.clone().multiplyScalar(power);
-    for (let i = 0; i <= arcSteps; i++) {
-      arcPoints.push(aPos.clone());
-      // Sub-step physics for accuracy (matches real physics closer)
-      let hit = false;
-      for (let sub = 0; sub < ARC_SUBSTEPS; sub++) {
-        for (const p of planetoids) {
-          _arcToCenter.subVectors(p.pos, aPos);
-          const d = _arcToCenter.length();
-          _arcToCenter.normalize();
-          const force = p.gravityStrength / Math.pow(d, 1.7);
-          aVel.addScaledVector(_arcToCenter, force * arcSubDt * 60);
-        }
-        aVel.multiplyScalar(0.9991);
-        aPos.addScaledVector(aVel, arcSubDt);
-        
-        // Only check hits after escaping start planet (skip first 5 steps)
-        if (i >= 5) {
-          for (const p of planetoids) {
-            if (aPos.distanceTo(p.pos) - p.radius - ballRadius < 0.1) { hit = true; break; }
-          }
-        }
-        if (hit) break;
-      }
-      if (hit) { arcPoints.push(aPos.clone()); break; }
-    }
-    currentAimPreviewPoints = arcPoints;
-    
     // Build dotted arc
     if (arcPoints.length >= 3) {
       updateArcDots(arcPoints, powerNorm, onGoal);
-      
+
       // Place arrowhead at the end, pointing in travel direction
       const lastPt = arcPoints[arcPoints.length - 1];
       const prevPt = arcPoints[arcPoints.length - 2];
@@ -10998,7 +11430,7 @@ function updateTrajectoryPreview() {
       arrowHead.visible = true;
       arrowHead.scale.setScalar(1.0);
       arrowHeadMat.color.setHex(0xffcc44);
-      
+
       arrowHeadGlow.position.copy(lastPt);
       arrowHeadGlow.quaternion.copy(headQuat);
       arrowHeadGlow.visible = true;
@@ -11010,77 +11442,12 @@ function updateTrajectoryPreview() {
     }
   }
 
-  // === 2-4. Simulate trajectory with speed tracking ===
-  let simPos = ball.position.clone();
-  let simVel = launchDir.clone().multiplyScalar(power);
-  const simDt = 0.02;
-  const dotCount = TRAJ_COUNT;
-
-  // Track gravity line candidates: {pos, planetIdx, strength}
-  const gravCandidates = [];
-  let impactFound = false;
-  let impactPos = null;
-  let impactNormal = null;
-  let simOnPlanet = null;
-
-  for (let i = 0; i < TRAJ_COUNT; i++) {
-    if (i < dotCount && !simOnPlanet) {
-      // Apply gravity
-      let strongestPull = 0;
-      let strongestPlanetIdx = -1;
-      for (let pi = 0; pi < planetoids.length; pi++) {
-        const p = planetoids[pi];
-        const toCenter = p.pos.clone().sub(simPos);
-        const d = toCenter.length();
-        const dir = toCenter.normalize();
-        const force = p.gravityStrength / Math.pow(d, 1.7);
-        simVel.add(dir.multiplyScalar(force * simDt * 60));
-        if (force > strongestPull) {
-          strongestPull = force;
-          strongestPlanetIdx = pi;
-        }
-      }
-      simVel.multiplyScalar(0.9991);
-      simPos.add(simVel.clone().multiplyScalar(simDt));
-
-      const speed = simVel.length();
-      trajSpeeds[i] = speed;
-
-      // === Gravity pull line candidates ===
-      if (strongestPull > 0.15 && gravCandidates.length < GRAV_LINE_COUNT) {
-        const tooClose = gravCandidates.some(c => c.pos.distanceTo(simPos) < 2);
-        if (!tooClose) {
-          gravCandidates.push({
-            pos: simPos.clone(),
-            planetIdx: strongestPlanetIdx,
-            strength: Math.min(strongestPull / 0.8, 1)
-          });
-        }
-      }
-
-      // Check for surface capture (impact marker)
-      if (!impactFound) {
-        for (const p of planetoids) {
-          const dist = simPos.distanceTo(p.pos);
-          const surfaceDist = dist - p.radius - ballRadius;
-          if (surfaceDist <= 0.15 && speed < CAPTURE_SPEED) {
-            impactFound = true;
-            const n = simPos.clone().sub(p.pos).normalize();
-            impactPos = p.pos.clone().add(n.multiplyScalar(p.radius + 0.02));
-            impactNormal = simPos.clone().sub(p.pos).normalize();
-            simOnPlanet = p;
-            break;
-          }
-        }
-      }
-
-      // Hide trajectory dots — arrow-only aiming
-      trajDots[i].visible = false;
-
-    } else {
-      trajDots[i].visible = false;
-    }
-  }
+  // === 2-4. Gravity pull lines and landing marker come from the same previewed flight ===
+  const gravCandidates = preview.gravCandidates;
+  const impactFound = preview.impactPlanet !== null;
+  const impactPos = preview.impactPos;
+  const impactNormal = preview.impactNormal;
+  const simOnPlanet = preview.impactPlanet;
 
   // === 5. Gravity pull lines ===
   for (let i = 0; i < GRAV_LINE_COUNT; i++) {
@@ -11159,347 +11526,77 @@ const optPathGeo = new THREE.BufferGeometry();
 optimalPathLine = new THREE.Line(optPathGeo, optPathMat);
 scene.add(optimalPathLine);
 
-function simulateShot(startPos, launchDir, power, maxSteps) {
-  const simDt = 0.018;
-  let pos = startPos.clone();
-  let vel = launchDir.clone().multiplyScalar(power);
-  const points = [pos.clone()];
-  let onPlanet = null;
-  let bestHoleDist = Infinity;
-  let hitGoal = false;
+// The search takes up to a second or two on the larger holes, so it runs in a Web Worker and the page
+// never freezes. The worker is built from the physics engine's own source text: it cannot drift
+// from the game. Without worker support the search runs on the main thread, as it used to.
+let solverWorker = null;   // null = not created yet, false = unavailable
+let solverWorkerUrl = null;
+let solverJob = null;      // the request in flight: { id, request, finish }
+let solverSeq = 0;
 
-  for (let i = 0; i < maxSteps; i++) {
-    if (onPlanet) {
-      // Surface physics
-      const toCenter = onPlanet.pos.clone().sub(pos);
-      const normal = toCenter.clone().normalize();
-      const targetDist = onPlanet.radius + ballRadius;
-      pos.copy(onPlanet.pos).add(normal.clone().negate().multiplyScalar(targetDist));
-      vel.sub(normal.clone().multiplyScalar(vel.dot(normal)));
-      vel.multiplyScalar(SURFACE_FRICTION);
-      pos.add(vel.clone().multiplyScalar(simDt));
-      const newNormal = onPlanet.pos.clone().sub(pos).normalize();
-      pos.copy(onPlanet.pos).add(newNormal.clone().negate().multiplyScalar(targetDist));
-
-      if (vel.length() > 6) onPlanet = null;
-      if (vel.length() < 0.01) {
-        if (onPlanet === goalPlanet) {
-          const d = pos.distanceTo(holePos);
-          if (d < bestHoleDist) bestHoleDist = d;
-          if (d < 0.5) hitGoal = true;
+function createSolverWorker() {
+  if (!solverWorkerUrl) {
+    const source = createGolfPhysics.toString() + `
+      const physics = createGolfPhysics();
+      self.onmessage = ({ data }) => {
+        try {
+          const world = physics.buildWorld(data.spec);
+          self.postMessage({ id: data.id, result: physics.findOptimalPath(world, data.start, data.maxPower) });
+        } catch (err) {
+          self.postMessage({ id: data.id, error: String(err) });
         }
-        break;
-      }
-
-      if (onPlanet === goalPlanet) {
-        const d = pos.distanceTo(holePos);
-        if (d < bestHoleDist) bestHoleDist = d;
-        if (d < 0.5 && vel.length() < 4) { hitGoal = true; break; }
-      }
-    } else {
-      // Space physics
-      for (const p of planetoids) {
-        const toCenter = p.pos.clone().sub(pos);
-        const dist = toCenter.length();
-        const dir = toCenter.normalize();
-        const force = p.gravityStrength / Math.pow(dist, 1.7);
-        vel.add(dir.multiplyScalar(force * simDt * 60));
-      }
-      vel.multiplyScalar(0.9991);
-      pos.add(vel.clone().multiplyScalar(simDt));
-
-      // Check capture
-      for (const p of planetoids) {
-        const dist = pos.distanceTo(p.pos);
-        const surfaceDist = dist - p.radius - ballRadius;
-        if (surfaceDist <= 0.1) {
-          const speed = vel.length();
-          if (speed < CAPTURE_SPEED || surfaceDist <= -0.05) {
-            onPlanet = p;
-            const normal = pos.clone().sub(p.pos).normalize();
-            pos.copy(p.pos).add(normal.multiplyScalar(p.radius + ballRadius));
-            const velNormal = vel.dot(pos.clone().sub(p.pos).normalize());
-            if (velNormal < 0) vel.sub(pos.clone().sub(p.pos).normalize().multiplyScalar(velNormal));
-            vel.multiplyScalar(0.5);
-            break;
-          }
-        }
-      }
-
-      // Lost in space check
-      let minDist = Infinity;
-      for (const p of planetoids) minDist = Math.min(minDist, pos.distanceTo(p.pos));
-      if (minDist > MAX_DIST) break;
-    }
-    points.push(pos.clone());
+      };`;
+    solverWorkerUrl = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
   }
-
-  return { points, bestHoleDist, hitGoal };
+  const worker = new Worker(solverWorkerUrl);
+  worker.onmessage = ({ data }) => {
+    if (!solverJob || data.id !== solverJob.id) return;
+    const job = solverJob;
+    solverJob = null;
+    job.finish(data.error ? null : data.result);
+  };
+  worker.onerror = () => {
+    // Workers do not run here: fall back to the main thread from now on
+    worker.terminate();
+    solverWorker = false;
+    if (!solverJob) return;
+    const job = solverJob;
+    solverJob = null;
+    job.finish(golfPhysics.findOptimalPath(aimWorld, job.request.start, job.request.maxPower));
+  };
+  return worker;
 }
 
-// Fast simulation — returns richer scoring data
-function simulateShotFast(startPos, launchDir, power, maxSteps) {
-  const simDt = 0.018;
-  let x = startPos.x, y = startPos.y, z = startPos.z;
-  let vx = launchDir.x * power, vy = launchDir.y * power, vz = launchDir.z * power;
-  let onPlanet = null;
-  let bestHoleDist = Infinity;
-  let bestGoalSurfDist = Infinity; // closest approach to goal planet surface
-  let hitGoal = false;
-  let landedOnGoal = false;
-
-  for (let i = 0; i < maxSteps; i++) {
-    if (onPlanet) {
-      const tcx = onPlanet.pos.x - x, tcy = onPlanet.pos.y - y, tcz = onPlanet.pos.z - z;
-      const tcLen = Math.sqrt(tcx*tcx + tcy*tcy + tcz*tcz);
-      const nx = tcx/tcLen, ny = tcy/tcLen, nz = tcz/tcLen;
-      const targetDist = onPlanet.radius + ballRadius;
-      x = onPlanet.pos.x - nx * targetDist;
-      y = onPlanet.pos.y - ny * targetDist;
-      z = onPlanet.pos.z - nz * targetDist;
-      const vdotn = vx*nx + vy*ny + vz*nz;
-      vx -= nx * vdotn; vy -= ny * vdotn; vz -= nz * vdotn;
-      vx *= SURFACE_FRICTION; vy *= SURFACE_FRICTION; vz *= SURFACE_FRICTION;
-      x += vx * simDt; y += vy * simDt; z += vz * simDt;
-      const nx2 = onPlanet.pos.x - x, ny2 = onPlanet.pos.y - y, nz2 = onPlanet.pos.z - z;
-      const n2Len = Math.sqrt(nx2*nx2 + ny2*ny2 + nz2*nz2);
-      const nnx = nx2/n2Len, nny = ny2/n2Len, nnz = nz2/n2Len;
-      x = onPlanet.pos.x - nnx * targetDist;
-      y = onPlanet.pos.y - nny * targetDist;
-      z = onPlanet.pos.z - nnz * targetDist;
-
-      const speed = Math.sqrt(vx*vx + vy*vy + vz*vz);
-      if (speed > 6) onPlanet = null;
-      if (speed < 0.01) {
-        if (landedOnGoal) {
-          const dx = x - holePos.x, dy = y - holePos.y, dz = z - holePos.z;
-          const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
-          if (d < bestHoleDist) bestHoleDist = d;
-          if (d < 0.5) hitGoal = true;
-        }
-        break;
-      }
-      if (landedOnGoal) {
-        const dx = x - holePos.x, dy = y - holePos.y, dz = z - holePos.z;
-        const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
-        if (d < bestHoleDist) bestHoleDist = d;
-        if (d < 0.5 && speed < 4) { hitGoal = true; break; }
-      }
-    } else {
-      for (let pi = 0; pi < planetoids.length; pi++) {
-        const p = planetoids[pi];
-        const tcx = p.pos.x - x, tcy = p.pos.y - y, tcz = p.pos.z - z;
-        const dist = Math.sqrt(tcx*tcx + tcy*tcy + tcz*tcz);
-        const force = p.gravityStrength / Math.pow(dist, 1.7);
-        const f = force * simDt * 60 / dist;
-        vx += tcx * f; vy += tcy * f; vz += tcz * f;
-      }
-      vx *= 0.9991; vy *= 0.9991; vz *= 0.9991;
-      x += vx * simDt; y += vy * simDt; z += vz * simDt;
-
-      // Track closest approach to goal planet surface
-      {
-        const dx = x - goalPlanet.pos.x, dy = y - goalPlanet.pos.y, dz = z - goalPlanet.pos.z;
-        const d = Math.sqrt(dx*dx + dy*dy + dz*dz) - goalPlanet.radius;
-        if (d < bestGoalSurfDist) bestGoalSurfDist = d;
-      }
-
-      for (let pi = 0; pi < planetoids.length; pi++) {
-        const p = planetoids[pi];
-        const dx = x - p.pos.x, dy = y - p.pos.y, dz = z - p.pos.z;
-        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-        const surfaceDist = dist - p.radius - ballRadius;
-        if (surfaceDist <= 0.1) {
-          const speed = Math.sqrt(vx*vx + vy*vy + vz*vz);
-          if (speed < CAPTURE_SPEED || surfaceDist <= -0.05) {
-            onPlanet = p;
-            landedOnGoal = (p === goalPlanet);
-            const nx = dx/dist, ny = dy/dist, nz = dz/dist;
-            x = p.pos.x + nx * (p.radius + ballRadius);
-            y = p.pos.y + ny * (p.radius + ballRadius);
-            z = p.pos.z + nz * (p.radius + ballRadius);
-            const vn = vx*nx + vy*ny + vz*nz;
-            if (vn < 0) { vx -= nx * vn; vy -= ny * vn; vz -= nz * vn; }
-            vx *= 0.5; vy *= 0.5; vz *= 0.5;
-            break;
-          }
-        }
-      }
-
-      let minDist = Infinity;
-      for (let pi = 0; pi < planetoids.length; pi++) {
-        const p = planetoids[pi];
-        const dx = x - p.pos.x, dy = y - p.pos.y, dz = z - p.pos.z;
-        const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
-        if (d < minDist) minDist = d;
-      }
-      if (minDist > MAX_DIST) break;
-    }
-  }
-
-  return { bestHoleDist, hitGoal, landedOnGoal, bestGoalSurfDist };
+// Drop the solve in flight: its answer is for an aim that no longer exists
+function cancelPathSolve() {
+  if (!solverJob) return;
+  const job = solverJob;
+  solverJob = null;
+  if (solverWorker) { solverWorker.terminate(); solverWorker = null; }
+  job.finish(null);
 }
 
-// Scoring function — lower is better
-function scoreResult(r) {
-  if (r.hitGoal) return -10000 + r.bestHoleDist; // Best: sank it
-  if (r.landedOnGoal) return -5000 + r.bestHoleDist; // Landed on goal, rolling distance
-  // Didn't reach goal — use closest approach to goal surface (rewards near-misses)
-  return r.bestGoalSurfDist;
-}
-
-// Build launch direction from tangent frame + params
-function buildLaunchDir(tangent1, tangent2, normal, angle, elevation) {
-  const cosA = Math.cos(angle), sinA = Math.sin(angle);
-  const cosE = Math.cos(elevation), sinE = Math.sin(elevation);
-  const tx = tangent1.x * cosA + tangent2.x * sinA;
-  const ty = tangent1.y * cosA + tangent2.y * sinA;
-  const tz = tangent1.z * cosA + tangent2.z * sinA;
-  const rx = tx * cosE + normal.x * sinE;
-  const ry = ty * cosE + normal.y * sinE;
-  const rz = tz * cosE + normal.z * sinE;
-  const len = Math.sqrt(rx*rx + ry*ry + rz*rz);
-  return new THREE.Vector3(rx/len, ry/len, rz/len);
-}
-
-function findOptimalPath() {
-  const startPos = ball.position.clone();
-  const planet = ballOnPlanet || homePlanet;
-  const normal = startPos.clone().sub(planet.pos).normalize();
-
-  // Build tangent frame
-  let tangent1 = new THREE.Vector3(1, 0, 0);
-  if (Math.abs(normal.dot(tangent1)) > 0.9) tangent1.set(0, 1, 0);
-  tangent1.cross(normal).normalize();
-  const tangent2 = normal.clone().cross(tangent1).normalize();
-
-  const MAX_POWER = 17.4 * levelPowerMult;
-
-  // Pre-extract tangent frame components to avoid object allocation in hot loop
-  const t1x=tangent1.x,t1y=tangent1.y,t1z=tangent1.z;
-  const t2x=tangent2.x,t2y=tangent2.y,t2z=tangent2.z;
-  const nx=normal.x,ny=normal.y,nz=normal.z;
-
-  // Inline launch dir builder — returns reusable object, no allocation
-  const _ld = new THREE.Vector3();
-  function launchDir(angle, elevation) {
-    const cosA=Math.cos(angle),sinA=Math.sin(angle),cosE=Math.cos(elevation),sinE=Math.sin(elevation);
-    const tx=t1x*cosA+t2x*sinA, ty=t1y*cosA+t2y*sinA, tz=t1z*cosA+t2z*sinA;
-    const rx=tx*cosE+nx*sinE, ry=ty*cosE+ny*sinE, rz=tz*cosE+nz*sinE;
-    const len=Math.sqrt(rx*rx+ry*ry+rz*rz);
-    _ld.set(rx/len, ry/len, rz/len);
-    return _ld;
-  }
-
-  // Convert world direction to (angle, elevation)
-  function dirToParams(dir) {
-    const nComp = dir.x*nx + dir.y*ny + dir.z*nz;
-    const elevation = Math.asin(Math.max(-1, Math.min(1, nComp)));
-    const px=dir.x-nx*nComp, py=dir.y-ny*nComp, pz=dir.z-nz*nComp;
-    const pLen=Math.sqrt(px*px+py*py+pz*pz);
-    if (pLen < 0.001) return [0, elevation];
-    const angle = Math.atan2((px*t2x+py*t2y+pz*t2z)/pLen, (px*t1x+py*t1y+pz*t1z)/pLen);
-    return [angle, elevation];
-  }
-
-  // ===== Build seed directions =====
-  const seeds = [];
-  const toGoal = goalPlanet.pos.clone().sub(startPos).normalize();
-  seeds.push(dirToParams(toGoal));
-  const toHole = holePos.clone().sub(startPos).normalize();
-  seeds.push(dirToParams(toHole));
-  for (const p of planetoids) {
-    if (p === planet || p === goalPlanet) continue;
-    seeds.push(dirToParams(p.pos.clone().sub(startPos).normalize()));
-  }
-
-  // ===== PASS 1: Coarse uniform sweep (60×14×5 = 4200) + seed neighborhoods =====
-  let bestScore = Infinity;
-  let bestA = 0, bestP = 0, bestE = 0.4;
-  const topK = []; // keep top 15
-
-  function tryShot(a, e, p, steps) {
-    const dir = launchDir(a, e);
-    const r = simulateShotFast(startPos, dir, p, steps);
-    const s = scoreResult(r);
-    if (s < bestScore) { bestScore = s; bestA = a; bestP = p; bestE = e; }
-    // Maintain top 15 for refinement
-    if (topK.length < 15 || s < topK[topK.length-1].s) {
-      topK.push({a, p, e, s});
-      if (topK.length > 15) {
-        topK.sort((x,y) => x.s - y.s);
-        topK.length = 15;
-      }
+// Resolves to { launchDir, power, points, sunk }, or null when cancelled or failed
+function solveOptimalPath() {
+  cancelPathSolve();
+  const request = { id: ++solverSeq, spec: physWorld.spec, start: aimStartState(), maxPower: 17.4 * levelPowerMult };
+  return new Promise(resolve => {
+    const finish = raw => {
+      if (!raw) { resolve(null); return; }
+      const points = [];
+      for (let i = 0; i < raw.points.length; i += 3) points.push(new THREE.Vector3(raw.points[i], raw.points[i + 1], raw.points[i + 2]));
+      resolve({ launchDir: new THREE.Vector3(raw.dir[0], raw.dir[1], raw.dir[2]), power: raw.power, points, sunk: raw.sunk });
+    };
+    if (solverWorker === null) {
+      try { solverWorker = createSolverWorker(); } catch (e) { solverWorker = false; }
     }
-  }
-
-  // Uniform sweep — short sims for fast rejection
-  for (let ai = 0; ai < 60; ai++) {
-    const angle = (ai / 60) * Math.PI * 2;
-    for (let pi = 1; pi < 14; pi++) {
-      const power = (pi / 14) * MAX_POWER;
-      for (let ei = 0; ei < 5; ei++) {
-        const elev = 0.1 + (ei / 4) * 1.05;
-        tryShot(angle, elev, power, 350);
-      }
+    if (!solverWorker) {
+      finish(golfPhysics.findOptimalPath(aimWorld, request.start, request.maxPower));
+      return;
     }
-  }
-
-  // Seed neighborhoods — denser, still short sims
-  for (const [sa, se] of seeds) {
-    for (let ai = 0; ai < 8; ai++) {
-      const angle = sa - 0.3 + (ai / 7) * 0.6;
-      for (let pi = 0; pi < 8; pi++) {
-        const power = Math.max(1, (pi / 7) * MAX_POWER);
-        for (let ei = 0; ei < 4; ei++) {
-          const elev = Math.max(0.05, se - 0.3 + (ei / 3) * 0.6);
-          tryShot(angle, elev, power, 350);
-        }
-      }
-    }
-  }
-
-  // ===== PASS 2: Refine top 15 (15 × 6×6×5 = 2700, longer sims) =====
-  topK.sort((x,y) => x.s - y.s);
-  const aStep = (Math.PI * 2 / 60) * 1.2;
-  const pStep = MAX_POWER / 14 * 1.5;
-  const eStep = 0.2;
-
-  for (const cand of topK) {
-    for (let ai = 0; ai < 6; ai++) {
-      const angle = cand.a - aStep + (ai / 5) * aStep * 2;
-      for (let pi = 0; pi < 6; pi++) {
-        const power = Math.max(0.5, cand.p - pStep + (pi / 5) * pStep * 2);
-        for (let ei = 0; ei < 5; ei++) {
-          const elev = Math.max(0.05, cand.e - eStep + (ei / 4) * eStep * 2);
-          const dir = launchDir(angle, elev);
-          const r = simulateShotFast(startPos, dir, power, 700);
-          const s = scoreResult(r);
-          if (s < bestScore) { bestScore = s; bestA = angle; bestP = power; bestE = elev; }
-        }
-      }
-    }
-  }
-
-  // ===== PASS 3: Gradient descent polish (5 iterations × 6 perturbations) =====
-  let sA = aStep * 0.3, sP = pStep * 0.4, sE = 0.06;
-  for (let iter = 0; iter < 5; iter++) {
-    let improved = false;
-    for (const [da,dp,de] of [[sA,0,0],[-sA,0,0],[0,sP,0],[0,-sP,0],[0,0,sE],[0,0,-sE]]) {
-      const a = bestA+da, p = Math.max(0.5, bestP+dp), e = Math.max(0.05, bestE+de);
-      const dir = launchDir(a, e);
-      const r = simulateShotFast(startPos, dir, p, 900);
-      const s = scoreResult(r);
-      if (s < bestScore) { bestScore = s; bestA = a; bestP = p; bestE = e; improved = true; }
-    }
-    if (!improved) { sA *= 0.35; sP *= 0.35; sE *= 0.35; }
-    else { sA *= 0.65; sP *= 0.65; sE *= 0.65; }
-  }
-
-  // ===== Generate full path for winner =====
-  const finalDir = buildLaunchDir(tangent1, tangent2, normal, bestA, bestE);
-  const finalResult = simulateShot(startPos.clone(), finalDir, bestP, 1500);
-  return { points: finalResult.points, launchDir: finalDir, power: bestP };
+    solverJob = { id: request.id, request, finish };
+    solverWorker.postMessage(request);
+  });
 }
 
 function toggleOptimalPath() {
@@ -11516,13 +11613,16 @@ function toggleOptimalPath() {
   btn.textContent = 'COMPUTING...';
   btn.style.pointerEvents = 'none';
 
-  // Use requestAnimationFrame so the UI updates before the heavy computation
-  requestAnimationFrame(() => {
-    const optimalResult = findOptimalPath();
-    optimalPathPoints = optimalResult.points;
-    lastOptimalLaunchDir = optimalResult.launchDir ? optimalResult.launchDir.clone() : null;
-    lastOptimalPower = optimalResult.power || 0;
+  solveOptimalPath().then((optimalResult) => {
     btn.style.pointerEvents = '';
+    if (!optimalResult || !ballOnPlanet || shotInFlight || gameWon || lostInSpace) {
+      // Cancelled, or the ball has moved on since the request
+      btn.textContent = 'PREVIEW OPTIMAL PATH';
+      return;
+    }
+    optimalPathPoints = optimalResult.points;
+    lastOptimalLaunchDir = optimalResult.launchDir.clone();
+    lastOptimalPower = optimalResult.power || 0;
 
     if (optimalPathPoints.length < 2) {
       btn.textContent = 'NO PATH FOUND';
@@ -11544,6 +11644,7 @@ function toggleOptimalPath() {
 }
 
 function hideOptimalPath() {
+  cancelPathSolve();
   optimalAnimating = false;
   optimalPathVisible = false;
   optimalPathLine.material.opacity = 0.0;
@@ -11633,25 +11734,24 @@ function animate() {
     return; // Skip all game logic during intro
   }
 
-  // Physics
+  // Physics. The engine also runs while the ball is sunk or lost, to keep the bodies moving.
+  const ballLive = !gameWon && !lostInSpace;
+  physicsStep(dt);
   if (!gameWon) {
-    if (lostInSpace) {
+    if (!ballLive) {
       lostTimer -= dt;
       if (lostTimer <= 0 || _lostSkipRequested) {
         _lostSkipRequested = false;
         lostInSpace = false;
         document.getElementById('message').style.display = 'none';
-        // Reset to last known position if undo available, otherwise home
-        if (undoStack.length > 0) {
-          const lastState = undoStack[undoStack.length - 1];
-          const resetPlanet = lastState.onPlanet || homePlanet;
-          placeBallOnPlanet(resetPlanet, lastState.ballPos.clone().sub(resetPlanet.pos).normalize());
+        // Back to where the shot was fired from, otherwise home
+        if (shotStart) {
+          placeBallOnPlanet(shotStart.planet, shotStart.dir.clone());
         } else {
           placeBallOnPlanet(homePlanet, lastBallPos.clone().sub(homePlanet.pos).normalize());
         }
       }
     } else {
-      physicsStep(dt);
       updateBoost(dt);
       updateBallAbility(dt);
       updateFlightMastery(dt);
@@ -11799,8 +11899,7 @@ function animate() {
   // Track ball on moving planets (moons, mediums, black holes)
   if (!shotInFlight && !aiming && !gameWon && ballOnPlanet && !introPlaying) {
     const p = ballOnPlanet;
-    const isMoving = p._basePos || p._mpBasePos || p._bhBasePos;
-    if (isMoving) {
+    if (p.isMoving) {
       const ballPos = ball.position;
       controls.target.lerp(ballPos, 0.12);
       if (!controls._userInteracting) {
@@ -12229,82 +12328,13 @@ function animate() {
   }
   if (hadBoostParts) boostInstanced.instanceMatrix.needsUpdate = true;
 
-  // === NINTENDO FUN: Planet gentle rotation + bob + moon orbits ===
+  // === Planets: slow spin. Moving bodies are positioned by the physics engine; the rest bob gently ===
   for (let i = 0; i < planetoids.length; i++) {
     const p = planetoids[i];
-    p.mesh.rotation.y += dt * 0.08; // slow spin
-    const bobPhase = i * 1.7;
-
-    if (p.radius < 0.8 && p.radius > 0.02 && currentLevel >= 5) {
-      // Throttle orbit calc to ~30fps on mobile
-      if (isTouchDevice && (i % 2 !== Math.floor(time * 30) % 2)) {
-        // Skip this frame for this moon (stagger across moons)
-        p.mesh.position.copy(p.pos);
-        if (p._gravField) p._gravField.position.copy(p.pos);
-      } else {
-      // Store base position on first frame
-      if (!p._basePos) p._basePos = p.pos.clone();
-      // Small moons: stochastic Lissajous orbit around their base position
-      const seed1 = (i * 137.5) % 6.28;
-      const seed2 = (i * 241.3) % 6.28;
-      const seed3 = (i * 89.7) % 6.28;
-      const orbitRadius = 1.2 + (i % 5) * 0.4;
-      const speedX = 0.3 + (i % 7) * 0.06;
-      const speedY = 0.25 + (i % 5) * 0.07;
-      const speedZ = 0.35 + (i % 3) * 0.05;
-      const ox = Math.sin(time * speedX + seed1) * orbitRadius;
-      const oy = Math.sin(time * speedY + seed2) * orbitRadius * 0.6;
-      const oz = Math.cos(time * speedZ + seed3) * orbitRadius * 0.8;
-      // Update both mesh and physics position
-      p.pos.set(p._basePos.x + ox, p._basePos.y + oy, p._basePos.z + oz);
-      p.mesh.position.copy(p.pos);
-      // Move gravity field rings too
-      if (p._gravField) p._gravField.position.copy(p.pos);
-      }
-    } else if (isBlackHole(p) && goalPlanet && p !== goalPlanet) {
-      // Black holes orbit around the goal planet
-      if (!p._bhBasePos) p._bhBasePos = p.pos.clone();
-      if (!p._bhAngle) p._bhAngle = Math.atan2(
-        p._bhBasePos.z - goalPlanet.pos.z,
-        p._bhBasePos.x - goalPlanet.pos.x
-      );
-      if (!p._bhDist) p._bhDist = p._bhBasePos.distanceTo(goalPlanet.pos);
-      if (!p._bhSpeed) p._bhSpeed = 0.02 + (i % 3) * 0.01;
-      if (!p._bhTilt) p._bhTilt = (i * 0.7) % 1.0 - 0.5;
-
-      p._bhAngle += p._bhSpeed * dt;
-      const ba = p._bhAngle;
-      const bd = p._bhDist;
-      const gp = goalPlanet.pos;
-      p.pos.set(
-        gp.x + Math.cos(ba) * bd,
-        p._bhBasePos.y + Math.sin(ba * 0.7) * bd * 0.05 * p._bhTilt,
-        gp.z + Math.sin(ba) * bd
-      );
-      p.mesh.position.copy(p.pos);
-      if (p._gravField) p._gravField.position.copy(p.pos);
-    } else if (p.radius >= 0.8 && currentLevel >= 7 && p !== homePlanet && p !== goalPlanet && !isBlackHole(p)) {
-      // Medium planets orbit their base position at level 8+
-      if (!p._mpBasePos) p._mpBasePos = p.pos.clone();
-      if (!p._mpAngle) p._mpAngle = (i * 2.37) % 6.28;
-      if (!p._mpRadius) p._mpRadius = 2.0 + (i % 4) * 0.8;
-      if (!p._mpSpeed) p._mpSpeed = 0.04 + (i % 5) * 0.015;
-      if (!p._mpTilt) p._mpTilt = 0.3 + (i % 3) * 0.2;
-
-      p._mpAngle += p._mpSpeed * dt;
-      const ma = p._mpAngle;
-      const mr = p._mpRadius;
-      p.pos.set(
-        p._mpBasePos.x + Math.cos(ma) * mr,
-        p._mpBasePos.y + Math.sin(ma * 0.6) * mr * p._mpTilt,
-        p._mpBasePos.z + Math.sin(ma) * mr
-      );
-      p.mesh.position.copy(p.pos);
-      if (p._gravField) p._gravField.position.copy(p.pos);
-    } else {
-      // Regular planets: gentle bob (visual only, physics stays at base)
-      const bobAmount = p.radius * 0.012;
-      p.mesh.position.y = p.pos.y + Math.sin(time * 1.2 + bobPhase) * bobAmount;
+    p.mesh.rotation.y += dt * 0.08;
+    if (!p.isMoving) {
+      // visual only, physics stays at the base position
+      p.mesh.position.y = p.pos.y + Math.sin(time * 1.2 + i * 1.7) * p.radius * 0.012;
     }
   }
 
