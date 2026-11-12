@@ -69,6 +69,21 @@
   .not-signed-in a { color: #c4a0ff; }
   #loading { font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(200,180,255,0.3); letter-spacing: 3px; }
   #content { display: none; }
+  .confirm-modal {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(4,2,14,0.94); padding: 20px;
+  }
+  .confirm-modal.visible { display: flex; }
+  .confirm-modal .card { max-width: 380px; text-align: center; margin-bottom: 0; }
+  .confirm-modal .desc { font-size: 12px; color: rgba(200,180,255,0.5); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-cancel {
+    margin-top: 20px; padding: 8px 24px; background: none;
+    border: 1px solid rgba(200,180,255,0.15); border-radius: 6px;
+    color: rgba(200,180,255,0.35); font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
+  }
+  .confirm-cancel:hover { border-color: rgba(200,180,255,0.4); color: rgba(200,180,255,0.6); }
 </style>
 </head>
 <body>
@@ -110,6 +125,16 @@
   </div>
 </div>
 
+<!-- Guest sign-out confirmation -->
+<div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="card">
+    <h2 id="confirmTitle">SIGN OUT?</h2>
+    <div class="desc">You are playing as a guest. If you sign out, this guest account and its game history and stats are lost for good. They cannot be recovered.</div>
+    <button type="button" class="link out" id="confirmOk">SIGN OUT ANYWAY</button>
+  </div>
+  <button type="button" class="confirm-cancel" id="confirmCancel">← STAY SIGNED IN</button>
+</div>
+
 <script>
 const CONFIG = {
   apiKey: "AIzaSyDPyq1wk3l-aMRJcOFwzY8CmKN5cpN7XXc",
@@ -124,6 +149,16 @@ firebase.initializeApp(CONFIG);
 const db = firebase.database();
 firebase.auth().getRedirectResult().catch(() => {});
 
+// Public player name: only a name the player confirmed in the game on this device
+// (localStorage 'gg_name_ok' = '<uid>|<name>'), otherwise the neutral default.
+// Never the email prefix and never the real name a Google profile carries.
+function shownPlayerName(user) {
+  let saved = null;
+  try { saved = localStorage.getItem('gg_name_ok'); } catch (e) {}
+  if (user.displayName && saved === user.uid + '|' + user.displayName) return user.displayName;
+  return 'Cosmonaut-' + user.uid.slice(0,5);
+}
+
 firebase.auth().onAuthStateChanged(async user => {
   document.getElementById('loading').style.display = 'none';
   if (!user) {
@@ -132,7 +167,7 @@ firebase.auth().onAuthStateChanged(async user => {
   }
 
   document.getElementById('content').style.display = 'block';
-  document.getElementById('name').textContent = user.displayName || ('Cosmonaut-' + user.uid.slice(0,5));
+  document.getElementById('name').textContent = shownPlayerName(user);
   document.getElementById('email').textContent = user.isAnonymous ? 'Guest account' : (user.email || '');
   const av = document.getElementById('avatar');
   // Build the image as an element: a profile URL must never be parsed as markup
@@ -143,7 +178,7 @@ firebase.auth().onAuthStateChanged(async user => {
     img.src = user.photoURL;
     av.textContent = '';
     av.appendChild(img);
-  } else av.textContent = (user.displayName || '?').charAt(0).toUpperCase();
+  } else av.textContent = shownPlayerName(user).charAt(0).toUpperCase();
 
   // Load games
   try {
@@ -198,7 +233,30 @@ firebase.auth().onAuthStateChanged(async user => {
   }
 });
 
-document.getElementById('signOutBtn').onclick = () => {
+// In-page confirmation (no window.confirm). Resolves true for "sign out anyway".
+let confirmResolve = null;
+function closeConfirm(result) {
+  document.getElementById('confirmModal').classList.remove('visible');
+  const resolve = confirmResolve;
+  confirmResolve = null;
+  if (resolve) resolve(result);
+}
+function confirmGuestSignOut() {
+  if (confirmResolve) closeConfirm(false);
+  document.getElementById('confirmModal').classList.add('visible');
+  document.getElementById('confirmCancel').focus(); // the safe choice is the default
+  return new Promise(resolve => { confirmResolve = resolve; });
+}
+document.getElementById('confirmOk').onclick = () => closeConfirm(true);
+document.getElementById('confirmCancel').onclick = () => closeConfirm(false);
+document.getElementById('confirmModal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { e.preventDefault(); closeConfirm(false); }
+});
+
+document.getElementById('signOutBtn').onclick = async () => {
+  const user = firebase.auth().currentUser;
+  // A guest account cannot be signed back into: its history is gone for good
+  if (user && user.isAnonymous && !(await confirmGuestSignOut())) return;
   firebase.auth().signOut().then(() => window.location.href = '/login.html');
 };
 </script>
