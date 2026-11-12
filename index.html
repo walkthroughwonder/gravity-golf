@@ -105,7 +105,17 @@
   #stats .stat-card.artifact .stat-value { color: #cc88ff; -webkit-text-fill-color: #cc88ff; font-size: 11px; }
 
   /* === Action buttons === */
-  #resetBtn {
+  #topRightBtns {
+    position: fixed; top: 8px; right: 8px; z-index: 10; pointer-events: auto;
+    display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; max-width: 300px;
+  }
+  /* SCORE button: below 960px it wraps under the row; from 960px the row is long enough to
+     clear the centred title, and it goes on the left end so the other four stay put */
+  @media (min-width: 960px) {
+    #topRightBtns { max-width: 380px; }
+    #scorecardBtn { order: -1; }
+  }
+  #resetBtn, #scorecardBtn {
     z-index: 10;
     background: rgb(18,14,8); border: 2px solid rgba(200,170,60,0.4); border-radius: 8px;
     color: rgba(220,195,100,0.7); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron', sans-serif;
@@ -113,13 +123,13 @@
     pointer-events: auto; text-transform: uppercase;
     box-shadow: 0 2px 0 rgba(80,65,10,0.7), 0 3px 8px rgba(0,0,0,0.3);
   }
-  #resetBtn:hover {
+  #resetBtn:hover, #scorecardBtn:hover {
     background: rgb(40,32,10); color: #ffe566;
     border-color: rgba(255,210,60,0.6);
     box-shadow: 0 3px 0 rgba(80,65,10,0.8), 0 5px 12px rgba(0,0,0,0.4);
     transform: translateY(-1px);
   }
-  #resetBtn:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(80,65,10,0.7), 0 2px 4px rgba(0,0,0,0.3); }
+  #resetBtn:active, #scorecardBtn:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(80,65,10,0.7), 0 2px 4px rgba(0,0,0,0.3); }
 
   #optimalBtn {
     display: none;
@@ -1443,32 +1453,38 @@
       width: calc(100vw - 24px); min-height: 0; grid-template-columns: 126px 1fr;
       gap: 16px; padding: 18px 17px; border-radius: 18px;
     }
+    #instructions.launch-lab .trainer-card::after { display: none; } /* 7px corner tag, would sit under the stacked buttons */
     #instructions.launch-lab .trainer-visual { min-height: 220px; padding-right: 13px; }
-    #instructions.launch-lab .trainer-visual-copy { right: 13px; font-size: 5px; letter-spacing: 1.4px; }
-    #instructions.launch-lab .trainer-kicker { margin-bottom: 9px; font-size: 6px; letter-spacing: 2px; }
-    #instructions.launch-lab #trainerStatus { font-size: 5px; padding: 4px 6px; letter-spacing: 1px; }
+    #instructions.launch-lab .trainer-visual-copy { right: 13px; font-size: 11px; line-height: 1.3; letter-spacing: 0.5px; }
+    #instructions.launch-lab .trainer-kicker { margin-bottom: 9px; font-size: 11px; letter-spacing: 2px; }
+    #instructions.launch-lab #trainerStatus { font-size: 11px; padding: 4px 8px; letter-spacing: 0.5px; }
     #instructions.launch-lab #trainerProgress { margin-bottom: 14px; gap: 4px; }
-    #instructions.launch-lab #trainerStepLabel { font-size: 6px; }
+    #instructions.launch-lab #trainerStepLabel { font-size: 11px; letter-spacing: 2px; }
     #instructions.launch-lab #trainerTitle { margin-bottom: 8px; font-size: 20px; letter-spacing: 2.5px; }
-    #instructions.launch-lab #trainerBody { min-height: 0; font-size: 10px; line-height: 1.55; }
-    #instructions.launch-lab #trainerHint { margin-top: 8px; font-size: 5px; }
+    #instructions.launch-lab #trainerBody { min-height: 0; font-size: 13px; line-height: 1.5; }
+    #instructions.launch-lab #trainerHint { margin-top: 8px; font-size: 11px; line-height: 1.4; letter-spacing: 0.5px; }
     #instructions.launch-lab .trainer-actions { margin-top: 14px; gap: 6px; }
-    #instructions.launch-lab .trainer-actions #startBtn { padding: 10px 14px; font-size: 8px; letter-spacing: 2px; }
+    /* Phone: the two choices stack, main one on top, each a full-width 44px+ target */
+    #instructions.launch-lab:not(.training) .trainer-actions { flex-direction: column-reverse; align-items: stretch; gap: 8px; }
+    #instructions.launch-lab:not(.training) .trainer-actions #startBtn { margin: 0; }
+    #instructions.launch-lab .trainer-actions #startBtn { min-height: 48px; padding: 10px 14px; font-size: 14px; letter-spacing: 2px; }
     #instructions.launch-lab .trainer-actions #skipBtn,
-    #instructions.launch-lab .trainer-actions #trainerResetBtn { padding: 8px 9px; font-size: 6px; letter-spacing: 1px; }
+    #instructions.launch-lab .trainer-actions #trainerResetBtn { min-height: 44px; padding: 8px 10px; font-size: 13px; letter-spacing: 1px; }
 
     #instructions.launch-lab.training .trainer-card {
-      top: 66px; left: 10px; right: 10px; bottom: auto; width: auto;
+      top: calc(104px + env(safe-area-inset-top, 0px)); left: 10px; right: 10px; bottom: auto; width: auto;
       padding: 11px 12px 10px; border-radius: 12px;
     }
-    #instructions.launch-lab.training .trainer-kicker { margin-bottom: 5px; }
+    /* The drill card sits over the play field: the brand/status row gives way to readable text
+       (the progress bar above the step label still shows the step) */
+    #instructions.launch-lab.training .trainer-kicker { display: none; }
     #instructions.launch-lab.training #trainerProgress { margin-bottom: 8px; }
-    #instructions.launch-lab.training #trainerStepLabel { font-size: 5px; }
+    #instructions.launch-lab.training #trainerStepLabel { margin-bottom: 2px; font-size: 11px; }
     #instructions.launch-lab.training #trainerTitle { margin-bottom: 4px; font-size: 14px; letter-spacing: 2px; }
-    #instructions.launch-lab.training #trainerBody { font-size: 8px; line-height: 1.4; }
-    #instructions.launch-lab.training #trainerHint { margin-top: 4px; font-size: 5px; line-height: 1.3; }
+    #instructions.launch-lab.training #trainerBody { font-size: 13px; line-height: 1.35; }
+    #instructions.launch-lab.training #trainerHint { margin-top: 4px; font-size: 11px; line-height: 1.3; }
     #instructions.launch-lab.training .trainer-actions { margin-top: 7px; }
-    #trainerTargetLabel { font-size: 6px; bottom: calc(100% + 9px); }
+    #trainerTargetLabel { font-size: 11px; letter-spacing: 1px; bottom: calc(100% + 9px); }
   }
 
   @media (max-width: 430px) {
@@ -1476,7 +1492,7 @@
     #instructions.launch-lab:not(.training) .trainer-visual { display: none; }
     #instructions.launch-lab:not(.training) .trainer-card { max-width: 350px; }
     #instructions.launch-lab:not(.training) #trainerTitle { font-size: 24px; }
-    #instructions.launch-lab:not(.training) #trainerBody { font-size: 11px; }
+    #instructions.launch-lab:not(.training) #trainerBody { font-size: 13px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2032,37 +2048,54 @@
     /* Hide in-game title to free up space */
     #ui { display: none; }
 
+    /* Phone HUD: a full-width stats strip (4-48px), then a row of 44px buttons (52-96px).
+       Labels are 11px, values and button text 13px or more, every tap target at least 44x44. */
     /* Stats */
-    #stats { top: 6px; left: 6px; gap: 4px; }
-    #stats .stat-card { min-width: 42px; padding: 3px 6px; border-radius: 6px; }
-    #stats .stat-label { font-size: 4.5px; letter-spacing: 1px; }
-    #stats .stat-value { font-size: 14px; }
+    #stats {
+      top: calc(4px + env(safe-area-inset-top, 0px));
+      left: calc(4px + env(safe-area-inset-left, 0px)); right: calc(4px + env(safe-area-inset-right, 0px));
+      gap: 3px; flex-wrap: nowrap; max-width: none;
+    }
+    #stats .stat-card { flex: 1 1 auto; min-width: 0; height: 44px; padding: 3px 4px; border-radius: 6px; justify-content: center; }
+    #stats .stat-card.time { min-width: 66px; } /* fits 888.8, so the strip does not shift as the clock runs */
+    #stats .stat-label,
+    #stats .stat-card.artifact .stat-label { font-size: 11px; line-height: 14px; letter-spacing: 0; margin-bottom: 0; white-space: nowrap; }
+    #stats .stat-value,
+    #stats .stat-card.time .stat-value, #stats .stat-card.artifact .stat-value { font-size: 15px; line-height: 20px; white-space: nowrap; }
 
     /* Top-right buttons */
-    #topRightBtns { top: 6px; right: 6px; gap: 3px; }
-    #topRightBtns button { font-size: 6px; padding: 4px 7px; letter-spacing: 1px; }
+    #topRightBtns {
+      top: calc(52px + env(safe-area-inset-top, 0px)); right: calc(4px + env(safe-area-inset-right, 0px));
+      gap: 4px; flex-wrap: nowrap; max-width: none;
+    }
+    #topRightBtns button { min-width: 44px; min-height: 44px; padding: 0 10px; font-size: 13px; letter-spacing: 0.5px; }
     #controlsBtn { display: none; }
-    #gravToggleBtn { padding: 4px 7px; font-size: 7px; min-width: 24px; }
     #undoBtn { top: 32px; right: 6px; font-size: 6px; padding: 3px 7px; }
+    #userBadge {
+      top: calc(52px + env(safe-area-inset-top, 0px)); left: calc(4px + env(safe-area-inset-left, 0px));
+      min-width: 44px; min-height: 44px; padding: 4px 12px; justify-content: center;
+    }
+    #userBadge .ub-avatar { font-size: 11px; }
+    #userBadge .ub-name { font-size: 11px; letter-spacing: 1px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #turnIndicator { top: calc(104px + env(safe-area-inset-top, 0px)); }
+    #turnLabel { font-size: 11px; }
 
     /* Bottom-left buttons */
     #aimToggleBtn { display: none !important; }
-    #findBallBtn { font-size: 7px; padding: 7px 12px; letter-spacing: 1px; }
+    #findBallBtn { min-height: 44px; padding: 0 12px; font-size: 13px; letter-spacing: 0.5px; white-space: nowrap; }
 
     /* Action bar */
     #gameBottomBar {
-    transition: opacity 0.3s ease; bottom: 10px; gap: 4px; }
-    #nudgeCounter { bottom: auto; top: 40px; display: none !important; }
+    transition: opacity 0.3s ease; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); gap: 4px;
+    width: max-content; max-width: calc(100vw - 8px); }
+    #nudgeCounter { bottom: auto; top: calc(104px + env(safe-area-inset-top, 0px)); display: none !important; }
     #nudgeCounter.visible { display: block !important; }
-    #nudgeLabel { font-size: 8px; padding: 4px 10px; letter-spacing: 2px; }
-    #stats .stat-card.time, #stats .stat-card.artifact { min-width: 44px; padding: 3px 6px; }
-    #stats .stat-card.time .stat-value, #stats .stat-card.artifact .stat-value { font-size: 9px; }
-    #userBadge { top: 48px; left: 6px; }
-    #boostBtn { bottom: 60px !important; font-size: 14px !important; padding: 14px 36px !important; letter-spacing: 3px !important; }
-    #boostChargeBar { bottom: 44px; width: 90px; height: 4px; }
-    #nudgeFlash { font-size: 11px; }
-    #gameBottomBar #fireBtn { padding: 10px 20px; font-size: 11px; min-width: 80px; }
-    #gameBottomBar #cancelBtn { padding: 8px 16px; font-size: 8px; min-width: 70px; white-space: nowrap; }
+    #nudgeLabel { display: block; font-size: 11px; padding: 4px 10px; letter-spacing: 2px; }
+    #boostBtn { bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important; font-size: 14px !important; padding: 14px 36px !important; letter-spacing: 3px !important; white-space: nowrap; }
+    #boostChargeBar { bottom: calc(46px + env(safe-area-inset-bottom, 0px)); width: 90px; height: 4px; }
+    #nudgeFlash { font-size: 13px; }
+    #gameBottomBar #fireBtn { min-height: 46px; padding: 0 18px; font-size: 14px; letter-spacing: 3px; min-width: 84px; }
+    #gameBottomBar #cancelBtn { min-height: 44px; padding: 0 12px; font-size: 13px; letter-spacing: 1px; min-width: 70px; white-space: nowrap; }
     /* Aim panel */
     #aimWrapper { display: none !important; }
     #powerColumn { transform: scale(0.75); }
@@ -2071,15 +2104,13 @@
     #titleScreen h1 { font-size: 31px; letter-spacing: 6px; text-align: center; padding: 0 16px; }
     #titleScreen .title-sub { font-size: 9px; letter-spacing: 2px; padding: 0 12px; }
     .mode-btn { width: 220px; padding: 14px 0; font-size: 13px; }
-    .mode-btn.daily { font-size: 8px; padding: 6px 12px; top: 14px; left: 14px; }
-    #userBadge { top: 48px; left: 6px; }
-    #userBadge .ub-avatar { width: 18px; height: 18px; font-size: 8px; }
-    #userBadge .ub-name { font-size: 7px; letter-spacing: 1px; }
+    .mode-btn.daily { font-size: 8px; padding: 6px 12px; top: 14px; left: 14px; min-height: 44px; }
+    #titleSignIn { min-height: 44px; }
 
     /* Game complete */
     .gc-title { font-size: 22px; letter-spacing: 5px; }
     .gc-score { font-size: 13px; letter-spacing: 2px; }
-    .gc-buttons button { font-size: 10px; padding: 10px 20px; letter-spacing: 2px; }
+    .gc-buttons button { min-height: 44px; font-size: 13px; padding: 10px 20px; letter-spacing: 2px; }
     #titleScreen .title-sub { font-size: 9px; letter-spacing: 2px; margin-bottom: 30px; }
 
     /* Ball picker */
@@ -2103,43 +2134,29 @@
   /* === Responsive — Mobile portrait === */
   @media (max-width: 480px) {
     /* Stats even smaller */
-    #stats { top: 4px; left: 4px; gap: 3px; }
-    #stats .stat-card { min-width: 38px; padding: 2px 5px; }
-    #stats .stat-label { font-size: 4px; }
-    #stats .stat-value { font-size: 12px; }
+    /* HUD sizes come from the 680px block above (11px labels, 13px+ values, 44px targets);
+       only what has to give at phone-portrait width is set here. */
+    #stats .stat-card { padding: 3px 2px; }
+    #stats .stat-card.time { min-width: 62px; }
 
     /* Top-right buttons */
-    #topRightBtns { top: 4px; right: 4px; gap: 2px; }
-    #topRightBtns button { font-size: 5.5px; padding: 3px 6px; border-radius: 6px; }
+    #topRightBtns button { padding: 0 8px; }
     #controlsBtn { display: none; }
-    #gravToggleBtn { padding: 3px 6px; font-size: 6px; min-width: 20px; }
     #undoBtn { top: 28px; right: 4px; font-size: 5.5px; padding: 2px 6px; border-radius: 6px; }
 
     /* Bottom buttons */
     #aimToggleBtn { display: none !important; }
-    #findBallBtn { font-size: 6px; padding: 6px 10px; }
 
-    #gameBottomBar {
-    transition: opacity 0.3s ease; bottom: 8px; gap: 3px; }
-    #nudgeCounter { bottom: auto; top: 36px; display: none !important; }
-    #nudgeCounter.visible { display: block !important; }
-    #nudgeLabel { font-size: 7px; padding: 3px 8px; letter-spacing: 1px; }
-    #stats .stat-card.time, #stats .stat-card.artifact { min-width: 38px; padding: 2px 4px; }
-    #stats .stat-card.time .stat-label, #stats .stat-card.artifact .stat-label { font-size: 4px; }
-    #stats .stat-card.time .stat-value, #stats .stat-card.artifact .stat-value { font-size: 8px; }
-    #userBadge { top: 44px; left: 4px; }
-    #boostBtn { bottom: 50px !important; font-size: 11px !important; padding: 12px 28px !important; }
-    #boostChargeBar { bottom: 36px; width: 70px; height: 3px; }
-    #nudgeFlash { font-size: 9px; }
-    #gameBottomBar #fireBtn { padding: 8px 16px; font-size: 10px; min-width: 70px; }
-    #gameBottomBar #cancelBtn { padding: 7px 14px; font-size: 7px; min-width: 60px; white-space: nowrap; }
+    #boostBtn { bottom: calc(50px + env(safe-area-inset-bottom, 0px)) !important; font-size: 13px !important; padding: 12px 28px !important; }
+    #boostChargeBar { bottom: calc(36px + env(safe-area-inset-bottom, 0px)); width: 70px; height: 3px; }
+    #gameBottomBar #fireBtn { padding: 0 14px; min-width: 76px; }
     #aimWrapper { display: none !important; }
 
     /* Title screen */
     #titleScreen h1 { font-size: 24px; letter-spacing: 5px; }
     .mode-btn { width: 200px; padding: 12px 0; font-size: 12px; letter-spacing: 3px; margin-bottom: 12px; }
-    .mode-btn.daily { font-size: 7px; padding: 5px 10px; top: 10px; left: 10px; }
-    #userBadge { top: 44px; left: 4px; }
+    .mode-btn.daily { font-size: 7px; padding: 5px 10px; top: 10px; left: 10px; min-height: 44px; }
+    #userBadge { padding: 4px; }
     #userBadge .ub-name { display: none; }
 
     /* Game complete */
@@ -2147,7 +2164,7 @@
     .gc-score { font-size: 11px; letter-spacing: 1px; }
     #gcScorecardBody { font-size: 9px; }
     .gc-buttons { flex-direction: column; gap: 8px; width: 100%; max-width: 240px; }
-    .gc-buttons button { width: 100%; font-size: 9px; padding: 10px 16px; }
+    .gc-buttons button { width: 100%; padding: 10px 16px; }
     #titleScreen .title-sub { font-size: 7px; letter-spacing: 1.5px; margin-bottom: 20px; }
 
     /* Ball picker */
@@ -2159,7 +2176,7 @@
     #ballLore { min-width: 180px; max-width: 240px; padding: 8px 12px; min-height: 40px; }
     #ballLoreName { font-size: 10px; letter-spacing: 3px; }
     #ballLoreText { font-size: 9px; }
-    #playBtn { padding: 10px 32px; font-size: 12px; }
+    #playBtn { padding: 10px 32px; font-size: 12px; min-height: 44px; }
 
     /* Metrics */
     #liveMetrics { padding: 4px 8px; bottom: 12px; }
@@ -2168,14 +2185,27 @@
     .metric-divider { height: 20px; }
   }
 
-  @media (max-width: 680px) and (orientation: portrait) {
-    #landscapeHint { display: block; }
-  }
+  /* Rotate hint: portrait phones only. The base rule has to come before the media rule that
+     shows it. It appears under the HUD rows once the menus are closed and fades out by
+     itself; pointer-events stay off, so it can never block a control. */
   #landscapeHint {
-    display: none; position: fixed; bottom: 4px; left: 50%; transform: translateX(-50%);
-    z-index: 5; pointer-events: none;
-    font-family: 'Orbitron', sans-serif; font-size: 6px; letter-spacing: 2px;
-    color: rgba(200,170,100,0.2); text-transform: uppercase;
+    display: none; position: fixed; top: calc(104px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+    z-index: 5; pointer-events: none; white-space: nowrap;
+    padding: 5px 12px; border-radius: 7px;
+    background: rgba(18,14,8,0.78); border: 1px solid rgba(200,170,60,0.3);
+    font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: rgba(255,226,120,0.9); text-transform: uppercase;
+    animation: landscapeHintFade 7s ease-in-out 0.5s both;
+  }
+  @keyframes landscapeHintFade {
+    0% { opacity: 0; }
+    8%, 80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @media (max-width: 680px) and (orientation: portrait) {
+    #titleScreen.hidden ~ #ballPicker.hidden ~ #instructions:not(.visible) ~ #landscapeHint { display: block; }
+    /* The in-flight readouts use the same strip: hide the hint without restarting its fade */
+    #nudgeCounter.visible ~ #landscapeHint, #masteryHud.visible ~ #landscapeHint { visibility: hidden; }
   }
 
   /* Boost tutorial overlay */
@@ -2290,6 +2320,7 @@
   #retryHoleBtn:hover { border-color: #ffdc58; color: #ffe98b; }
   .sc-mastery { width: 58px; text-align: center; color: rgba(255,215,80,0.55); font-size: 9px; letter-spacing: 1px; }
 
+  @keyframes masteryHudFade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes masteryHudIn { from { opacity: 0; transform: translateX(-50%) translateY(-5px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
   @keyframes styleBurst {
     0% { opacity: 0; transform: translate(-50%, -50%) scale(0.72); }
@@ -2298,19 +2329,181 @@
     100% { opacity: 0; transform: translate(-50%, -68%) scale(0.96); }
   }
   @media (max-width: 760px) {
-    #masteryHud { top: 72px; min-width: 175px; padding: 7px 11px; }
-    #comboLabel { font-size: 7px; }
-    #comboMeta { font-size: 6px; }
+    #masteryHud { top: 72px; min-width: 175px; width: max-content; max-width: calc(100vw - 16px); padding: 7px 11px; }
+    #comboLabel { font-size: 11px; letter-spacing: 1.5px; }
+    #comboMeta { font-size: 11px; letter-spacing: 1px; }
     #styleBurstLabel { font-size: 13px; letter-spacing: 3px; }
-    #abilityBtn { padding: 8px 10px; font-size: 7px; letter-spacing: 1px; }
-    #bestGhostLegend { bottom: 64px; }
-    #routeChip { bottom: 63px; max-width: 82vw; overflow: hidden; text-overflow: ellipsis; }
-    #gameBottomBar.in-flight { bottom: 126px; opacity: 1 !important; }
+    #styleBurstPoints { font-size: 11px; letter-spacing: 2px; }
+    #abilityBtn { min-height: 44px; padding: 0 14px; font-size: 13px; letter-spacing: 1px; }
+    #bestGhostLegend {
+      bottom: calc(100px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: calc(100vw - 16px);
+      font-size: 11px; letter-spacing: 1px; line-height: 1.3; text-align: center;
+    }
+    #routeChip {
+      bottom: calc(64px + env(safe-area-inset-bottom, 0px)); max-width: 82vw; overflow: hidden; text-overflow: ellipsis;
+      font-size: 11px; letter-spacing: 1px;
+    }
+    #gameBottomBar.in-flight { bottom: calc(126px + env(safe-area-inset-bottom, 0px)); opacity: 1 !important; }
     #gameBottomBar.in-flight #findBallBtn { display: none; }
     .mastery-medal { min-width: 52px; padding: 5px 6px; font-size: 6px; }
   }
+  @media (max-width: 680px) {
+    /* Below the two HUD rows and the boost readout */
+    #masteryHud { top: calc(136px + env(safe-area-inset-top, 0px)); }
+  }
   @media (max-width: 480px) {
-    #gameBottomBar.in-flight { bottom: 108px; }
+    #gameBottomBar.in-flight { bottom: calc(108px + env(safe-area-inset-bottom, 0px)); }
+  }
+
+  /* === Phone landscape (about 640-960px wide, 360-440px tall) ===
+     One HUD row: stats on the left, 44px buttons on the right. Same text sizes as the
+     phone-portrait rules; kept last so it wins over the width-only blocks above. */
+  @media (max-width: 1000px) and (max-height: 480px) and (orientation: landscape) {
+    #ui { display: none; }
+    #stats {
+      top: calc(6px + env(safe-area-inset-top, 0px));
+      left: calc(4px + env(safe-area-inset-left, 0px)); right: auto;
+      gap: 3px; flex-wrap: wrap; max-width: 340px;
+    }
+    #stats .stat-card { flex: 0 1 auto; min-width: 0; height: 44px; padding: 3px 3px; border-radius: 6px; justify-content: center; }
+    #stats .stat-card.time { min-width: 64px; } /* fits 888.8, so the row does not shift as the clock runs */
+    #stats .stat-label,
+    #stats .stat-card.artifact .stat-label { font-size: 11px; line-height: 14px; letter-spacing: 0; margin-bottom: 0; white-space: nowrap; }
+    #stats .stat-value,
+    #stats .stat-card.time .stat-value, #stats .stat-card.artifact .stat-value { font-size: 15px; line-height: 20px; white-space: nowrap; }
+
+    /* The buttons wrap onto a second row rather than run into the stats on the narrowest phones */
+    #topRightBtns {
+      top: calc(6px + env(safe-area-inset-top, 0px)); right: calc(4px + env(safe-area-inset-right, 0px));
+      gap: 3px; flex-wrap: wrap;
+      max-width: calc(100vw - 348px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    }
+    #topRightBtns button { min-width: 44px; min-height: 44px; padding: 0 8px; font-size: 13px; letter-spacing: 0.5px; }
+    #scorecardBtn { order: 0; } /* stays at the right end on the widest phones too */
+    #controlsBtn { display: none; }
+    #userBadge {
+      top: calc(56px + env(safe-area-inset-top, 0px)); left: calc(4px + env(safe-area-inset-left, 0px));
+      min-width: 44px; min-height: 44px; padding: 4px 12px; justify-content: center;
+    }
+    #userBadge .ub-avatar { font-size: 11px; }
+    #userBadge .ub-name { font-size: 11px; letter-spacing: 1px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #turnIndicator { top: calc(58px + env(safe-area-inset-top, 0px)); }
+    #turnLabel { font-size: 11px; }
+
+    /* Bottom bar: no fine-aim panel on a screen this short, same as phone portrait */
+    #aimToggleBtn { display: none !important; }
+    #aimWrapper { display: none !important; }
+    #gameBottomBar, #gameBottomBar.in-flight { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); gap: 6px; width: max-content; max-width: calc(100vw - 8px); }
+    #gameBottomBar.in-flight { opacity: 1 !important; } /* keep the ability button visible, as on phone portrait */
+    #findBallBtn { min-height: 44px; padding: 0 14px; font-size: 13px; letter-spacing: 1px; white-space: nowrap; }
+    #gameBottomBar #fireBtn { min-height: 46px; padding: 0 24px; font-size: 14px; letter-spacing: 3px; min-width: 100px; }
+    #gameBottomBar #cancelBtn { min-height: 44px; padding: 0 16px; font-size: 13px; letter-spacing: 1.5px; min-width: 90px; white-space: nowrap; }
+    #abilityBtn { min-height: 44px; padding: 0 14px; font-size: 13px; letter-spacing: 1px; }
+    #boostBtn { bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important; font-size: 14px !important; padding: 12px 32px !important; letter-spacing: 3px !important; white-space: nowrap; }
+    #boostChargeBar { bottom: calc(118px + env(safe-area-inset-bottom, 0px)); width: 90px; height: 4px; }
+    #routeChip { bottom: calc(64px + env(safe-area-inset-bottom, 0px)); font-size: 11px; letter-spacing: 1px; }
+    #bestGhostLegend {
+      bottom: calc(100px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: calc(100vw - 16px);
+      font-size: 11px; letter-spacing: 1px; text-align: center;
+    }
+
+    /* In-flight readouts stack under the buttons on the right, so the middle of a short
+       screen (and the drill card on the left) stays clear */
+    #nudgeCounter {
+      bottom: auto; top: calc(56px + env(safe-area-inset-top, 0px));
+      left: auto; right: calc(4px + env(safe-area-inset-right, 0px)); transform: none;
+    }
+    #nudgeLabel { display: block; font-size: 11px; padding: 4px 10px; letter-spacing: 2px; }
+    #nudgeFlash { font-size: 13px; }
+    #masteryHud {
+      top: calc(88px + env(safe-area-inset-top, 0px)); left: auto; right: calc(4px + env(safe-area-inset-right, 0px));
+      transform: none; min-width: 175px; padding: 5px 11px;
+    }
+    #masteryHud.visible { animation: masteryHudFade 0.24s ease-out; }
+    #comboLabel { font-size: 11px; letter-spacing: 1.5px; }
+    #comboMeta { font-size: 11px; letter-spacing: 1px; }
+    #styleBurstPoints { font-size: 11px; letter-spacing: 2px; }
+
+    /* Launch Lab: the intro card fits the short screen; the drill card moves from the bottom
+       (where it covered FIND BALL) to the left edge under the stats */
+    #instructions.launch-lab .trainer-card {
+      width: calc(100vw - 24px); min-height: 0; max-height: calc(100vh - 12px);
+      grid-template-columns: minmax(150px, 0.5fr) minmax(300px, 1.5fr); gap: 18px; padding: 14px 20px;
+    }
+    #instructions.launch-lab .trainer-card::after { display: none; }
+    #instructions.launch-lab .trainer-visual { min-height: 200px; padding-right: 14px; }
+    #instructions.launch-lab .trainer-visual-copy { right: 14px; font-size: 11px; line-height: 1.3; letter-spacing: 0.5px; }
+    #instructions.launch-lab .trainer-kicker { margin-bottom: 9px; font-size: 11px; letter-spacing: 2px; }
+    #instructions.launch-lab #trainerStatus { font-size: 11px; padding: 4px 8px; letter-spacing: 0.5px; }
+    #instructions.launch-lab #trainerProgress { margin-bottom: 12px; }
+    #instructions.launch-lab #trainerStepLabel { font-size: 11px; letter-spacing: 2px; }
+    #instructions.launch-lab #trainerTitle { margin-bottom: 8px; font-size: 22px; letter-spacing: 2.5px; }
+    #instructions.launch-lab #trainerBody { min-height: 0; font-size: 13px; line-height: 1.5; }
+    #instructions.launch-lab #trainerHint { margin-top: 8px; font-size: 11px; line-height: 1.4; letter-spacing: 0.5px; }
+    #instructions.launch-lab .trainer-actions { margin-top: 12px; gap: 8px; }
+    #instructions.launch-lab:not(.training) .trainer-actions { flex-direction: row; align-items: center; }
+    #instructions.launch-lab:not(.training) .trainer-actions #startBtn { margin: 0 0 0 auto; }
+    #instructions.launch-lab .trainer-actions #startBtn { min-height: 48px; padding: 10px 18px; font-size: 14px; letter-spacing: 2px; }
+    #instructions.launch-lab .trainer-actions #skipBtn,
+    #instructions.launch-lab .trainer-actions #trainerResetBtn { min-height: 44px; padding: 8px 10px; font-size: 13px; letter-spacing: 1px; }
+    #instructions.launch-lab.training .trainer-card {
+      top: calc(56px + env(safe-area-inset-top, 0px)); left: calc(4px + env(safe-area-inset-left, 0px)); right: auto; bottom: auto;
+      width: min(330px, 46vw); display: block; padding: 9px 12px; border-radius: 12px;
+    }
+    #instructions.launch-lab.training .trainer-kicker { display: none; }
+    #instructions.launch-lab.training #trainerProgress { margin-bottom: 7px; }
+    #instructions.launch-lab.training #trainerStepLabel { margin-bottom: 2px; font-size: 11px; }
+    #instructions.launch-lab.training #trainerTitle { margin-bottom: 4px; font-size: 14px; letter-spacing: 2px; }
+    #instructions.launch-lab.training #trainerBody { font-size: 13px; line-height: 1.35; }
+    #instructions.launch-lab.training #trainerHint { margin-top: 4px; font-size: 11px; line-height: 1.3; }
+    #instructions.launch-lab.training .trainer-actions { margin-top: 6px; }
+    #trainerTargetLabel { font-size: 11px; letter-spacing: 1px; }
+    body.trainer-running #userBadge.visible { display: none; } /* same corner as the drill card */
+  }
+
+  /* === Phone overlays, portrait and landscape: scorecard, hole-complete panel, audio popup ===
+     The scorecard has to fit the screen (it was wider than a phone and taller than a
+     landscape one), scroll its rows by touch, and keep the close button in reach. */
+  @media (max-width: 680px), (max-width: 1000px) and (max-height: 480px) and (orientation: landscape) {
+    #scorecard {
+      min-width: 0; padding: 16px 12px 12px;
+      width: min(520px, calc(100vw - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+      max-height: calc(100vh - 16px);
+      max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    }
+    #scorecard.visible { display: flex; flex-direction: column; }
+    #scorecard h2 { flex: none; margin-bottom: 10px; }
+    #scorecardBody { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    #scorecard .sc-row { padding: 7px 2px; }
+    #scorecard .sc-row.header { font-size: 11px; letter-spacing: 0; }
+    #scorecard .sc-hole { width: 22px; font-size: 13px; }
+    #scorecard .sc-name { font-size: 11px; letter-spacing: 0.5px; line-height: 1.25; white-space: normal; padding-right: 4px; }
+    #scorecard .sc-par { width: 34px; font-size: 13px; }
+    #scorecard .sc-score { width: 46px; font-size: 13px; }
+    #scorecard .sc-diff { width: 32px; font-size: 13px; }
+    #scorecard .sc-time { width: 50px; font-size: 11px; }
+    #scorecard .sc-art { width: 20px; font-size: 13px; }
+    #scorecard .sc-mastery { width: 54px; font-size: 11px; letter-spacing: 0; }
+    #scorecard .sc-row.header span { font-size: 11px; }
+    #scorecard .sc-total-row { flex: none; }
+    #scorecardClose { flex: none; min-width: 140px; min-height: 44px; margin-top: 10px; font-size: 13px; letter-spacing: 2px; }
+    #scorecardClose .key-hint { display: none; }
+
+    /* Hole-complete panel: use the screen width instead of half of it, readable medals, 44px buttons */
+    #message { width: max-content; max-width: calc(100vw - 92px); }
+    #message .sub { font-size: 13px; letter-spacing: 2px; }
+    #masteryMedals { flex-wrap: wrap; gap: 6px; }
+    .mastery-medal { min-width: 0; padding: 6px 8px; font-size: 11px; letter-spacing: 0.5px; }
+    #nextHoleBtn { min-height: 48px; padding: 12px 24px; white-space: nowrap; }
+    #retryHoleBtn, #postScoreBtn, #unlockPromptBtn { min-height: 44px; font-size: 13px; letter-spacing: 2px; }
+
+    #soundSettings { padding: 22px 24px; }
+    .vol-label { font-size: 11px; letter-spacing: 1px; }
+    .vol-pct { font-size: 13px; min-width: 42px; }
+    /* 44px tall touch strip; the visible track stays 6px (background clipped to the content box) */
+    .vol-slider { height: 44px; padding: 19px 0; background-clip: content-box; }
+    .vol-row, .vol-row:last-of-type { margin-bottom: 6px; }
+    #soundSettingsClose { min-width: 120px; min-height: 44px; margin-top: 10px; font-size: 13px; }
   }
 </style>
 </head>
@@ -2344,11 +2537,12 @@
   </div>
 </div>
 
-<div id="topRightBtns" style="position:fixed; top:8px; right:8px; z-index:10; display:flex; gap:4px; pointer-events:auto; flex-wrap:wrap; justify-content:flex-end; max-width:300px;">
+<div id="topRightBtns">
   <button id="resetBtn">RESET</button>
   <button id="soundBtn">♪ SOUND</button>
   <button id="gravToggleBtn" aria-label="Toggle gravity field rings" title="Toggle gravity field rings (G)">G</button>
   <button id="controlsBtn" onclick="document.getElementById('keyDisplay').classList.toggle('visible'); this.classList.toggle('open'); this.textContent = this.classList.contains('open') ? '✕ CLOSE' : '⌨ CONTROLS'">⌨ CONTROLS</button>
+  <button id="scorecardBtn" aria-label="Open scorecard" title="Scorecard (Tab)">SCORE</button>
 </div>
 
 
@@ -2398,7 +2592,7 @@
     <span class="sc-total-label">TOTAL</span>
     <span class="sc-total-val" id="scTotal">—</span>
   </div>
-  <button id="scorecardClose">CLOSE · TAB</button>
+  <button id="scorecardClose">CLOSE<span class="key-hint"> · TAB</span></button>
 </div>
 
 <div id="gameCompleteScreen">
@@ -10181,6 +10375,10 @@ function renderScorecard() {
 document.getElementById('scorecardClose').addEventListener('click', () => {
   scorecardOpen = false;
   document.getElementById('scorecard').classList.remove('visible');
+});
+document.getElementById('scorecardBtn').addEventListener('click', (e) => {
+  toggleScorecard();
+  if (e.detail) e.currentTarget.blur(); // mouse/touch click: keep Space (fire) from re-pressing this button
 });
 
 // === Game Complete Screen ===
