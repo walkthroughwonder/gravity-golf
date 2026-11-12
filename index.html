@@ -10191,7 +10191,7 @@ function showGameComplete(title, isFreeEnd) {
   // Par of the holes that were played (identical to course par for a full round)
   const totalPar = LEVELS.reduce((a, l, i) => a + (levelScores[i] !== undefined ? l.par : 0), 0);
   const diff = totalScore - totalPar;
-  const scoreLabel = diff === 0 ? 'EVEN PAR' : (diff > 0 ? '+' + diff + ' OVER PAR' : diff + ' UNDER PAR');
+  const scoreLabel = diff === 0 ? 'EVEN PAR' : (diff > 0 ? diff + ' OVER PAR' : -diff + ' UNDER PAR');
   document.getElementById('gcScore').textContent = totalScore + ' STROKES · ' + scoreLabel;
 
   // Toggle buttons: unlock vs play again/home
