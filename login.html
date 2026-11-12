@@ -151,7 +151,12 @@ const CONFIG = {
   appId: "1:371434804348:web:98f1b3fd530bbf39c825f9"
 };
 firebase.initializeApp(CONFIG);
-firebase.auth().getRedirectResult().catch(() => {});
+// A failed Google redirect used to return the player signed out with no message
+firebase.auth().getRedirectResult().catch((e) => {
+  const s = document.getElementById('status');
+  s.textContent = 'Google sign-in did not complete. Please try again.'; s.className = 'status error';
+  console.error('Redirect sign-in failed:', e);
+});
 
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
@@ -214,7 +219,11 @@ document.getElementById('signUpBtn').onclick = async () => {
 };
 
 document.getElementById('guestBtn').onclick = () => {
-  firebase.auth().signInAnonymously().then(() => window.location.href = '/');
+  firebase.auth().signInAnonymously().then(() => window.location.href = '/').catch((e) => {
+    const s = document.getElementById('status');
+    s.textContent = 'Could not start a guest session. Check your connection and try again.'; s.className = 'status error';
+    console.error('Guest sign-in failed:', e);
+  });
 };
 
 document.getElementById('signOutBtn').onclick = () => firebase.auth().signOut();

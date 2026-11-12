@@ -5,18 +5,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gravity Golf</title>
+<meta name="description" content="Gravity Golf: bend your shot around planets and black holes. Play 8 free holes and the Daily Challenge in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Exo+2:wght@300;400;500;600&display=swap">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gravity Golf">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <!-- Firebase SDK (compat mode for simplicity) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<!-- defer: runs in order after parsing and before the game module, without blocking first paint -->
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Exo+2:wght@300;400;500;600&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { overflow: hidden; background: #000; font-family: 'Exo 2', sans-serif; color: #fff;
@@ -2301,7 +2308,7 @@
 <div id="topRightBtns" style="position:fixed; top:8px; right:8px; z-index:10; display:flex; gap:4px; pointer-events:auto; flex-wrap:wrap; justify-content:flex-end; max-width:300px;">
   <button id="resetBtn">RESET</button>
   <button id="soundBtn">♪ SOUND</button>
-  <button id="gravToggleBtn">G</button>
+  <button id="gravToggleBtn" aria-label="Toggle gravity field rings" title="Toggle gravity field rings (G)">G</button>
   <button id="controlsBtn" onclick="document.getElementById('keyDisplay').classList.toggle('visible'); this.classList.toggle('open'); this.textContent = this.classList.contains('open') ? '✕ CLOSE' : '⌨ CONTROLS'">⌨ CONTROLS</button>
 </div>
 
@@ -2414,7 +2421,7 @@
   <button id="nextHoleBtn">NEXT HOLE</button>
   <button id="retryHoleBtn">RETRY HOLE</button>
   <div id="unlockPrompt">
-    <button id="unlockPromptBtn">★ UNLOCK HOLES 6-18</button>
+    <button id="unlockPromptBtn">★ UNLOCK HOLES 9-19</button>
   </div>
   <button id="postScoreBtn">POST TO LEADERBOARD</button>
 </div>
@@ -2422,7 +2429,7 @@
   <div class="unlock-card">
     <h2>PRO COURSE</h2>
     <div class="unlock-desc">
-      13 more holes with asteroid fields, black holes,<br>
+      11 more holes with asteroid fields, black holes,<br>
       neutron alleys, and The Final Frontier.<br>
       Holes 9-19 — the real challenge begins.
     </div>
@@ -2739,7 +2746,7 @@ const isLowPowerDevice = (navigator.hardwareConcurrency && navigator.hardwareCon
   || (navigator.deviceMemory && navigator.deviceMemory <= 4);
 const maxPixelRatio = isLowPowerDevice ? 1.2 : (isTouchDevice ? 1.35 : 1.6);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2866,7 +2873,8 @@ function initAudio() {
 // Ensure audio context starts on user interaction
 function ensureAudio() {
   if (!audioInitialized) initAudio();
-  if (audioCtx && audioCtx.state === 'suspended') {
+  // 'interrupted' is what iOS reports after a call or an app switch
+  if (audioCtx && audioCtx.state !== 'running') {
     audioCtx.resume().then(() => {
       tryStartSoundtrack();
     }).catch(() => {});
@@ -2879,18 +2887,26 @@ function ensureAudio() {
 let soundtrackEl = null;
 let soundtrackSource = null;
 function tryStartSoundtrack() {
-  if (!soundtrackEl || !soundEnabled || musicVolume <= 0) return;
+  if (!soundtrackEl || !soundEnabled || musicVolume <= 0 || document.hidden) return;
   soundtrackEl.play().catch(() => {});
+}
+// Music at 0% used to keep streaming the 32.8 MB file silently: stop the element instead.
+function syncSoundtrackPlayback() {
+  if (!soundtrackEl) return;
+  if (musicVolume <= 0 || !soundEnabled || document.hidden) soundtrackEl.pause();
+  else tryStartSoundtrack();
 }
 function initSoundtrack() {
   if (!audioCtx) return;
   // Try to load soundtrack.mp3 from same directory
-  soundtrackEl = new Audio('soundtrack.mp3');
-  soundtrackEl.preload = 'auto';
+  soundtrackEl = new Audio();
+  soundtrackEl.preload = 'none'; // nothing is fetched until it actually plays
+  soundtrackEl.src = 'soundtrack.mp3';
   soundtrackEl.loop = true;
   soundtrackEl.volume = 1; // volume controlled via gain node
   soundtrackSource = audioCtx.createMediaElementSource(soundtrackEl);
   soundtrackSource.connect(musicGain);
+  if (musicVolume <= 0) return; // muted from a saved setting: do not start the download
   soundtrackEl.play().catch(() => {
     // Will retry on next user interaction
     const retryPlay = () => {
@@ -3260,30 +3276,58 @@ document.getElementById('soundSettingsClose').addEventListener('click', () => {
   document.getElementById('soundSettings').classList.remove('visible');
 });
 
-// Music volume slider
-document.getElementById('musicVol').addEventListener('input', (e) => {
-  musicVolume = parseInt(e.target.value) / 100;
-  document.getElementById('musicPct').textContent = e.target.value + '%';
-  if (musicGain) musicGain.gain.setTargetAtTime(musicVolume, audioCtx.currentTime, 0.05);
+const AUDIO_PREFS_KEY = 'gg_audio';
+function applyVolumeUi(save) {
+  document.getElementById('musicVol').value = Math.round(musicVolume * 100);
+  document.getElementById('sfxVol').value = Math.round(sfxVolume * 100);
+  document.getElementById('musicPct').textContent = Math.round(musicVolume * 100) + '%';
+  document.getElementById('sfxPct').textContent = Math.round(sfxVolume * 100) + '%';
   const allMuted = musicVolume === 0 && sfxVolume === 0;
   document.getElementById('soundBtn').classList.toggle('muted', allMuted);
   document.getElementById('soundBtn').textContent = allMuted ? '♪ MUTED' : '♪ SOUND';
   document.getElementById('titleSoundBtn').textContent = allMuted ? '♪ MUTED' : '♪ SOUND';
   document.getElementById('titleSoundBtn').style.opacity = allMuted ? '0.4' : '1';
   soundEnabled = !(allMuted);
+  syncSoundtrackPlayback();
+  if (save) {
+    try { localStorage.setItem(AUDIO_PREFS_KEY, JSON.stringify({ music: musicVolume, sfx: sfxVolume })); } catch (e) {}
+  }
+}
+// Restore the player's volumes (they used to reset to the defaults on every visit)
+try {
+  const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || 'null');
+  if (saved && Number.isFinite(saved.music) && Number.isFinite(saved.sfx)) {
+    musicVolume = Math.min(1, Math.max(0, saved.music));
+    sfxVolume = Math.min(1, Math.max(0, saved.sfx));
+    applyVolumeUi(false);
+  }
+} catch (e) {}
+
+// Music volume slider
+document.getElementById('musicVol').addEventListener('input', (e) => {
+  musicVolume = parseInt(e.target.value) / 100;
+  if (musicGain) musicGain.gain.setTargetAtTime(musicVolume, audioCtx.currentTime, 0.05);
+  applyVolumeUi(true);
 });
+
+document.getElementById('musicVol').addEventListener('change', syncSoundtrackPlayback);
 
 // SFX volume slider
 document.getElementById('sfxVol').addEventListener('input', (e) => {
   sfxVolume = parseInt(e.target.value) / 100;
-  document.getElementById('sfxPct').textContent = e.target.value + '%';
   if (sfxGain) sfxGain.gain.setTargetAtTime(sfxVolume, audioCtx.currentTime, 0.05);
-  const allMuted = musicVolume === 0 && sfxVolume === 0;
-  document.getElementById('soundBtn').classList.toggle('muted', allMuted);
-  document.getElementById('soundBtn').textContent = allMuted ? '♪ MUTED' : '♪ SOUND';
-  document.getElementById('titleSoundBtn').textContent = allMuted ? '♪ MUTED' : '♪ SOUND';
-  document.getElementById('titleSoundBtn').style.opacity = allMuted ? '0.4' : '1';
-  soundEnabled = !(allMuted);
+  applyVolumeUi(true);
+});
+
+// A hidden tab stops rendering but used to keep playing: silence it, and resume on return.
+document.addEventListener('visibilitychange', () => {
+  if (!audioCtx) return;
+  if (document.hidden) {
+    if (soundtrackEl) soundtrackEl.pause();
+    audioCtx.suspend().catch(() => {});
+  } else {
+    audioCtx.resume().then(syncSoundtrackPlayback).catch(() => {});
+  }
 });
 
 // Close on click outside
@@ -3297,7 +3341,8 @@ document.addEventListener('click', (e) => {
 });
 
 // Start audio on very first interaction (so soundtrack plays from title screen)
-function firstInteraction() {
+function firstInteraction(e) {
+  if (e && !e.isTrusted) return; // scripted click: wait for a real one
   ensureAudio();
   document.removeEventListener('click', firstInteraction);
   document.removeEventListener('touchstart', firstInteraction);
@@ -4122,6 +4167,7 @@ function createAccretionDisk(planet) {
 function animateAccretionDisks(time, dt) {
   // Color shift palettes per layer
   const _c = new THREE.Color();
+  const _c2 = new THREE.Color();
   const layerColors = [
     [0x88ccff, 0xaaeeff, 0x66aadd], // inner: cyan shift
     [0xaa44ff, 0xcc66ff, 0x8822cc], // mid: purple shift
@@ -4142,7 +4188,7 @@ function animateAccretionDisks(time, dt) {
       const ct = (Math.sin(time * 1.5 + p.phase) * 0.5 + 0.5);
       const ci = Math.floor(ct * (colors.length - 1));
       const cf = ct * (colors.length - 1) - ci;
-      _c.setHex(colors[ci]).lerp(new THREE.Color(colors[Math.min(ci + 1, colors.length - 1)]), cf);
+      _c.setHex(colors[ci]).lerp(_c2.setHex(colors[Math.min(ci + 1, colors.length - 1)]), cf);
       p.mat.color.copy(_c);
 
       // Shrink/grow pulse
@@ -4419,8 +4465,10 @@ function createGoalBeacon(goalPos, goalRadius, dir) {
   // Clear old beacon
   while (beaconGroup.children.length) {
     const c = beaconGroup.children[0];
-    if (c.geometry) c.geometry.dispose();
-    if (c.material) c.material.dispose();
+    c.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) o.material.dispose();
+    });
     beaconGroup.remove(c);
   }
   beaconGroup.userData = {};
@@ -5164,7 +5212,7 @@ const STRIPE_PAYMENT_URL = 'https://buy.stripe.com/4gMeVe5PnaYT47i0Jo3Nm00';
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           filter: drop-shadow(0 0 20px rgba(255,200,40,0.5));">★ PRO UNLOCKED</div>
         <div style="font-size: 11px; font-weight: 600; letter-spacing: 3px; margin-top: 8px;
-          color: #ffe566;">13 NEW HOLES ADDED</div>
+          color: #ffe566;">11 NEW HOLES ADDED</div>
       `;
       document.body.appendChild(notif);
       setTimeout(() => { notif.style.opacity = '0'; }, 3000);
@@ -5207,18 +5255,32 @@ document.getElementById('redeemBtn').addEventListener('click', async () => {
 
   const valid = await validateUnlockCode(code);
   if (valid) {
-    document.getElementById('codeStatus').textContent = '★ UNLOCKED! 13 NEW HOLES ADDED';
+    document.getElementById('codeStatus').textContent = '★ UNLOCKED! 11 NEW HOLES ADDED';
     document.getElementById('codeStatus').className = 'success';
     // Hide prompt button if visible
     document.getElementById('unlockPrompt').style.display = 'none';
     // Update title screen if visible
     updateTitleProBadge();
+    continueRoundAfterUnlock();
     setTimeout(() => hideUnlockModal(), 1500);
   } else {
     document.getElementById('codeStatus').textContent = 'Invalid code';
     document.getElementById('codeStatus').className = 'error';
   }
 });
+
+// After an in-session unlock: the title level select gains holes 9-19, and a player standing on
+// the finished last free hole goes on to hole 9 with the round intact (not a stale end screen).
+function continueRoundAfterUnlock() {
+  buildLevelSelect();
+  if (dailyMode || gameMode !== '1p' || currentLevel !== 7 || levelScores[7] === undefined) return;
+  hideGameComplete();
+  const btn = document.getElementById('nextHoleBtn');
+  btn._showComplete = false;
+  btn.textContent = 'NEXT HOLE';
+  btn.style.display = 'inline-block';
+  document.getElementById('message').style.display = 'block';
+}
 
 // Enter key on code input
 document.getElementById('codeInput').addEventListener('keydown', (e) => {
@@ -5439,7 +5501,6 @@ void main() {
   shaderProgram._uTime = gl.getUniformLocation(shaderProgram, 'u_time');
 
   shaderStartTime = performance.now() / 1000;
-  console.log('Galaxy shader initialized');
 }
 
 function resizeShaderCanvas() {
@@ -5460,10 +5521,13 @@ function renderTitleFrame() {
   titleAnimFrame = requestAnimationFrame(renderTitleFrame);
 }
 
+let titleBgCovering = false; // true while the opaque title background hides the game canvas
+let coveredWarmupFrames = 3; // frames still drawn under the cover, so nothing compiles at the moment of reveal
 function startTitleBackground() {
   // CSS starfield + nebula gradient (all devices)
   const mbBg = document.getElementById('mobileTitleBg');
   mbBg.classList.add('visible');
+  titleBgCovering = true;
   if (!mbBg._populated) {
     mbBg._populated = true;
     for (let i = 0; i < 100; i++) {
@@ -5484,6 +5548,10 @@ function startTitleBackground() {
 function stopTitleBackground() {
   const mbBg = document.getElementById('mobileTitleBg');
   if (mbBg) mbBg.classList.remove('visible');
+  if (titleBgCovering) {
+    titleBgCovering = false;
+    composer.render(); // draw a current frame before the canvas is revealed (no stale-frame flash)
+  }
 }
 
 window.addEventListener('resize', resizeShaderCanvas);
@@ -5516,7 +5584,7 @@ function buildLevelSelect() {
   container.querySelectorAll('.lvl-btn').forEach(b => b.remove());
   for (let i = 0; i < LEVELS.length; i++) {
     const btn = document.createElement('button');
-    btn.className = 'lvl-btn' + (i >= 9 ? ' pro' : '');
+    btn.className = 'lvl-btn' + (i >= 8 ? ' pro' : '');
     btn.textContent = i + 1;
     btn.title = LEVELS[i].name;
     btn.addEventListener('click', () => {
@@ -5591,7 +5659,6 @@ function initFirebase() {
     firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.database();
     firebaseReady = true;
-    console.log("Firebase initialized");
     return true;
   } catch (e) {
     console.error("Firebase init failed:", e);
@@ -5606,36 +5673,60 @@ function generateRoomCode() {
   return code;
 }
 
+let lobbyOpToken = 0; // bumped by cleanupOnline(): an in-flight create/join that sees a new value was cancelled
 async function createRoom() {
+  const opToken = lobbyOpToken;
   if (!initFirebase()) {
     showLobbyStatus('host', 'Firebase not configured — see source code', true);
     return;
   }
 
-  roomCode = generateRoomCode();
-  localPlayerIdx = 0;
-  roomRef = db.ref('rooms/' + roomCode);
+  document.getElementById('lobbyRoomCode').textContent = '----';
+  document.getElementById('lobbyChoice').style.display = 'none';
+  document.getElementById('lobbyHosting').style.display = 'block';
+  showLobbyStatus('host', 'Creating room...', false);
 
-  // Write initial room state
-  await roomRef.set({
-    created: firebase.database.ServerValue.TIMESTAMP,
-    status: 'waiting',
-    currentHole: 0,
-    host: {
-      ballColor: null,
-      scores: {},
-      ready: false,
-    },
-    guest: null,
-  });
+  // Claim an unused code: the write only goes through if the room does not exist yet,
+  // so a new room can never overwrite a game in progress.
+  let newRef = null;
+  let newCode = null;
+  try {
+    for (let attempt = 0; attempt < 5 && !newRef; attempt++) {
+      const code = generateRoomCode();
+      const ref = db.ref('rooms/' + code);
+      const result = await ref.transaction((current) => {
+        if (current !== null) return; // taken: abort
+        return {
+          created: firebase.database.ServerValue.TIMESTAMP,
+          status: 'waiting',
+          currentHole: 0,
+          host: { ready: false },
+        };
+      });
+      if (result.committed) { newRef = ref; newCode = code; }
+    }
+  } catch (e) {
+    console.error('Create room failed:', e);
+  }
+  if (opToken !== lobbyOpToken) {
+    // BACK was pressed while the room was being created: give the code back
+    if (newRef) newRef.remove().catch(() => {});
+    return;
+  }
+  if (!newRef) {
+    showLobbyStatus('host', 'Could not create a room. Check your connection and try again.', true);
+    return;
+  }
+
+  roomCode = newCode;
+  localPlayerIdx = 0;
+  roomRef = newRef;
 
   // Auto-cleanup room on disconnect
   roomRef.onDisconnect().remove();
 
   // Show code to user
   document.getElementById('lobbyRoomCode').textContent = roomCode;
-  document.getElementById('lobbyChoice').style.display = 'none';
-  document.getElementById('lobbyHosting').style.display = 'block';
   showLobbyStatus('host', 'Waiting for player...', false);
 
   // Listen for guest joining
@@ -5663,28 +5754,39 @@ async function joinRoom() {
     return;
   }
 
+  const opToken = lobbyOpToken;
+  // Nothing is stored as "our room" until the join succeeds. (Before, a failed join left
+  // roomRef pointing at the other room, and BACK then deleted that room's real guest.)
+  const ref = db.ref('rooms/' + code);
+  try {
+    const snap = await ref.once('value');
+    if (!snap.exists()) {
+      showLobbyStatus('join', 'Room not found', true);
+      return;
+    }
+    // Take the guest seat only if it is still empty (two people joining at once)
+    const result = await ref.child('guest').transaction((current) => {
+      if (current !== null) return; // taken: abort
+      return { ready: false };
+    });
+    if (!result.committed) {
+      showLobbyStatus('join', 'Room is full', true);
+      return;
+    }
+    if (opToken !== lobbyOpToken) {
+      // BACK was pressed while joining: free the seat we just took
+      ref.child('guest').remove().catch(() => {});
+      return;
+    }
+  } catch (e) {
+    console.error('Join room failed:', e);
+    showLobbyStatus('join', 'Could not join. Check your connection and try again.', true);
+    return;
+  }
+
   roomCode = code;
   localPlayerIdx = 1;
-  roomRef = db.ref('rooms/' + roomCode);
-
-  // Check room exists
-  const snap = await roomRef.once('value');
-  if (!snap.exists()) {
-    showLobbyStatus('join', 'Room not found', true);
-    return;
-  }
-  const room = snap.val();
-  if (room.guest) {
-    showLobbyStatus('join', 'Room is full', true);
-    return;
-  }
-
-  // Join as guest
-  await roomRef.child('guest').set({
-    ballColor: null,
-    scores: {},
-    ready: false,
-  });
+  roomRef = ref;
 
   // Remove guest data on disconnect
   roomRef.child('guest').onDisconnect().remove();
@@ -5699,12 +5801,12 @@ function showLobbyStatus(which, text, isError) {
     : document.getElementById('lobbyJoinStatus');
   el.textContent = text;
   el.classList.toggle('error', isError);
-  el.classList.toggle('connected', !isError && text.includes('Joined') || text.includes('joined'));
+  el.classList.toggle('connected', !isError && (text.includes('Joined') || text.includes('joined')));
 }
 
 function startOnlineGame() {
-  console.log('Online: startOnlineGame, localPlayerIdx=', localPlayerIdx);
   // Set mode
+  endDailyChallenge();
   gameMode = '2p';
   onlineMode = true;
   currentPlayer = 0;
@@ -5732,6 +5834,7 @@ function startOnlineGame() {
   listenForRoomUpdates();
 }
 
+let ghostGlowBase = 0.06; // resting opacity of the opponent ghost glow; the render loop pulses around it
 function listenForRoomUpdates() {
   if (!roomRef) return;
 
@@ -5746,7 +5849,8 @@ function listenForRoomUpdates() {
       ghostLastUpdate = performance.now();
       ghostBall.visible = true;
       ghostGlow.visible = true;
-      ghostGlowMat.opacity = data.flying ? 0.15 : 0.06;
+      ghostGlowBase = data.flying ? 0.15 : 0.06;
+      ghostGlowMat.opacity = ghostGlowBase;
       // Clear trail when opponent starts a new shot
       if (data.flying && !ghostWasFlying) {
         ghostTrailPositions.length = 0;
@@ -5786,9 +5890,6 @@ function listenForRoomUpdates() {
     // Sync opponent ball color
     if (opp.ballColor !== null && opp.ballColor !== undefined) {
       const oppIdx = localPlayerIdx === 0 ? 1 : 0;
-      if (players[oppIdx].ballColor !== opp.ballColor) {
-        console.log('Online: opponent ball color synced:', opp.ballColor);
-      }
       players[oppIdx].ballColor = opp.ballColor;
       applyGhostBallColor(opp.ballColor);
     }
@@ -5799,7 +5900,6 @@ function listenForRoomUpdates() {
       const me = room[myKey];
       if (me && me.ready) {
         // Both ready — start playing
-        console.log('Online: both ready, setting status to playing');
         roomRef.child('status').set('playing');
       }
     }
@@ -5809,8 +5909,9 @@ function listenForRoomUpdates() {
       const oppIdx = localPlayerIdx === 0 ? 1 : 0;
       Object.keys(opp.scores).forEach(h => {
         const holeIdx = parseInt(h);
-        const score = opp.scores[h];
-        if (players[oppIdx].scores[holeIdx] === undefined && score !== undefined) {
+        const score = Math.round(Number(opp.scores[h]));
+        if (!Number.isInteger(holeIdx) || holeIdx < 0 || holeIdx >= LEVELS.length) return;
+        if (players[oppIdx].scores[holeIdx] === undefined && Number.isFinite(score) && score > 0) {
           // Opponent finished this hole
           players[oppIdx].scores[holeIdx] = score;
           players[oppIdx].totalScore = players[oppIdx].scores.reduce((a, b) => a + (b || 0), 0);
@@ -5832,14 +5933,12 @@ function listenForRoomUpdates() {
 
 async function syncBallPick(colorIdx) {
   if (!roomRef) return;
-  console.log('Online: syncing ball pick', colorIdx, 'as', localPlayerIdx === 0 ? 'host' : 'guest');
   const myKey = localPlayerIdx === 0 ? 'host' : 'guest';
   await roomRef.child(myKey).update({
     ballColor: colorIdx,
     ready: true,
   });
   await roomRef.child('status').set('picking');
-  console.log('Online: pick synced, status set to picking');
 }
 
 async function syncScore(holeIdx, strokes) {
@@ -5882,11 +5981,17 @@ function applyGhostBallColor(colorIdx) {
 }
 
 function cleanupOnline() {
-  if (roomListener && roomRef) {
-    roomRef.off('value', roomListener);
-    const oppKey = localPlayerIdx === 0 ? 'guest' : 'host';
-    roomRef.child(oppKey + '/live').off();
+  lobbyOpToken++;
+  if (roomRef) {
+    // Drop every listener on this room (the host's "guest joined" listener was never removed)
+    roomRef.off();
+    roomRef.child('guest').off();
+    roomRef.child('guest/live').off();
+    roomRef.child('host/live').off();
     roomListener = null;
+    // Cancel the queued disconnect-delete, or a later disconnect would delete
+    // whoever is using this room code by then.
+    (localPlayerIdx === 0 ? roomRef : roomRef.child('guest')).onDisconnect().cancel().catch(() => {});
   }
   clearBallLive();
   ghostBall.visible = false;
@@ -5974,17 +6079,26 @@ function initAuth() {
   });
 }
 
+function setAvatar(el, user) {
+  el.textContent = '';
+  if (user.photoURL && /^https:\/\//i.test(user.photoURL)) {
+    const img = document.createElement('img');
+    img.alt = '';
+    img.referrerPolicy = 'no-referrer';
+    img.src = user.photoURL;
+    el.appendChild(img);
+  } else {
+    el.textContent = user.displayName.charAt(0).toUpperCase();
+  }
+}
+
 function updateUserBadge() {
   if (!currentUser) return;
   const badge = document.getElementById('userBadge');
   const avatar = document.getElementById('ubAvatar');
   const name = document.getElementById('ubName');
   name.textContent = currentUser.displayName;
-  if (currentUser.photoURL) {
-    avatar.innerHTML = `<img src="${currentUser.photoURL}" alt="">`;
-  } else {
-    avatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
-  }
+  setAvatar(avatar, currentUser);
   badge.classList.add('visible');
 
   // Update title screen auth
@@ -5993,11 +6107,7 @@ function updateUserBadge() {
   tp.style.display = 'block';
   document.getElementById('tpName').textContent = currentUser.displayName;
   const tpAvatar = document.getElementById('tpAvatar');
-  if (currentUser.photoURL) {
-    tpAvatar.innerHTML = `<img src="${currentUser.photoURL}" alt="">`;
-  } else {
-    tpAvatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
-  }
+  setAvatar(tpAvatar, currentUser);
   // Show email for email users
   const fbUser = firebase.auth().currentUser;
   const email = fbUser && fbUser.email ? fbUser.email : '';
@@ -6176,9 +6286,8 @@ document.getElementById('authEmailSignUp').addEventListener('click', async () =>
 
 // ===================== GAME HISTORY =====================
 async function saveGameHistory(mode, scores, totalScore, totalPar) {
-  if (!currentUser || !db) { console.log('saveGameHistory: no user or db'); return; }
+  if (!currentUser || !db) return;
   try {
-    console.log('Saving game history:', mode, totalScore, 'par', totalPar, 'holes', scores.length);
     const ref = db.ref('users/' + currentUser.uid + '/games');
     await ref.push({
       date: firebase.database.ServerValue.TIMESTAMP,
@@ -6192,7 +6301,6 @@ async function saveGameHistory(mode, scores, totalScore, totalPar) {
     });
     // Clear current round marker
     await db.ref('users/' + currentUser.uid + '/currentRound').remove();
-    console.log('Game saved successfully');
   } catch (e) {
     console.error('Failed to save game:', e);
   }
@@ -6210,7 +6318,6 @@ async function saveHoleProgress() {
       // Create new entry in games
       const ref = db.ref('users/' + currentUser.uid + '/games').push();
       _currentRoundKey = ref.key;
-      console.log('Created round:', _currentRoundKey);
     }
     await db.ref('users/' + currentUser.uid + '/games/' + _currentRoundKey).set({
       date: firebase.database.ServerValue.TIMESTAMP,
@@ -6222,21 +6329,18 @@ async function saveHoleProgress() {
       holes: holesPlayed,
       complete: false,
     });
-    console.log('Hole progress saved, holes:', holesPlayed);
   } catch (e) {
     console.error('Failed to save hole progress:', e);
   }
 }
 
 async function loadGameHistory() {
-  if (!currentUser || !db) { console.log('loadGameHistory: no user or db'); return []; }
+  if (!currentUser || !db) return [];
   try {
-    console.log('Loading game history for', currentUser.uid);
     const snap = await db.ref('users/' + currentUser.uid + '/games')
       .orderByChild('date').limitToLast(20).once('value');
     const games = [];
     snap.forEach(child => games.push({ key: child.key, ...child.val() }));
-    console.log('Loaded', games.length, 'games');
     return games.reverse(); // newest first
   } catch (e) {
     console.error('Failed to load games:', e);
@@ -6246,7 +6350,6 @@ async function loadGameHistory() {
 
 // ===================== STATS PANEL =====================
 async function showStatsPanel() {
-  console.log('Opening stats panel, currentUser:', currentUser ? currentUser.uid : 'null', 'db:', !!db);
   const games = await loadGameHistory();
   
   // Compute summary stats
@@ -6255,8 +6358,14 @@ async function showStatsPanel() {
   let totalStrokes = 0;
   let holesInOne = 0;
   
+  let completeRounds = 0;
+  let completeStrokes = 0;
   for (const g of games) {
-    if (g.diff < bestRound) bestRound = g.diff;
+    if (g.complete) {
+      completeRounds++;
+      completeStrokes += g.total || 0;
+      if (g.diff < bestRound) bestRound = g.diff;
+    }
     totalStrokes += g.total || 0;
     if (g.scores) {
       for (const s of Object.values(g.scores)) {
@@ -6266,11 +6375,11 @@ async function showStatsPanel() {
   }
   
   document.getElementById('stGamesPlayed').textContent = gamesPlayed;
-  document.getElementById('stBestRound').textContent = gamesPlayed > 0
+  document.getElementById('stBestRound').textContent = completeRounds > 0
     ? (bestRound === 0 ? 'EVEN' : (bestRound > 0 ? '+' + bestRound : '' + bestRound))
     : '—';
-  document.getElementById('stAvgScore').textContent = gamesPlayed > 0
-    ? (totalStrokes / gamesPlayed).toFixed(1)
+  document.getElementById('stAvgScore').textContent = completeRounds > 0
+    ? (completeStrokes / completeRounds).toFixed(1)
     : '—';
   document.getElementById('stHolesInOne').textContent = holesInOne;
   document.getElementById('stTotalStrokes').textContent = totalStrokes;
@@ -6289,7 +6398,7 @@ async function showStatsPanel() {
       const diffClass = g.diff < 0 ? 'under' : g.diff > 0 ? 'over' : 'even';
       const diffLabel = g.diff === 0 ? 'E' : (g.diff > 0 ? '+' + g.diff : '' + g.diff);
       const statusTag = g.complete ? '' : ' · ' + (g.holes || '?') + 'H';
-      row.innerHTML = `<span class="stats-game-date">${dateStr}</span><span class="stats-game-mode">${(g.mode || '1p').toUpperCase()}${statusTag}</span><span class="stats-game-score ${diffClass}">${g.total} (${diffLabel})</span>`;
+      row.innerHTML = `<span class="stats-game-date">${dateStr}</span><span class="stats-game-mode">${escapeHtml(String(g.mode || '1p').toUpperCase() + statusTag)}</span><span class="stats-game-score ${diffClass}">${escapeHtml(g.total)} (${escapeHtml(diffLabel)})</span>`;
       histDiv.appendChild(row);
     }
   }
@@ -6328,6 +6437,8 @@ function mulberry32(seed) {
   };
 }
 
+let activeDailySeed = null; // seed of the daily run in progress (kept until the next run starts)
+let activeDailyDateLabel = null; // the matching date text, so the board header names the day that was played
 function getDailySeed() {
   const now = new Date();
   const dateStr = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
@@ -6341,6 +6452,8 @@ function getDailyDateString() {
 
 function generateDailyChallenge() {
   const seed = getDailySeed();
+  activeDailySeed = seed;
+  activeDailyDateLabel = getDailyDateString();
   const rng = mulberry32(seed);
 
   const holes = [];
@@ -6495,7 +6608,7 @@ const LB_MAX_ENTRIES = 50;
 
 function getDailyLBRef() {
   if (!db) return null;
-  const seed = getDailySeed();
+  const seed = activeDailySeed || getDailySeed();
   return db.ref('leaderboard/' + seed);
 }
 
@@ -6529,11 +6642,25 @@ async function fetchLeaderboard() {
   return entries;
 }
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 function renderLeaderboard(entries) {
   const body = document.getElementById('lbBody');
   const dateEl = document.getElementById('lbDate');
-  dateEl.textContent = getDailyDateString();
+  dateEl.textContent = activeDailyDateLabel || getDailyDateString();
 
+  if (entries.length === 0) {
+    body.innerHTML = '<div class="lb-empty">No scores yet today. Be the first!</div>';
+    document.getElementById('lbYourRank').style.display = 'none';
+    return;
+  }
+
+  // Rows are written by other players: coerce the numbers, drop rows without a real score
+  entries = entries
+    .map(e => ({ ...e, strokes: Number(e.strokes), par: Number(e.par) || 0, timestamp: Number(e.timestamp) || 0 }))
+    .filter(e => Number.isFinite(e.strokes) && e.strokes > 0);
   if (entries.length === 0) {
     body.innerHTML = '<div class="lb-empty">No scores yet today. Be the first!</div>';
     document.getElementById('lbYourRank').style.display = 'none';
@@ -6566,7 +6693,7 @@ function renderLeaderboard(entries) {
 
     html += `<div class="${rowClass}">
       <span class="lb-rank">${medal}</span>
-      <span class="lb-name">${e.name || 'Anonymous'}</span>
+      <span class="lb-name">${escapeHtml(String(e.name || 'Anonymous').slice(0, 24))}</span>
       <span class="lb-strokes">${e.strokes}</span>
       <span class="lb-diff ${diffClass}">${diffLabel}</span>
     </div>`;
@@ -6675,10 +6802,10 @@ function clearLevel() {
   boostActiveParts.length = 0;
   boostPartHead = 0;
   dustActiveParts.length = 0;
-  for (let i = 0; i < MAX_DUST_PARTS; i++) dustInstanced.setMatrixAt(i, _dummy.matrix);
-  dustInstanced.instanceMatrix.needsUpdate = true;
   _dummy.scale.set(0, 0, 0);
   _dummy.updateMatrix();
+  for (let i = 0; i < MAX_DUST_PARTS; i++) dustInstanced.setMatrixAt(i, _dummy.matrix);
+  dustInstanced.instanceMatrix.needsUpdate = true;
   for (let i = 0; i < MAX_CELEB_STARS; i++) starInstanced.setMatrixAt(i, _dummy.matrix);
   for (let i = 0; i < MAX_CELEB_DOTS; i++) dotInstanced.setMatrixAt(i, _dummy.matrix);
   for (let i = 0; i < MAX_CELEB_RINGS; i++) ringInstanced.setMatrixAt(i, _dummy.matrix);
@@ -6896,6 +7023,7 @@ function updateBackgroundIntensity(levelIdx) {
 }
 
 function loadLevel(idx) {
+  coveredWarmupFrames = 3; // new level content: draw it a few times even if a menu covers the canvas
   clearLevel();
   resetOrbitalMastery();
   // Hide game complete screen if open
@@ -6929,7 +7057,9 @@ function loadLevel(idx) {
   for (const p of planetoids) {
     if (p.radius > 0.1) createGravityField(p);
     else if (p.radius <= 0.1 && p.gravityStrength > 1.0) createSentinelField(p);
-    if (isBlackHole(p)) createAccretionDisk(p);
+    // Invisible sentinel bodies (radius 0.01) match the black-hole colour test: their disk would be
+    // 40 sub-pixel quads each, drawn and animated every frame for nothing.
+    if (isBlackHole(p) && p.radius > 0.1) createAccretionDisk(p);
   }
   // Restore visibility state
   gravityFieldMeshes.forEach(g => g.visible = gravityFieldsVisible);
@@ -7514,6 +7644,12 @@ function initBallPicker() {
       const opt = document.createElement('div');
       opt.className = 'ball-option' + (idx === selectedBallColor ? ' selected' : '');
       opt.dataset.idx = idx;
+      opt.tabIndex = 0;
+      opt.setAttribute('role', 'button');
+      opt.setAttribute('aria-label', 'Ball: ' + bc.name);
+      opt.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); opt.click(); }
+      });
       const ballColorHex = '#' + new THREE.Color(bc.glow).getHexString();
       opt.style.setProperty('--ball-color', ballColorHex);
 
@@ -7586,7 +7722,6 @@ function initBallPicker() {
 
     // Online: single pick, then wait for opponent
     if (ballPickPhase === 10) {
-      console.log('Online: READY clicked, syncing ball', selectedBallColor);
       players[localPlayerIdx].ballColor = selectedBallColor;
       // Sync pick to Firebase
       syncBallPick(selectedBallColor);
@@ -7604,7 +7739,6 @@ function initBallPicker() {
         const oppIdx = localPlayerIdx === 0 ? 1 : 0;
         if (players[oppIdx].ballColor !== null && players[oppIdx].ballColor !== undefined) {
           clearInterval(checkReady);
-          console.log('Online: opponent picked, starting game');
           ballPickPhase = 2;
           // Each client plays as themselves simultaneously
           currentPlayer = localPlayerIdx;
@@ -7665,7 +7799,7 @@ let ballPickPhase = 0; // 0 = P1 picking, 1 = P2 picking, 2 = done
 // ===================== TITLE SCREEN =====================
 document.getElementById('mode1p').addEventListener('click', () => {
   gameMode = '1p';
-  dailyMode = false;
+  endDailyChallenge(); // restores the course if a daily run was left unfinished
   resetSessionStats();
   currentPlayer = 0;
   players[0].scores = [];
@@ -7682,6 +7816,7 @@ document.getElementById('mode1p').addEventListener('click', () => {
 });
 
 document.getElementById('mode2p').addEventListener('click', () => {
+  endDailyChallenge();
   gameMode = '2p';
   currentPlayer = 0;
   players[0].scores = [];
@@ -8017,6 +8152,16 @@ let ballVel = new THREE.Vector3();
 let ballOnPlanet = null;
 let strokes = 0;
 let holeStartTime = 0;    // timestamp when first shot fired
+let _tabHiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    _tabHiddenAt = performance.now();
+  } else if (_tabHiddenAt > 0) {
+    // The loop is paused while hidden: shift the start so the hole timer does not count that time
+    if (holeStartTime > 0 && !gameWon && !holeScored) holeStartTime += performance.now() - _tabHiddenAt;
+    _tabHiddenAt = 0;
+  }
+});
 let holeElapsed = 0;       // seconds to complete hole
 let holeTimes = [];        // time per hole
 let artifactsCollected = 0;
@@ -8797,8 +8942,10 @@ powerBar.addEventListener('pointercancel', (e) => {
 });
 const aimHud = document.getElementById('aimHud');
 
+let aimPointerId = null; // the pointer that started the current aim drag
 renderer.domElement.addEventListener('pointerdown', (e) => {
   if (gameWon || lostInSpace || !ballOnPlanet || spaceHeld || introPlaying) return;
+  if (e.button !== 0 || aiming) return; // primary button only, and never a second aim while one is in progress
 
   if (isBallHit(e)) {
     // Always start a new aim when clicking the ball, even if aim was locked
@@ -8811,6 +8958,7 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
     cameraFollowPos.copy(camera.position); // stop follow if player starts aiming
     shotInFlight = false;
     aiming = true;
+    aimPointerId = e.pointerId;
     aimStart.set(e.clientX, e.clientY);
     aimCurrent.copy(aimStart);
     controls.enabled = false;
@@ -8819,7 +8967,7 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
 });
 
 renderer.domElement.addEventListener('pointermove', (e) => {
-  if (!aiming) return;
+  if (!aiming || e.pointerId !== aimPointerId) return;
   aimCurrent.set(e.clientX, e.clientY);
   const dx = aimCurrent.x - aimStart.x;
   const dy = aimCurrent.y - aimStart.y;
@@ -8828,9 +8976,19 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   updatePowerDisplay(power);
 });
 
-renderer.domElement.addEventListener('pointerup', (e) => {
-  if (!aiming) return;
+// The system took the gesture away (notification shade, palm rejection): drop the aim cleanly.
+renderer.domElement.addEventListener('pointercancel', (e) => {
+  if (!aiming || e.pointerId !== aimPointerId) return;
   aiming = false;
+  aimPointerId = null;
+  controls.enabled = true;
+  hideAimVisuals();
+});
+
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (!aiming || e.pointerId !== aimPointerId) return;
+  aiming = false;
+  aimPointerId = null;
   controls.enabled = true;
  
 
@@ -8916,7 +9074,30 @@ function updateKeyHud(key, pressed) {
 }
 
 // W = pan camera (hold) — swaps left-click from orbit to pan
+function isTypingTarget(t) {
+  if (!t) return false;
+  if (t.isContentEditable || t.tagName === 'TEXTAREA') return true;
+  // Text fields only: the aim and volume sliders are inputs too, and Space must still fire from them
+  return t.tagName === 'INPUT' && !/^(range|checkbox|radio|button|submit|reset)$/i.test(t.type || '');
+}
+function menuOverlayOpen() {
+  return !document.getElementById('titleScreen').classList.contains('hidden')
+    || !document.getElementById('ballPicker').classList.contains('hidden')
+    || !!document.querySelector('#authModal.visible, #unlockModal.visible, #lobbyScreen.visible, #statsPanel.visible, #leaderboard.visible, #gameCompleteScreen.visible, #winnerScreen.visible');
+}
+function releasePanKey() {
+  spaceHeld = false;
+  controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+  updateKeyHud('kW', false);
+}
+
 window.addEventListener('keydown', (e) => {
+  // Typing an email, unlock code or room code used to trigger W / Space / R / digits / Tab.
+  if (isTypingTarget(e.target)) return;
+  // Browser shortcuts (Cmd+R, Ctrl+A ...) are not game input.
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  // Title, ball picker, dialogs and end screens keep normal keyboard behaviour (Tab moves focus).
+  if (menuOverlayOpen()) return;
   if (e.key === 'w' || e.key === 'W') {
     e.preventDefault();
     if (!spaceHeld) {
@@ -8925,6 +9106,12 @@ window.addEventListener('keydown', (e) => {
       controls.enabled = true;
       updateKeyHud('kW', true);
     }
+  }
+  // A held key repeats: without this, holding Space fired and then chained every boost,
+  // and holding R / A reloaded the hole or re-ran the path solver many times a second.
+  if (e.repeat) {
+    if (e.key === ' ' || e.key === 'Tab') e.preventDefault();
+    return;
   }
   // Space = start power oscillation or boost charge
   if (e.key === ' ') {
@@ -8954,8 +9141,8 @@ window.addEventListener('keydown', (e) => {
     updateKeyHud('kQ', true);
     activateBallAbility();
   }
-  // Number keys 1-9 = jump to level
-  if (!trainerActive && e.key >= '1' && e.key <= '9') {
+  // Number keys 1-9 = jump to level (not in the daily: it let a player skip to the last hole and post one hole as the full round)
+  if (!trainerActive && !dailyMode && e.key >= '1' && e.key <= '9') {
     const lvl = parseInt(e.key) - 1;
     if (lvl < LEVELS.length) {
       currentLevel = lvl;
@@ -8969,7 +9156,7 @@ window.addEventListener('keydown', (e) => {
     else loadLevel(currentLevel);
   }
   // U = undo last shot
-  if (!trainerActive && (e.key === 'u' || e.key === 'U')) {
+  if (!trainerActive && !dailyMode && (e.key === 'u' || e.key === 'U')) {
     updateKeyHud('kU', true);
     performUndo();
   }
@@ -8993,11 +9180,17 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Losing focus with a key held (alt-tab) never delivers the keyup: release held keys here,
+// otherwise W stayed "held" and the ball could not be clicked.
+window.addEventListener('blur', () => {
+  if (spaceHeld) releasePanKey();
+  updateKeyHud('kSpace', false);
+  releaseBoostCharge();
+});
+
 window.addEventListener('keyup', (e) => {
   if (e.key === 'w' || e.key === 'W') {
-    spaceHeld = false;
-    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-    updateKeyHud('kW', false);
+    releasePanKey();
   }
   if (e.key === ' ') {
     updateKeyHud('kSpace', false);
@@ -9049,6 +9242,12 @@ function fireLockedShot() {
     nudgeTrainer('Make one route adjustment before launching. Drag the ball or change an AIM control.');
     return;
   }
+  if (gameWon || lostInSpace) {
+    // The ball sank (or was lost) while an aim was still held: no extra stroke
+    cancelLockedAim();
+    return;
+  }
+  ballJustSettled = false; // otherwise the settle camera could end this flight early (no boost, no follow camera)
   ensureAudio();
   haptic(15);
   const firedPilotRoute = shotUsesPilotRoute;
@@ -9251,7 +9450,7 @@ function snapToOptimal(sourceBtn) {
         const rightComp = result.launchDir.dot(frame.right);
         const azimuth = Math.atan2(rightComp, fwdComp) * 180 / Math.PI;
         const elevation = Math.asin(Math.max(-1, Math.min(1, nComp))) * 180 / Math.PI;
-        sliderX.value = Math.round(azimuth);
+        sliderX.value = Math.round(-azimuth); // computeLaunchFromSliders() negates X, so the inverse must too
         sliderY.value = Math.round(Math.max(0, Math.min(80, elevation)));
         sliderZ.value = 0;
         valX.textContent = sliderX.value + '°';
@@ -9607,7 +9806,7 @@ function renderScorecard() {
     header.innerHTML = '<span class="sc-hole">#</span><span class="sc-name">HOLE</span><span class="sc-par">PAR</span><span class="sc-score">P1</span><span class="sc-diff">P2</span>';
     body.appendChild(header);
 
-    let t0 = 0, t1 = 0, totalPar = 0;
+    let t0 = 0, t1 = 0, par0 = 0, par1 = 0;
     LEVELS.forEach((lvl, i) => {
       const row = document.createElement('div');
       row.className = 'sc-row' + (i === currentLevel ? ' current' : '');
@@ -9615,9 +9814,8 @@ function renderScorecard() {
       const s1 = players[1].scores[i];
       const h0 = s0 !== undefined;
       const h1 = s1 !== undefined;
-      if (h0) t0 += s0;
-      if (h1) t1 += s1;
-      totalPar += lvl.par;
+      if (h0) { t0 += s0; par0 += lvl.par; }
+      if (h1) { t1 += s1; par1 += lvl.par; }
 
       let c0 = 'sc-none', c1 = 'sc-none';
       if (h0) c0 = (s0 - lvl.par) < 0 ? 'sc-under' : (s0 - lvl.par) > 0 ? 'sc-over' : 'sc-even';
@@ -9627,7 +9825,7 @@ function renderScorecard() {
       body.appendChild(row);
     });
 
-    const d0 = t0 - totalPar, d1 = t1 - totalPar;
+    const d0 = t0 - par0, d1 = t1 - par1;
     const l0 = t0 > 0 ? (d0 === 0 ? 'E' : (d0 > 0 ? '+' + d0 : '' + d0)) : '—';
     const l1 = t1 > 0 ? (d1 === 0 ? 'E' : (d1 > 0 ? '+' + d1 : '' + d1)) : '—';
     const scTotal = document.getElementById('scTotal');
@@ -9653,11 +9851,11 @@ function renderScorecard() {
       let diffClass = 'sc-none';
       if (hasScore) {
         totalStrokes += score;
+        totalPar += lvl.par;
         if (diff < 0) { diffText = '' + diff; diffClass = 'sc-under'; }
         else if (diff === 0) { diffText = 'E'; diffClass = 'sc-even'; }
         else { diffText = '+' + diff; diffClass = 'sc-over'; }
       }
-      totalPar += lvl.par;
       const ht = holeTimes[i];
       const timeStr = ht ? ht.toFixed(1) + 's' : '—';
       if (ht) totalTime += ht;
@@ -9691,7 +9889,8 @@ function showGameComplete(title, isFreeEnd) {
   const gc = document.getElementById('gameCompleteScreen');
   gc.querySelector('.gc-title').textContent = title || 'COURSE COMPLETE';
 
-  const totalPar = LEVELS.reduce((a, l) => a + l.par, 0);
+  // Par of the holes that were played (identical to course par for a full round)
+  const totalPar = LEVELS.reduce((a, l, i) => a + (levelScores[i] !== undefined ? l.par : 0), 0);
   const diff = totalScore - totalPar;
   const scoreLabel = diff === 0 ? 'EVEN PAR' : (diff > 0 ? '+' + diff + ' OVER PAR' : diff + ' UNDER PAR');
   document.getElementById('gcScore').textContent = totalScore + ' STROKES · ' + scoreLabel;
@@ -9703,7 +9902,7 @@ function showGameComplete(title, isFreeEnd) {
   
   if (isFreeEnd) {
     playAgainBtn.style.display = 'none';
-    homeBtn.style.display = 'none';
+    homeBtn.style.display = ''; // always leave an exit
     if (!gcUnlockBtn) {
       gcUnlockBtn = document.createElement('button');
       gcUnlockBtn.id = 'gcUnlockBtn';
@@ -9720,8 +9919,7 @@ function showGameComplete(title, isFreeEnd) {
       `;
       gcUnlockBtn.addEventListener('click', () => {
         sfxClick();
-        hideGameComplete();
-        showUnlockModal();
+        showUnlockModal(); // opens above this screen, so BACK returns here
       });
       gc.querySelector('.gc-buttons').appendChild(gcUnlockBtn);
     }
@@ -9771,7 +9969,7 @@ function showGameComplete(title, isFreeEnd) {
       holes: levelScores.filter(s => s !== undefined).length,
       complete: true,
       date: firebase.database.ServerValue.TIMESTAMP,
-    }).then(() => console.log('Round marked complete')).catch(e => console.error('Failed:', e));
+    }).catch(e => console.error('Failed to mark round complete:', e));
     db.ref('users/' + currentUser.uid + '/currentRound').remove();
     _currentRoundKey = null;
   } else {
@@ -9885,6 +10083,10 @@ document.getElementById('retryHoleBtn').addEventListener('click', () => {
 
 // Next hole button
 document.getElementById('nextHoleBtn').addEventListener('click', () => {
+  if (gameMode === '2p' && onlineMode) {
+    const oppIdxNow = localPlayerIdx === 0 ? 1 : 0;
+    if (players[oppIdxNow].scores[currentLevel] === undefined) return; // still waiting: keep the button
+  }
   document.getElementById('message').style.display = 'none';
   document.getElementById('nextHoleBtn').style.display = 'none';
   document.getElementById('retryHoleBtn').style.display = 'none';
@@ -9989,16 +10191,22 @@ renderer.domElement.addEventListener('pointerdown', () => {
   if (lostInSpace) _lostSkipRequested = true;
 });
 
+let _gestureMultiTouch = false; // a second finger joined at any point of this gesture
+let _gestureStartTime = 0;
 renderer.domElement.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1) {
     _swipeStartY = e.touches[0].clientY;
     _swipeStartX = e.touches[0].clientX;
     _wasAiming = aiming; // track if we started during aim drag
+    _gestureMultiTouch = false;
+    _gestureStartTime = Date.now();
+  } else {
+    _gestureMultiTouch = true;
   }
 }, { passive: true });
 renderer.domElement.addEventListener('touchend', (e) => {
   // Only fire on swipe-up if aim was already locked AND we weren't just aiming
-  if (aimLocked && !_wasAiming && !aiming && e.changedTouches.length === 1) {
+  if (aimLocked && !_wasAiming && !aiming && !_gestureMultiTouch && e.touches.length === 0 && e.changedTouches.length === 1) {
     const dy = _swipeStartY - e.changedTouches[0].clientY;
     const dx = Math.abs(e.changedTouches[0].clientX - _swipeStartX);
     // Swipe up: dy > 80px, mostly vertical
@@ -10014,14 +10222,19 @@ renderer.domElement.addEventListener('touchend', (e) => {
 let _lastTapTime = 0;
 renderer.domElement.addEventListener('touchend', (e) => {
   const now = Date.now();
-  if (now - _lastTapTime < 300 && e.changedTouches.length === 1) {
+  if (e.touches.length > 0) return; // fingers still down: gesture not finished
+  // A tap = one finger, short, and it barely moved
+  const t = e.changedTouches[0];
+  const moved = t ? Math.hypot(t.clientX - _swipeStartX, t.clientY - _swipeStartY) : Infinity;
+  const isTap = !_gestureMultiTouch && moved < 24 && now - _gestureStartTime < 300;
+  if (isTap && now - _lastTapTime < 300) {
     // Double tap detected
     if (!aiming && !aimLocked) {
       findBall();
       haptic(10);
     }
   }
-  _lastTapTime = now;
+  _lastTapTime = isTap ? now : 0;
 }, { passive: true });
 
 // ===================== PHYSICS =====================
@@ -10216,6 +10429,7 @@ function physicsStep(dt) {
         document.getElementById('strokeCount').textContent = strokes;
         playLostSound();
         showMessage('LOST IN SPACE', '+1 Stroke Penalty · Resetting...');
+        break; // one penalty: stop simulating this frame
       }
     }
   }
@@ -10271,7 +10485,7 @@ function physicsStep(dt) {
 
         // Sync score to Firebase if online
         if (onlineMode) {
-          syncScore(currentLevel, strokes);
+          syncScore(currentLevel, strokes).catch((e) => console.error('Score sync failed:', e));
         }
 
         const btn = document.getElementById('nextHoleBtn');
@@ -10296,7 +10510,10 @@ function physicsStep(dt) {
 
           // If opponent hasn't finished, poll for their score
           if (!oppFinished) {
+            const waitLevel = currentLevel;
             const waitCheck = setInterval(() => {
+              // The game moved on or the room closed: stop polling (this timer used to run forever)
+              if (!onlineMode || currentLevel !== waitLevel) { clearInterval(waitCheck); return; }
               if (players[oppIdx].scores[currentLevel] !== undefined) {
                 clearInterval(waitCheck);
                 if (isLast) {
@@ -11292,6 +11509,8 @@ function toggleOptimalPath() {
     return;
   }
 
+  if (!ballOnPlanet || shotInFlight || gameWon || lostInSpace || introPlaying) return;
+
   // Compute the path
   const btn = document.getElementById('optimalBtn');
   btn.textContent = 'COMPUTING...';
@@ -11410,7 +11629,7 @@ function animate() {
     holeRing.material.opacity = 0.6 + Math.sin(time * 3) * 0.3;
 
     controls.update();
-    composer.render();
+    if (!titleBgCovering || coveredWarmupFrames-- > 0) composer.render();
     return; // Skip all game logic during intro
   }
 
@@ -11612,7 +11831,7 @@ function animate() {
       ghostLabel.position.y += 1.2;
       ghostLabel.visible = true;
       // Pulse ghost glow
-      ghostGlowMat.opacity = Math.max(0.04, ghostGlowMat.opacity) + Math.sin(time * 3) * 0.02;
+      ghostGlowMat.opacity = ghostGlowBase + Math.sin(time * 3) * 0.02;
 
       // Accumulate ghost trail
       if (appendTrailPoint(ghostTrailPositions, ghostBall.position, GHOST_TRAIL_MAX, 0.0025)) {
@@ -12116,7 +12335,7 @@ function animate() {
 
   // Update orbit controls
   controls.update();
-  composer.render();
+  if (!titleBgCovering || coveredWarmupFrames-- > 0) composer.render();
 }
 
 window.render_game_to_text = () => JSON.stringify({

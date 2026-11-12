@@ -135,8 +135,15 @@ firebase.auth().onAuthStateChanged(async user => {
   document.getElementById('name').textContent = user.displayName || ('Cosmonaut-' + user.uid.slice(0,5));
   document.getElementById('email').textContent = user.isAnonymous ? 'Guest account' : (user.email || '');
   const av = document.getElementById('avatar');
-  if (user.photoURL) av.innerHTML = '<img src="' + user.photoURL + '" alt="">';
-  else av.textContent = (user.displayName || '?').charAt(0).toUpperCase();
+  // Build the image as an element: a profile URL must never be parsed as markup
+  if (user.photoURL && /^https:\/\//i.test(user.photoURL)) {
+    const img = document.createElement('img');
+    img.alt = '';
+    img.referrerPolicy = 'no-referrer';
+    img.src = user.photoURL;
+    av.textContent = '';
+    av.appendChild(img);
+  } else av.textContent = (user.displayName || '?').charAt(0).toUpperCase();
 
   // Load games
   try {
@@ -145,16 +152,21 @@ firebase.auth().onAuthStateChanged(async user => {
     snap.forEach(c => games.push(c.val()));
     games.reverse();
 
-    let best = Infinity, total = 0, hio = 0;
+    // The game saves a row after every hole: only finished rounds count for best and average
+    let best = Infinity, total = 0, hio = 0, done = 0, doneTotal = 0;
     for (const g of games) {
-      if (g.diff < best) best = g.diff;
+      if (g.complete) {
+        done++;
+        doneTotal += g.total || 0;
+        if (g.diff < best) best = g.diff;
+      }
       total += g.total || 0;
       if (g.scores) Object.values(g.scores).forEach(s => { if (s === 1) hio++; });
     }
 
     document.getElementById('sGames').textContent = games.length;
-    document.getElementById('sBest').textContent = games.length ? (best === 0 ? 'EVEN' : (best > 0 ? '+' + best : '' + best)) : '—';
-    document.getElementById('sAvg').textContent = games.length ? (total / games.length).toFixed(1) : '—';
+    document.getElementById('sBest').textContent = done ? (best === 0 ? 'EVEN' : (best > 0 ? '+' + best : '' + best)) : '—';
+    document.getElementById('sAvg').textContent = done ? (doneTotal / done).toFixed(1) : '—';
     document.getElementById('sHIO').textContent = hio;
     document.getElementById('sTotal').textContent = total;
 
@@ -168,9 +180,16 @@ firebase.auth().onAuthStateChanged(async user => {
         const d = new Date(g.date);
         const cls = g.diff < 0 ? 'under' : g.diff > 0 ? 'over' : 'even';
         const label = g.diff === 0 ? 'E' : (g.diff > 0 ? '+' + g.diff : '' + g.diff);
-        row.innerHTML = '<span class="game-date">' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>' +
-          '<span class="game-mode">' + (g.mode||'1P').toUpperCase() + ' · ' + (g.holes||'?') + 'H</span>' +
-          '<span class="game-score ' + cls + '">' + g.total + ' (' + label + ')</span>';
+        // Values read back from the database are written as text, never as markup
+        const cell = (className, text) => {
+          const span = document.createElement('span');
+          span.className = className;
+          span.textContent = text;
+          return span;
+        };
+        row.appendChild(cell('game-date', d.toLocaleDateString('en-US',{month:'short',day:'numeric'})));
+        row.appendChild(cell('game-mode', String(g.mode||'1P').toUpperCase() + ' · ' + (g.holes||'?') + 'H'));
+        row.appendChild(cell('game-score ' + cls, g.total + ' (' + label + ')'));
         hist.appendChild(row);
       }
     }
