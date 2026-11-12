@@ -7468,6 +7468,23 @@ function loadLevel(idx) {
   // Look at a point 30% toward goal from the ball for better framing
   introTargetEnd.copy(ball.position).add(ballToGoal.clone().multiplyScalar(0.3));
   introFovEnd = CAMERA_DEFAULT_FOV;
+  // On a narrow (portrait) screen that look-ahead point can leave the ball off the side of the view,
+  // where it cannot be tapped. Pull the target back toward the ball until the ball is well on screen.
+  {
+    const probe = camera.clone();
+    probe.fov = introFovEnd;
+    probe.aspect = window.innerWidth / window.innerHeight;
+    probe.updateProjectionMatrix();
+    probe.position.copy(introCamEnd);
+    const ballOnScreen = new THREE.Vector3();
+    for (let step = 6; step >= 0; step--) {
+      introTargetEnd.copy(ball.position).add(ballToGoal.clone().multiplyScalar(step * 0.05));
+      probe.lookAt(introTargetEnd);
+      probe.updateMatrixWorld();
+      ballOnScreen.copy(ball.position).project(probe);
+      if (Math.abs(ballOnScreen.x) < 0.7 && Math.abs(ballOnScreen.y) < 0.75) break;
+    }
+  }
 
   // Start position: wide establishing shot — high arc from the opposite side
   const wideHeight = Math.max(spanDist * 0.7, 16);
