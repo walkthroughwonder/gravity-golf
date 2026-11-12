@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gravity Golf">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <!-- Firebase SDK (compat mode for simplicity) -->
 <!-- defer: runs in order after parsing and before the game module, without blocking first paint -->
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
@@ -2959,10 +2959,10 @@ function syncSoundtrackPlayback() {
 }
 function initSoundtrack() {
   if (!audioCtx) return;
-  // Try to load soundtrack.mp3 from same directory
   soundtrackEl = new Audio();
   soundtrackEl.preload = 'none'; // nothing is fetched until it actually plays
-  soundtrackEl.src = 'soundtrack.mp3';
+  // AAC copy is a third smaller; the MP3 stays as the fallback
+  soundtrackEl.src = soundtrackEl.canPlayType('audio/mp4; codecs="mp4a.40.2"') ? 'soundtrack.m4a' : 'soundtrack.mp3';
   soundtrackEl.loop = true;
   soundtrackEl.volume = 1; // volume controlled via gain node
   soundtrackSource = audioCtx.createMediaElementSource(soundtrackEl);
@@ -6724,6 +6724,35 @@ function getDailyDateString() {
   return now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
+// Daily courses are random, so bodies can land inside one another. Push overlapping ones apart until
+// the ball fits between any two surfaces. No random numbers are drawn here, so everyone still gets
+// the same course on the same day. The start and goal planets stay where they are.
+function separateDailyBodies(planets) {
+  const GAP = 1.0;
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let a = 0; a < planets.length; a++) {
+      for (let b = a + 1; b < planets.length; b++) {
+        const A = planets[a], B = planets[b];
+        if (A.r <= 0.1 || B.r <= 0.1) continue; // invisible markers
+        const aFixed = A.type !== 'obstacle', bFixed = B.type !== 'obstacle';
+        if (aFixed && bFixed) continue;
+        let dx = B.pos[0] - A.pos[0], dy = B.pos[1] - A.pos[1], dz = B.pos[2] - A.pos[2];
+        let d = Math.hypot(dx, dy, dz);
+        const need = A.r + B.r + GAP;
+        if (d >= need) continue;
+        if (d < 1e-6) { dx = 0; dy = 1; dz = 0; d = 1; }
+        const push = (need - d + 0.01) / d;
+        const wa = aFixed ? 0 : (bFixed ? 1 : 0.5), wb = bFixed ? 0 : (aFixed ? 1 : 0.5);
+        A.pos = [A.pos[0] - dx * push * wa, A.pos[1] - dy * push * wa, A.pos[2] - dz * push * wa];
+        B.pos = [B.pos[0] + dx * push * wb, B.pos[1] + dy * push * wb, B.pos[2] + dz * push * wb];
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+}
+
 function generateDailyChallenge() {
   const seed = getDailySeed();
   activeDailySeed = seed;
@@ -6811,6 +6840,7 @@ function generateDailyChallenge() {
       color: 0x000000, emissive: 0x000000, type: 'obstacle', gravMult: sentGrav,
     });
     const par = Math.floor(3 + difficulty * 2 + rng());
+    separateDailyBodies(planets);
 
     holes.push({
       name: 'DAILY ' + (h + 1),
@@ -6902,7 +6932,6 @@ async function postDailyScore(totalStrokes, holeScores) {
     par: totalPar,
     holes: holeScores,
     timestamp: firebase.database.ServerValue.TIMESTAMP,
-    photoURL: currentUser.photoURL || null,
   });
   dailyPosted = true;
   return true;

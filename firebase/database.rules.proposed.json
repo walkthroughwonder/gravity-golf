@@ -1,0 +1,43 @@
+{
+  // PROPOSED Realtime Database rules for gravity-golf-6ec4f.
+  //
+  // This is NOT a copy of the rules that are live. The live rules exist only in the Firebase
+  // console and could not be read from outside. This file was written from the paths the game
+  // uses, and it has not been run against the emulator. Before publishing: open the console
+  // (Realtime Database > Rules), compare with what is there, and test in the Rules Playground.
+  // Once the live rules are confirmed, save them here as database.rules.json and delete this file.
+  //
+  // What these rules do:
+  //   users/<uid>              only that signed-in player can read or write their own data
+  //   leaderboard/<day>/<uid>  any signed-in player can read a day's board; each player writes only
+  //                            their own row
+  //   rooms/<code>             a room can be read and written by anyone who knows its code, but the
+  //                            list of rooms can no longer be read (today anyone can list /rooms)
+  //   everything else          closed
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "leaderboard": {
+      "$day": {
+        ".read": "auth != null",
+        ".indexOn": ["strokes"],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.child('name').isString() && newData.child('name').val().length <= 32 && newData.child('strokes').isNumber()"
+        }
+      }
+    },
+    "rooms": {
+      "$code": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}
