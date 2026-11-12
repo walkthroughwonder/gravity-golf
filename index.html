@@ -9806,6 +9806,7 @@ function fireLockedShot() {
 }
 
 function cancelLockedAim() {
+  cancelPathSolve(); // a late auto-aim answer must not overwrite the next aim
   document.getElementById('gameBottomBar').classList.remove('aiming');
   aimLocked = false;
   powerOscillating = false;
@@ -9906,6 +9907,7 @@ function snapToOptimal(sourceBtn) {
   allBtns.forEach(b => { b.classList.add('computing'); b.textContent = '⟡ COMPUTING...'; });
   
   solveOptimalPath().then((result) => {
+    if (!result && solverJob) return; // replaced by a newer request: leave that one's COMPUTING label alone
     allBtns.forEach(b => { b.classList.remove('computing'); b.textContent = '⟡ SNAP OPTIMAL'; });
     // Cancelled, or the aim was released or fired while the search ran
     if (!result || !aimLocked || !ballOnPlanet) return;
@@ -10748,6 +10750,8 @@ function createGolfPhysics() {
   const MAX_DIST = 400;
   const WORMHOLE_COOLDOWN = 0.5;   // seconds before the ball can re-enter a wormhole
   const SENTINEL_RADIUS = 0.1;     // bodies this small are invisible markers: no surface to land on
+  const SENTINEL_CORE = 0.26;      // their pull stops growing inside this distance (no surface keeps the ball out)
+  const MAX_ELEVATION = 1.396;     // 80 degrees: the steepest shot the aim sliders allow
   const EV = { NONE: 0, CAPTURE: 1, SUNK: 2, LIFTOFF: 3, REST: 4, WORMHOLE: 5, LOST: 6 };
 
   // Coarse solver steps (k > 1) are approximate by nature, so they also use a cheaper force:
@@ -10801,6 +10805,7 @@ function createGolfPhysics() {
       bodies: spec.bodies.map((b, i) => ({
         x: b.x, y: b.y, z: b.z, radius: b.radius, gravity: b.gravity,
         solid: b.radius > SENTINEL_RADIUS, motion: motionFor(i, spec),
+        minD2: b.radius > SENTINEL_RADIUS ? 0 : SENTINEL_CORE * SENTINEL_CORE,
       })),
       moving: [],
       home: spec.home, goal: spec.goal,
@@ -10901,8 +10906,9 @@ function createGolfPhysics() {
       for (let i = 0; i < n; i++) {
         const b = bodies[i];
         const tx = b.x - s.x, ty = b.y - s.y, tz = b.z - s.z;
-        const d2 = tx * tx + ty * ty + tz * tz;
+        let d2 = tx * tx + ty * ty + tz * tz;
         if (near) near[i] = Math.sqrt(d2);
+        if (d2 < b.minD2) d2 = b.minD2;
         const f = b.gravity * pull / Math.pow(d2, ex); // gravity / dist^1.7, along the unit vector
         s.vx += tx * f; s.vy += ty * f; s.vz += tz * f;
       }
@@ -10911,7 +10917,9 @@ function createGolfPhysics() {
       for (let i = 0; i < n; i++) {
         const b = bodies[i];
         const tx = b.x - s.x, ty = b.y - s.y, tz = b.z - s.z;
-        const d2 = tx * tx + ty * ty + tz * tz, d = Math.sqrt(d2);
+        let d2 = tx * tx + ty * ty + tz * tz;
+        if (d2 < b.minD2) d2 = b.minD2;
+        const d = Math.sqrt(d2);
         let f;
         if (d < POW03_MAX) {
           const u = d * POW03_STEP, j = u | 0;
@@ -11106,6 +11114,12 @@ function createGolfPhysics() {
   // (a ball at rest on body start.on). The search runs on coarse steps; the winners are re-checked and
   // polished on the exact step, so the returned shot is what the real ball does when fired now.
   function findOptimalPath(world, start, maxPower) {
+    // Put the moving bodies where they are right now before reading any position (a freshly built
+    // world, as in the worker, still has them at their level-start positions)
+    if (world.moving.length) {
+      buildTrack(world, start.tick, 28);
+      placeBodies(world, start.tick, null);
+    }
     const planet = world.bodies[start.on >= 0 ? start.on : world.home];
     let nx = start.x - planet.x, ny = start.y - planet.y, nz = start.z - planet.z;
     const nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
@@ -11142,6 +11156,7 @@ function createGolfPhysics() {
       setDir(a, e);
       return simulate(world, start, dir[0], dir[1], dir[2], p, maxTime, k, trace);
     }
+    const clampElevation = e => Math.min(MAX_ELEVATION, Math.max(0.05, e));
     function keepBest(list, cand, size) {
       if (list.length < size || cand.s < list[list.length - 1].s) {
         list.push(cand);
@@ -11149,8 +11164,6 @@ function createGolfPhysics() {
         if (list.length > size) list.length = size;
       }
     }
-
-    if (world.moving.length) buildTrack(world, start.tick, 28);
 
     // Seed directions: the goal, the cup, and the bodies closest to the straight line to the goal
     const goal = world.bodies[world.goal];
@@ -11181,7 +11194,7 @@ function createGolfPhysics() {
       for (let ai = 0; ai < 8; ai++) {
         for (let pi = 0; pi < 8; pi++) {
           for (let ei = 0; ei < 4; ei++) {
-            coarse(sa - 0.3 + (ai / 7) * 0.6, Math.max(0.05, se - 0.3 + (ei / 3) * 0.6), Math.max(1, (pi / 7) * maxPower));
+            coarse(sa - 0.3 + (ai / 7) * 0.6, clampElevation(se - 0.3 + (ei / 3) * 0.6), Math.max(1, (pi / 7) * maxPower));
           }
         }
       }
@@ -11196,7 +11209,7 @@ function createGolfPhysics() {
       for (let iter = 0; iter < iterations && cur.s > SUNK_SCORE; iter++) {
         let improved = false;
         for (const [da, dp, de] of [[sA, 0, 0], [-sA, 0, 0], [0, sP, 0], [0, -sP, 0], [0, 0, sE], [0, 0, -sE]]) {
-          const a = cur.a + da, p = Math.min(maxPower, Math.max(0.5, cur.p + dp)), e = Math.max(0.05, cur.e + de);
+          const a = cur.a + da, p = Math.min(maxPower, Math.max(0.5, cur.p + dp)), e = clampElevation(cur.e + de);
           const s = scoreResult(world, run(a, e, p, EXACT_T, 1));
           if (s < cur.s) { cur.a = a; cur.e = e; cur.p = p; cur.s = s; improved = true; }
         }
@@ -11229,7 +11242,7 @@ function createGolfPhysics() {
           for (let ei = 0; ei < 4; ei++) {
             const a = c.a - aStep + (ai / 4) * aStep * 2;
             const p = Math.min(maxPower, Math.max(0.5, c.p - pStep + (pi / 4) * pStep * 2));
-            const e = Math.max(0.05, c.e - eStep + (ei / 3) * eStep * 2);
+            const e = clampElevation(c.e - eStep + (ei / 3) * eStep * 2);
             keepBest(fine, { a, e, p, s: scoreResult(world, run(a, e, p, 12.6, 4)) }, 4);
           }
         }
@@ -11281,6 +11294,7 @@ function buildPhysicsWorld(levelIdx) {
   physState.whIndex = -1;
   physState.near = new Float64Array(planetoids.length);
   physAccumulator = 0;
+  aimPreview.key = ''; // never reuse an arc from the previous level
   planetoids.forEach((p, i) => { p.isMoving = !!physWorld.bodies[i].motion; });
   syncMovingBodies();
 }
@@ -12719,6 +12733,167 @@ function animate() {
 
   // Update nudge UI visibility
   updateNudgeUI();
+
+  // Animate optimal path
+  if (optimalAnimating && optimalPathPoints.length > 1) {
+    // Animate the ghost ball along the path
+    const speed = 120; // points per second
+    optimalAnimT += dt * speed;
+
+    // Loop the animation
+    const totalPts = optimalPathPoints.length;
+    const loopT = optimalAnimT % (totalPts + 40); // small pause at end
+    const idx = Math.min(Math.floor(loopT), totalPts - 1);
+
+    if (idx < totalPts) {
+      // Position ghost ball
+      const frac = loopT - Math.floor(loopT);
+      const nextIdx = Math.min(idx + 1, totalPts - 1);
+      optimalGhostBall.position.lerpVectors(optimalPathPoints[idx], optimalPathPoints[nextIdx], frac);
+      ghostMat.opacity = 0.6;
+
+      // Show line up to current point with fade-in
+      const showCount = Math.min(idx + 1, totalPts);
+      if (showCount > 1) {
+        updateDynamicLine(optimalPathLine, optimalPathPoints, showCount);
+        optimalPathLine.material.opacity = 0.35;
+      }
+    } else {
+      // In the pause gap — fade
+      ghostMat.opacity *= 0.9;
+      optimalPathLine.material.opacity *= 0.9;
+    }
+  }
+
+  // === UPDATE DUST PARTICLES ===
+  const hadDustParts = dustActiveParts.length > 0;
+  for (let i = dustActiveParts.length - 1; i >= 0; i--) {
+    const dp = dustActiveParts[i];
+    if (!dp) continue;
+    dp.pos.addScaledVector(dp.vel, dt);
+    dp.vel.multiplyScalar(0.94);
+    dp.life -= dt;
+    if (dp.life <= 0) {
+      _dummy.scale.set(0, 0, 0);
+      _dummy.updateMatrix();
+      dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
+      dustActiveParts.splice(i, 1);
+    } else {
+      const alpha = dp.life / dp.maxLife;
+      const s = alpha * 1.5;
+      _dummy.position.copy(dp.pos);
+      _dummy.scale.set(s, s, s);
+      _dummy.updateMatrix();
+      dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
+    }
+  }
+  if (hadDustParts) dustInstanced.instanceMatrix.needsUpdate = true;
+
+  // === UPDATE CELEBRATION INSTANCES ===
+  // Stars
+  const hadCelebrationStars = celebActive.stars.length > 0;
+  for (let i = celebActive.stars.length - 1; i >= 0; i--) {
+    const p = celebActive.stars[i];
+    _vTemp1.copy(p.vel).multiplyScalar(dt);
+    p.pos.add(_vTemp1);
+    p.vel.multiplyScalar(0.97);
+    p.life -= dt;
+    p.rotZ += p.spin * dt;
+    
+    if (p.life <= 0) {
+      _dummy.scale.set(0, 0, 0);
+      _dummy.updateMatrix();
+      starInstanced.setMatrixAt(p.idx, _dummy.matrix);
+      celebActive.stars.splice(i, 1);
+    } else {
+      const scale = Math.max(0, p.life / p.maxLife);
+      _dummy.position.copy(p.pos);
+      _dummy.rotation.set(0, 0, p.rotZ);
+      _dummy.scale.set(scale, scale, scale);
+      _dummy.updateMatrix();
+      starInstanced.setMatrixAt(p.idx, _dummy.matrix);
+    }
+  }
+  if (hadCelebrationStars) starInstanced.instanceMatrix.needsUpdate = true;
+
+  // Dots
+  const hadCelebrationDots = celebActive.dots.length > 0;
+  for (let i = celebActive.dots.length - 1; i >= 0; i--) {
+    const p = celebActive.dots[i];
+    _vTemp1.copy(p.vel).multiplyScalar(dt);
+    p.pos.add(_vTemp1);
+    p.vel.multiplyScalar(0.97);
+    p.life -= dt;
+    
+    if (p.life <= 0) {
+      _dummy.scale.set(0, 0, 0);
+      _dummy.updateMatrix();
+      dotInstanced.setMatrixAt(p.idx, _dummy.matrix);
+      celebActive.dots.splice(i, 1);
+    } else {
+      const scale = Math.max(0, p.life / p.maxLife);
+      _dummy.position.copy(p.pos);
+      _dummy.scale.set(scale, scale, scale);
+      _dummy.updateMatrix();
+      dotInstanced.setMatrixAt(p.idx, _dummy.matrix);
+    }
+  }
+  if (hadCelebrationDots) dotInstanced.instanceMatrix.needsUpdate = true;
+
+  // Rings
+  const hadCelebrationRings = celebActive.rings.length > 0;
+  for (let i = celebActive.rings.length - 1; i >= 0; i--) {
+    const p = celebActive.rings[i];
+    _vTemp1.copy(p.vel).multiplyScalar(dt);
+    p.pos.add(_vTemp1);
+    p.vel.multiplyScalar(0.97);
+    p.life -= dt;
+    p.scale += dt * 4;
+    
+    if (p.life <= 0) {
+      _dummy.scale.set(0, 0, 0);
+      _dummy.updateMatrix();
+      ringInstanced.setMatrixAt(p.idx, _dummy.matrix);
+      celebActive.rings.splice(i, 1);
+    } else {
+      _dummy.position.copy(p.pos);
+      _dummy.quaternion.setFromUnitVectors(_zAxis, p.dir);
+      _dummy.scale.set(p.scale, p.scale, p.scale);
+      _dummy.updateMatrix();
+      ringInstanced.setMatrixAt(p.idx, _dummy.matrix);
+    }
+  }
+  if (hadCelebrationRings) ringInstanced.instanceMatrix.needsUpdate = true;
+
+  // === UPDATE BOOST INSTANCES ===
+  const hadBoostParts = boostActiveParts.length > 0;
+  for (let i = boostActiveParts.length - 1; i >= 0; i--) {
+    const p = boostActiveParts[i];
+    p.life -= dt;
+    if (p.life <= 0) {
+      _dummy.scale.set(0, 0, 0);
+      _dummy.updateMatrix();
+      boostInstanced.setMatrixAt(p.idx, _dummy.matrix);
+      boostActiveParts.splice(i, 1);
+    } else {
+      const scale = Math.max(0, p.life / p.maxLife);
+      _dummy.position.copy(p.pos);
+      _dummy.scale.set(scale, scale, scale);
+      _dummy.updateMatrix();
+      boostInstanced.setMatrixAt(p.idx, _dummy.matrix);
+    }
+  }
+  if (hadBoostParts) boostInstanced.instanceMatrix.needsUpdate = true;
+
+  // === Planets: slow spin. Moving bodies are positioned by the physics engine; the rest bob gently ===
+  for (let i = 0; i < planetoids.length; i++) {
+    const p = planetoids[i];
+    p.mesh.rotation.y += dt * 0.08;
+    if (!p.isMoving) {
+      // visual only, physics stays at the base position
+      p.mesh.position.y = p.pos.y + Math.sin(time * 1.2 + i * 1.7) * p.radius * 0.012;
+    }
+  }
 
   // === Star twinkle ===
   starMat3.opacity = (0.2 + (currentLevel / 8) * 0.3) * (0.85 + Math.sin(time * 2.5) * 0.15);

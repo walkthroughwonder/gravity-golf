@@ -197,3 +197,41 @@ test('the solver sinks the first three holes from the tee, checked on the exact 
     assert.equal(check.sunk, true, ALL[idx].name + ' (replayed)');
   }
 });
+
+test('the solver gives the same answer in a freshly built world, as in the worker', () => {
+  const { spec, maxPower } = levelSpec(8);
+  const tick = 4800; // ten seconds into the hole
+  const placed = P.buildWorld(spec);
+  P.placeBodies(placed, tick, null);
+  const i = placed.moving.find(k => placed.bodies[k].radius >= 0.8), b = placed.bodies[i], g = placed.bodies[spec.goal];
+  const toGoal = [g.x - b.x, g.y - b.y, g.z - b.z], l = Math.hypot(...toGoal), rest = b.radius + BALL_RADIUS;
+  const start = { x: b.x + toGoal[0] / l * rest, y: b.y + toGoal[1] / l * rest, z: b.z + toGoal[2] / l * rest, on: i, tick, whCooldown: 0 };
+  const here = P.findOptimalPath(placed, start, maxPower);
+  const fresh = P.findOptimalPath(P.buildWorld(spec), start, maxPower); // bodies still at their level-start positions
+  assert.deepEqual(fresh.dir, here.dir);
+  assert.equal(fresh.power, here.power);
+  // and the shot leaves the surface instead of pointing into the body
+  const up = (here.dir[0] * toGoal[0] + here.dir[1] * toGoal[1] + here.dir[2] * toGoal[2]) / l;
+  assert.ok(up > 0, 'the shot points into the body it starts on');
+});
+
+test('the solver never asks for a shot steeper than the 80 degree slider limit', () => {
+  for (const idx of [0, 3, 4, 9]) {
+    const { spec, start, maxPower } = levelSpec(idx);
+    const world = P.buildWorld(spec), h = world.bodies[spec.home];
+    const n = [start.x - h.x, start.y - h.y, start.z - h.z], nl = Math.hypot(...n);
+    const shot = P.findOptimalPath(world, start, maxPower);
+    const elevation = Math.asin((shot.dir[0] * n[0] + shot.dir[1] * n[1] + shot.dir[2] * n[2]) / nl) * 180 / Math.PI;
+    assert.ok(elevation <= 80.01 && elevation > 0, `${ALL[idx].name}: elevation ${elevation.toFixed(1)}`);
+  }
+});
+
+test('a ball crossing a sentinel marker is not flung away', () => {
+  const { spec } = levelSpec(1);
+  const world = P.buildWorld(spec);
+  const b = world.bodies[spec.bodies.findIndex(x => x.radius <= 0.1)];
+  const s = Object.assign(P.newState(), { x: b.x - 0.3, y: b.y + 0.004, z: b.z, vx: 0.5, on: -1 });
+  let fastest = 0;
+  for (let n = 0; n < 960; n++) { P.step(world, s, 1); fastest = Math.max(fastest, Math.hypot(s.vx, s.vy, s.vz)); }
+  assert.ok(fastest < 5, 'speed reached ' + fastest.toFixed(1));
+});
