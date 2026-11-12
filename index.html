@@ -897,6 +897,45 @@
   }
   .auth-email-status.error { color: #ff6688; }
   .auth-email-status.success { color: #44ffaa; }
+  .auth-forgot {
+    align-self: center; background: none; border: none; padding: 2px 6px; cursor: pointer;
+    font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 2px;
+    color: rgba(200,180,255,0.45); text-transform: uppercase; text-decoration: underline;
+  }
+  .auth-forgot:hover { color: rgba(200,180,255,0.8); }
+  .auth-forgot:disabled { opacity: 0.5; cursor: default; }
+
+  /* === Account dialogs (player name, sign-out confirm) === */
+  .acct-modal {
+    position: fixed; inset: 0; z-index: 140; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(4,2,14,0.92); backdrop-filter: blur(20px);
+    pointer-events: auto; padding: 20px;
+  }
+  .acct-modal.visible { display: flex; }
+  .acct-modal .auth-card { width: 100%; }
+  .acct-modal .auth-btn:disabled { opacity: 0.5; cursor: default; }
+  .acct-danger {
+    background: rgba(255,60,80,0.1); border: 2px solid rgba(255,60,80,0.3); color: #ff6688;
+  }
+  .acct-danger:hover { background: rgba(255,60,80,0.2); border-color: rgba(255,60,80,0.5); }
+  .acct-cancel {
+    margin-top: 20px; padding: 8px 24px; background: none;
+    border: 1px solid rgba(200,180,255,0.15); border-radius: 6px;
+    color: rgba(200,180,255,0.35); font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
+  }
+  .acct-cancel:hover { border-color: rgba(200,180,255,0.4); color: rgba(200,180,255,0.6); }
+  .stats-name-row { flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  .stats-name-row .stats-val { display: flex; align-items: center; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
+  .stats-name-btn {
+    background: rgba(123,92,255,0.15); border: 1px solid rgba(123,92,255,0.25);
+    border-radius: 6px; color: #c4a0ff; -webkit-text-fill-color: #c4a0ff;
+    padding: 5px 10px; cursor: pointer; flex-shrink: 0;
+    font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 700;
+    letter-spacing: 2px; transition: all 0.2s; text-transform: uppercase;
+  }
+  .stats-name-btn:hover { background: rgba(123,92,255,0.3); }
 
   /* === Stats Panel === */
   #statsPanel {
@@ -2461,12 +2500,37 @@
         <button class="auth-btn auth-btn-email" id="authEmailSignIn">SIGN IN</button>
         <button class="auth-btn auth-btn-email" id="authEmailSignUp">SIGN UP</button>
       </div>
+      <button type="button" class="auth-forgot" id="authForgot">Forgot password?</button>
       <div class="auth-email-status" id="authEmailStatus"></div>
     </div>
     <div class="auth-divider">OR</div>
     <button class="auth-btn" id="authGuest">PLAY AS GUEST</button>
   </div>
   <button id="authClose">← CANCEL</button>
+</div>
+
+<!-- Player Name Dialog -->
+<div id="nameModal" class="acct-modal" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+  <div class="auth-card">
+    <h2 id="nameModalTitle">PLAYER NAME</h2>
+    <div class="auth-desc">This name is shown on the public leaderboard.<br>Do not use your real name or email address.</div>
+    <div class="auth-email-form">
+      <input type="text" id="nameInput" maxlength="16" placeholder="Player name" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="auth-email-status" id="nameStatus"></div>
+      <button type="button" class="auth-btn auth-btn-email" id="nameConfirm">CONFIRM</button>
+    </div>
+  </div>
+  <button type="button" class="acct-cancel" id="nameCancel">← CANCEL</button>
+</div>
+
+<!-- Confirm Dialog (guest sign-out) -->
+<div id="confirmModal" class="acct-modal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+  <div class="auth-card">
+    <h2 id="confirmModalTitle"></h2>
+    <div class="auth-desc" id="confirmModalText"></div>
+    <button type="button" class="auth-btn acct-danger" id="confirmModalOk"></button>
+  </div>
+  <button type="button" class="acct-cancel" id="confirmModalCancel"></button>
 </div>
 
 <!-- User Badge -->
@@ -2480,6 +2544,7 @@
   <div class="stats-card">
     <h2>MY STATS</h2>
     <div class="stats-summary" id="statsSummary">
+      <div class="stats-row stats-name-row"><span class="stats-label">PLAYER NAME</span><span class="stats-val"><span id="stPlayerName">—</span><button type="button" class="stats-name-btn" id="stChangeName">CHANGE</button></span></div>
       <div class="stats-row"><span class="stats-label">GAMES PLAYED</span><span class="stats-val" id="stGamesPlayed">0</span></div>
       <div class="stats-row"><span class="stats-label">BEST ROUND</span><span class="stats-val" id="stBestRound">—</span></div>
       <div class="stats-row"><span class="stats-label">AVG SCORE</span><span class="stats-val" id="stAvgScore">—</span></div>
@@ -6046,6 +6111,48 @@ document.getElementById('lobbyBack').addEventListener('click', () => {
 // ===================== AUTH SYSTEM =====================
 let currentUser = null;  // { uid, displayName, photoURL, isAnonymous }
 
+// ----- Public player name -----
+// The leaderboard is public, so the only name ever shown or posted is one the player typed and
+// confirmed on this device. Until then everyone is the neutral 'Cosmonaut-xxxxx' — never the
+// email prefix and never the real name a Google profile carries.
+const NAME_OK_KEY = 'gg_name_ok';   // localStorage: '<uid>|<confirmed name>'
+let nameOkMemory = null;            // same value, for browsers where localStorage is blocked
+
+function neutralPlayerName(uid) {
+  return 'Cosmonaut-' + String(uid).slice(0, 5);
+}
+
+// Letters, digits, space, _ and - only; single spaces; trimmed; at most 16 characters.
+function cleanPlayerName(raw) {
+  const kept = String(raw == null ? '' : raw).replace(/[^\p{L}\p{N} _-]/gu, '').replace(/ +/g, ' ').trim();
+  return Array.from(kept).slice(0, 16).join('').trim();
+}
+
+// The confirmed name for this account on this device, or '' when there is none.
+function confirmedPlayerName(user) {
+  if (!user || !user.uid || !user.displayName) return '';
+  let saved = null;
+  try { saved = localStorage.getItem(NAME_OK_KEY); } catch (e) {}
+  const want = user.uid + '|' + user.displayName;
+  if (saved !== want && nameOkMemory !== want) return '';
+  const name = cleanPlayerName(user.displayName);
+  return (name === user.displayName && Array.from(name).length >= 2) ? name : '';
+}
+
+function publicPlayerName(user) {
+  return confirmedPlayerName(user) || neutralPlayerName(user.uid);
+}
+
+// The signed-in Firebase user, or null (also null when Firebase never loaded or initialised).
+function authUser() {
+  try { return firebaseReady ? firebase.auth().currentUser : null; } catch (e) { return null; }
+}
+
+function rememberPlayerName(uid, name) {
+  nameOkMemory = uid + '|' + name;
+  try { localStorage.setItem(NAME_OK_KEY, nameOkMemory); } catch (e) {}
+}
+
 function initAuth() {
   if (!initFirebase()) return;
   // Handle redirect result (from signInWithRedirect fallback)
@@ -6058,7 +6165,7 @@ function initAuth() {
     if (user) {
       currentUser = {
         uid: user.uid,
-        displayName: user.displayName || ('Cosmonaut-' + user.uid.slice(0, 5)),
+        displayName: publicPlayerName(user),
         photoURL: user.photoURL,
         isAnonymous: user.isAnonymous,
       };
@@ -6099,6 +6206,7 @@ function updateUserBadge() {
   const tp = document.getElementById('titleProfile');
   tp.style.display = 'block';
   document.getElementById('tpName').textContent = currentUser.displayName;
+  document.getElementById('stPlayerName').textContent = currentUser.displayName;
   const tpAvatar = document.getElementById('tpAvatar');
   setAvatar(tpAvatar, currentUser);
   // Show email for email users
@@ -6115,9 +6223,14 @@ async function signInWithGoogle() {
     try {
       await firebase.auth().signInWithPopup(provider);
     } catch (popupErr) {
-      if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user' ||
-          popupErr.code === 'auth/cancelled-popup-request') {
-        // Fallback to redirect
+      // The player closed the popup (or started a second one): that is a cancel, not a failure.
+      // Stop quietly — the caller re-enables its button — and never force a redirect.
+      if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+        return false;
+      }
+      // Only when a popup cannot open at all do we fall back to a full-page redirect.
+      if (popupErr.code === 'auth/popup-blocked' ||
+          popupErr.code === 'auth/operation-not-supported-in-this-environment') {
         await firebase.auth().signInWithRedirect(provider);
         return false; // page will redirect
       }
@@ -6154,22 +6267,152 @@ async function signInWithEmail(email, pass) {
 async function signUpWithEmail(email, pass) {
   if (!initFirebase()) return false;
   try {
-    const cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-    // Set display name from email prefix
-    const name = email.split('@')[0].slice(0, 12);
-    await cred.user.updateProfile({ displayName: name });
+    // No display name is set here: the public name is never derived from the email address.
+    // The player picks one in the player-name dialog before a first leaderboard post.
+    await firebase.auth().createUserWithEmailAndPassword(email, pass);
     return true;
   } catch (e) {
     throw e;
   }
 }
 
-function signOut() {
+// Returns true when the player was signed out, false when a guest chose to stay.
+async function signOut() {
+  const fbUser = authUser();
+  const isGuest = fbUser ? fbUser.isAnonymous : !!(currentUser && currentUser.isAnonymous);
+  if (isGuest) {
+    // A guest account cannot be signed back into: its history is gone for good.
+    const ok = await showConfirmDialog({
+      title: 'SIGN OUT?',
+      text: 'You are playing as a guest. If you sign out, this guest account and its game history and stats are lost for good. They cannot be recovered.',
+      okLabel: 'SIGN OUT ANYWAY',
+      cancelLabel: '← STAY SIGNED IN',
+    });
+    if (!ok) return false;
+  }
   if (firebase.auth) firebase.auth().signOut();
   currentUser = null;
   document.getElementById('userBadge').classList.remove('visible');
   document.getElementById('titleAuth').style.display = 'block';
   document.getElementById('titleProfile').style.display = 'none';
+  return true;
+}
+
+// ----- In-page confirm dialog (no window.confirm) -----
+let confirmDialogResolve = null;
+
+function closeConfirmDialog(result) {
+  document.getElementById('confirmModal').classList.remove('visible');
+  const resolve = confirmDialogResolve;
+  confirmDialogResolve = null;
+  if (resolve) resolve(result);
+}
+
+function showConfirmDialog({ title, text, okLabel, cancelLabel }) {
+  if (confirmDialogResolve) closeConfirmDialog(false);
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalText').textContent = text;
+  document.getElementById('confirmModalOk').textContent = okLabel;
+  const cancelBtn = document.getElementById('confirmModalCancel');
+  cancelBtn.textContent = cancelLabel;
+  document.getElementById('confirmModal').classList.add('visible');
+  cancelBtn.focus(); // the safe choice is the default
+  return new Promise((resolve) => { confirmDialogResolve = resolve; });
+}
+
+document.getElementById('confirmModalOk').addEventListener('click', () => { sfxClick(); closeConfirmDialog(true); });
+document.getElementById('confirmModalCancel').addEventListener('click', () => { sfxClick(); closeConfirmDialog(false); });
+
+// ----- Player name dialog -----
+let nameDialogResolve = null;
+
+function closeNameDialog(result) {
+  document.getElementById('nameModal').classList.remove('visible');
+  const resolve = nameDialogResolve;
+  nameDialogResolve = null;
+  if (resolve) resolve(result);
+}
+
+// Opens the dialog. Resolves true once a name is saved and confirmed, false on cancel.
+function showNameDialog() {
+  const fbUser = authUser();
+  if (!fbUser) return Promise.resolve(false);
+  if (nameDialogResolve) closeNameDialog(false);
+  const input = document.getElementById('nameInput');
+  // Prefill: the name already confirmed here, otherwise the neutral one. Never the raw profile name.
+  input.value = publicPlayerName(fbUser);
+  const status = document.getElementById('nameStatus');
+  status.textContent = '';
+  status.className = 'auth-email-status';
+  document.getElementById('nameConfirm').disabled = false;
+  document.getElementById('nameModal').classList.add('visible');
+  input.focus();
+  input.select();
+  return new Promise((resolve) => { nameDialogResolve = resolve; });
+}
+
+async function submitNameDialog() {
+  const input = document.getElementById('nameInput');
+  const status = document.getElementById('nameStatus');
+  const btn = document.getElementById('nameConfirm');
+  if (btn.disabled) return;
+  const fbUser = authUser();
+  if (!fbUser) { closeNameDialog(false); return; }
+  const name = cleanPlayerName(input.value);
+  input.value = name;
+  if (Array.from(name).length < 2) {
+    status.textContent = 'Use 2 to 16 letters, numbers, spaces, _ or -';
+    status.className = 'auth-email-status error';
+    return;
+  }
+  btn.disabled = true;
+  status.textContent = 'Saving...';
+  status.className = 'auth-email-status';
+  try {
+    await fbUser.updateProfile({ displayName: name });
+  } catch (e) {
+    console.error('Could not save player name:', e);
+    status.textContent = 'Could not save the name. Check your connection and try again.';
+    status.className = 'auth-email-status error';
+    btn.disabled = false;
+    return;
+  }
+  btn.disabled = false;
+  rememberPlayerName(fbUser.uid, name);
+  if (currentUser && currentUser.uid === fbUser.uid) {
+    currentUser.displayName = name;
+    updateUserBadge();
+  }
+  closeNameDialog(true);
+}
+
+// True when this account has a confirmed player name (asking for one first if needed).
+async function ensurePlayerName() {
+  const fbUser = authUser();
+  if (!fbUser) return false;
+  if (confirmedPlayerName(fbUser)) return true;
+  return showNameDialog();
+}
+
+document.getElementById('nameConfirm').addEventListener('click', () => { sfxClick(); submitNameDialog(); });
+document.getElementById('nameCancel').addEventListener('click', () => { sfxClick(); closeNameDialog(false); });
+document.getElementById('nameInput').addEventListener('input', (e) => {
+  if (e.isComposing) return; // let an IME finish its word first
+  const input = e.currentTarget;
+  const kept = input.value.replace(/[^\p{L}\p{N} _-]/gu, '');
+  if (kept !== input.value) input.value = kept;
+});
+document.getElementById('nameModal').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.id === 'nameInput' && !e.isComposing) { e.preventDefault(); submitNameDialog(); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeNameDialog(false); }
+});
+document.getElementById('confirmModal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeConfirmDialog(false); }
+});
+// Like the auth modal: clicks inside these dialogs must not reach the game canvas
+for (const id of ['nameModal', 'confirmModal']) {
+  document.getElementById(id).addEventListener('pointerdown', (e) => e.stopPropagation());
+  document.getElementById(id).addEventListener('click', (e) => e.stopPropagation());
 }
 
 // Auth modal handlers
@@ -6275,6 +6518,39 @@ document.getElementById('authEmailSignUp').addEventListener('click', async () =>
                 e.message;
     status.textContent = msg; status.className = 'auth-email-status error';
   }
+});
+
+// Password reset. The answer is the same whether or not the address has an account,
+// so this form cannot be used to find out who is registered.
+document.getElementById('authForgot').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  const email = document.getElementById('authEmail').value.trim();
+  const status = document.getElementById('authEmailStatus');
+  if (!email) { status.textContent = 'Enter your email address first'; status.className = 'auth-email-status error'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { status.textContent = 'Invalid email'; status.className = 'auth-email-status error'; return; }
+  if (!initFirebase()) { status.textContent = 'Could not reach the server. Check your connection and try again.'; status.className = 'auth-email-status error'; return; }
+  btn.disabled = true;
+  status.textContent = 'Sending...'; status.className = 'auth-email-status';
+  try {
+    await firebase.auth().sendPasswordResetEmail(email);
+  } catch (err) {
+    console.error('Password reset request failed:', err.code || err);
+    if (err.code === 'auth/invalid-email') {
+      status.textContent = 'Invalid email'; status.className = 'auth-email-status error';
+      btn.disabled = false;
+      return;
+    }
+    if (err.code === 'auth/network-request-failed') {
+      // The request never reached the server, so this says nothing about the account.
+      status.textContent = 'Could not reach the server. Check your connection and try again.'; status.className = 'auth-email-status error';
+      btn.disabled = false;
+      return;
+    }
+    // Any other answer (no such account, too many requests ...) gets the neutral message below.
+  }
+  btn.disabled = false;
+  status.textContent = 'If an account exists for that address, a reset email is on its way.';
+  status.className = 'auth-email-status success';
 });
 
 // ===================== GAME HISTORY =====================
@@ -6404,10 +6680,15 @@ document.getElementById('statsClose').addEventListener('click', () => {
   document.getElementById('statsPanel').classList.remove('visible');
 });
 
-document.getElementById('statsSignOut').addEventListener('click', () => {
+document.getElementById('statsSignOut').addEventListener('click', async () => {
   sfxClick();
-  document.getElementById('statsPanel').classList.remove('visible');
-  signOut();
+  // A guest is asked first; the panel only closes once the sign-out really happens
+  if (await signOut()) document.getElementById('statsPanel').classList.remove('visible');
+});
+
+document.getElementById('stChangeName').addEventListener('click', () => {
+  sfxClick();
+  showNameDialog();
 });
 
 document.getElementById('userBadge').addEventListener('click', () => {
@@ -6611,8 +6892,12 @@ async function postDailyScore(totalStrokes, holeScores) {
   if (!ref) return false;
 
   const totalPar = dailyLevels ? dailyLevels.reduce((a, l) => a + l.par, 0) : 0;
+  // Public board: only a name confirmed on this device is posted, otherwise the neutral one
+  const fbUser = authUser();
+  const publicName = (fbUser && fbUser.uid === currentUser.uid)
+    ? publicPlayerName(fbUser) : neutralPlayerName(currentUser.uid);
   await ref.child(currentUser.uid).set({
-    name: currentUser.displayName,
+    name: publicName,
     strokes: totalStrokes,
     par: totalPar,
     holes: holeScores,
@@ -6737,6 +7022,11 @@ document.getElementById('postScoreBtn').addEventListener('click', async () => {
 
 async function postAndShowLB() {
   const btn = document.getElementById('postScoreBtn');
+  // The player confirms a public player name first. Cancel = nothing is posted.
+  if (currentUser && !(await ensurePlayerName())) {
+    btn.textContent = 'POST TO LEADERBOARD';
+    return;
+  }
   btn.textContent = 'POSTING...';
   try {
     await postDailyScore(dailyTotalStrokes, dailyScores);
@@ -9041,7 +9331,7 @@ function isTypingTarget(t) {
 function menuOverlayOpen() {
   return !document.getElementById('titleScreen').classList.contains('hidden')
     || !document.getElementById('ballPicker').classList.contains('hidden')
-    || !!document.querySelector('#authModal.visible, #unlockModal.visible, #lobbyScreen.visible, #statsPanel.visible, #leaderboard.visible, #gameCompleteScreen.visible, #winnerScreen.visible');
+    || !!document.querySelector('#authModal.visible, #nameModal.visible, #confirmModal.visible, #unlockModal.visible, #lobbyScreen.visible, #statsPanel.visible, #leaderboard.visible, #gameCompleteScreen.visible, #winnerScreen.visible');
 }
 function releasePanKey() {
   spaceHeld = false;
