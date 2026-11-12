@@ -11063,6 +11063,7 @@ function buildPhysicsWorld(levelIdx) {
   aimWorld = golfPhysics.buildWorld(spec);
   physState.tick = 0;
   physState.whCooldown = 0;
+  physState.whIndex = -1;
   physState.near = new Float64Array(planetoids.length);
   physAccumulator = 0;
   planetoids.forEach((p, i) => { p.isMoving = !!physWorld.bodies[i].motion; });
