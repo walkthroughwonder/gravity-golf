@@ -3539,7 +3539,7 @@ function createNebulaTexture(color1, color2, color3, size) {
   for (let i = 0; i < 600; i++) {
     const x = Math.random() * size;
     const y = Math.random() * size;
-    const r = Math.random() * 2;
+    const r = Math.random() * 2 * (size / 512); // same apparent size at any canvas size
     const a = Math.random() * 0.15;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -3573,7 +3573,8 @@ const nebulaConfigs = [
 
 const nebulaMats = [];
 nebulaConfigs.forEach(cfg => {
-  const tex = createNebulaTexture(cfg.c1, cfg.c2, cfg.c3, 512);
+  // Soft clouds drawn at 5.5% opacity: 256 px holds everything they show (was 512: four times the memory)
+  const tex = createNebulaTexture(cfg.c1, cfg.c2, cfg.c3, 256);
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.055, blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
   const sprite = new THREE.Sprite(mat);
   sprite.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
@@ -3642,7 +3643,7 @@ function createHeroNebulaLayer(size, color1, color2, color3, offsetX, offsetY) {
     const dx = x - cx, dy = y - cy;
     const distFromCenter = Math.sqrt(dx*dx + dy*dy) / (size * 0.5);
     if (distFromCenter > 1) continue;
-    const r = Math.random() * 1.8;
+    const r = Math.random() * 1.8 * (size / 1024); // same apparent size at any canvas size
     const a = Math.random() * 0.18 * (1 - distFromCenter * 0.6);
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -3677,9 +3678,10 @@ const heroLayers = [
   { ox: -0.12, oy: -0.1, baseZ: -320, scale: 280, c1: 'rgba(40,60,140,0.16)', c2: 'rgba(30,45,100,0.09)', c3: 'rgba(15,25,60,0.03)' },
 ];
 
+const HERO_NEBULA_SIZE = 512; // was 1024: nine layers held about 38 MB of canvas memory
 const heroSprites = [];
 heroLayers.forEach(layer => {
-  const tex = createHeroNebulaLayer(1024, layer.c1, layer.c2, layer.c3, layer.ox, layer.oy);
+  const tex = createHeroNebulaLayer(HERO_NEBULA_SIZE, layer.c1, layer.c2, layer.c3, layer.ox, layer.oy);
   const mat = new THREE.SpriteMaterial({
     map: tex, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false
   });
@@ -4068,37 +4070,50 @@ function createPlanetoid(pos, radius, color, emissiveColor, name) {
 let gravityFieldsVisible = true;
 const gravityFieldMeshes = [];
 
+// All rings of a planet are merged into one mesh (one draw call per planet instead of up to eight).
+// The rings are additive, so each ring's opacity is baked into its vertex colours.
+const gravityRingMaterial = new THREE.MeshBasicMaterial({
+  vertexColors: true, transparent: true,
+  side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+});
+
 function createGravityField(planet) {
-  const group = new THREE.Group();
   const strength = planet.gravityStrength / (planet.radius * 3.614625 * 1.215); // normalized multiplier
   const ringCount = Math.floor(2 + strength * 3);
   const maxRingRadius = planet.radius * (1.5 + strength * 2.5);
-  
+  const positions = [], colors = [], indices = [];
+  const color = new THREE.Color(), white = new THREE.Color(0xffffff);
+  const tilt = new THREE.Euler(), tiltMatrix = new THREE.Matrix4();
+
   for (let i = 0; i < ringCount; i++) {
     const t = (i + 1) / ringCount;
     const ringRadius = planet.radius + (maxRingRadius - planet.radius) * t;
-    const geo = new THREE.RingGeometry(ringRadius - 0.06, ringRadius + 0.06, 48);
-    // Color: match parent planet, brightened for visibility
-    const color = new THREE.Color(planet.emissiveColor);
-    color.lerp(new THREE.Color(0xffffff), 0.4); // brighten toward white
-    
-    const mat = new THREE.MeshBasicMaterial({
-      color, transparent: true, opacity: (1 - t) * 0.06 * Math.min(strength, 2),
-      side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
-    });
-    const ring = new THREE.Mesh(geo, mat);
+    const ring = new THREE.RingGeometry(ringRadius - 0.06, ringRadius + 0.06, 48);
     // Orient randomly for 3D feel
-    ring.rotation.x = Math.random() * Math.PI;
-    ring.rotation.y = Math.random() * Math.PI;
-    group.add(ring);
+    ring.applyMatrix4(tiltMatrix.makeRotationFromEuler(tilt.set(Math.random() * Math.PI, Math.random() * Math.PI, 0)));
+    // Color: match parent planet, brightened for visibility; fainter further out
+    color.set(planet.emissiveColor).lerp(white, 0.4).multiplyScalar((1 - t) * 0.06 * Math.min(strength, 2));
+
+    const base = positions.length / 3, pos = ring.attributes.position, idx = ring.index;
+    for (let v = 0; v < pos.count; v++) {
+      positions.push(pos.getX(v), pos.getY(v), pos.getZ(v));
+      colors.push(color.r, color.g, color.b);
+    }
+    for (let k = 0; k < idx.count; k++) indices.push(base + idx.getX(k));
+    ring.dispose();
   }
-  
-  group.position.copy(planet.pos);
-  group.visible = gravityFieldsVisible;
-  scene.add(group);
-  gravityFieldMeshes.push(group);
-  planet._gravField = group;
-  return group;
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  geo.setIndex(indices);
+  const field = new THREE.Mesh(geo, gravityRingMaterial);
+  field.position.copy(planet.pos);
+  field.visible = gravityFieldsVisible;
+  scene.add(field);
+  gravityFieldMeshes.push(field);
+  planet._gravField = field;
+  return field;
 }
 
 function toggleGravityFields() {
@@ -4109,7 +4124,7 @@ function toggleGravityFields() {
 function clearGravityFields() {
   for (const g of gravityFieldMeshes) {
     scene.remove(g);
-    g.traverse(c => { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); });
+    g.geometry.dispose(); // the material is shared
   }
   gravityFieldMeshes.length = 0;
 }
@@ -4171,103 +4186,102 @@ function isBlackHole(planet) {
   return planet.radius > 0.1 && isBlackHoleColor(planet.mesh.material.color.getHex());
 }
 
+// Each disk is one instanced mesh (one draw call per black hole instead of roughly a hundred).
+// The particles are additive, so a particle's opacity is folded into its instance colour.
+const _diskDummy = new THREE.Object3D();
+
 function createAccretionDisk(planet) {
   const r = planet.radius;
   const particleCount = Math.floor(40 + r * 15);
   const diskRadius = r * 2.2;
   const diskWidth = r * 0.6;
 
-  const group = new THREE.Group();
-  group.position.copy(planet.pos);
-
-  // Random tilt for each disk
-  group.rotation.x = (Math.random() - 0.5) * 0.8 + 0.3;
-  group.rotation.z = (Math.random() - 0.5) * 0.5;
-
-  // Particle geometry — smaller stretched quads
-  const geo = new THREE.PlaneGeometry(r * 0.1, r * 0.03);
-  
   // Three color layers: hot inner (cyan-white), mid (purple), outer (red-orange)
   const layers = [
-    { rMin: 0.5, rMax: 0.7, color: 0x88ccff, opacity: 0.5, count: Math.floor(particleCount * 0.3) },
-    { rMin: 0.65, rMax: 0.9, color: 0xaa44ff, opacity: 0.35, count: Math.floor(particleCount * 0.4) },
-    { rMin: 0.85, rMax: 1.0, color: 0xff6633, opacity: 0.25, count: Math.floor(particleCount * 0.3) },
+    { rMin: 0.5, rMax: 0.7, opacity: 0.5, count: Math.floor(particleCount * 0.3) },
+    { rMin: 0.65, rMax: 0.9, opacity: 0.35, count: Math.floor(particleCount * 0.4) },
+    { rMin: 0.85, rMax: 1.0, opacity: 0.25, count: Math.floor(particleCount * 0.3) },
   ];
 
   const particles = [];
-
   layers.forEach((layer, li) => {
     for (let i = 0; i < layer.count; i++) {
-      const mat = new THREE.MeshBasicMaterial({
-        color: layer.color, transparent: true, opacity: layer.opacity,
-        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
-      });
-      const mesh = new THREE.Mesh(geo, mat);
       const angle = Math.random() * Math.PI * 2;
       const dist = diskRadius * (layer.rMin + Math.random() * (layer.rMax - layer.rMin));
       const yOff = (Math.random() - 0.5) * diskWidth * (1 - (dist / diskRadius) * 0.5);
-
-      mesh.position.set(
-        Math.cos(angle) * dist,
-        yOff,
-        Math.sin(angle) * dist
-      );
-      mesh.rotation.y = angle + Math.PI / 2;
-      mesh.rotation.x = (Math.random() - 0.5) * 0.3;
-
+      const tiltX = (Math.random() - 0.5) * 0.3;
       const speed = 0.4 + (1 - dist / diskRadius) * 1.2 + Math.random() * 0.3;
       const phase = Math.random() * 6.28;
-      particles.push({ mesh, mat, angle, dist, yOff, speed, baseOpacity: layer.opacity, layer: li, phase });
-      group.add(mesh);
+      particles.push({ angle, dist, yOff, tiltX, speed, baseOpacity: layer.opacity, layer: li, phase });
     }
   });
 
-  scene.add(group);
-  accretionDisks.push({ group, planet, particles });
-  return group;
+  // Particle geometry — small stretched quads
+  const geo = new THREE.PlaneGeometry(r * 0.1, r * 0.03);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true,
+    blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.InstancedMesh(geo, mat, particles.length);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  mesh.frustumCulled = false; // the instances spread well beyond the base quad
+  mesh.position.copy(planet.pos);
+  // Random tilt for each disk
+  mesh.rotation.x = (Math.random() - 0.5) * 0.8 + 0.3;
+  mesh.rotation.z = (Math.random() - 0.5) * 0.5;
+  mesh.setColorAt(0, new THREE.Color(0x000000)); // creates the per-instance colour buffer
+  mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
+
+  scene.add(mesh);
+  const disk = { mesh, planet, particles };
+  accretionDisks.push(disk);
+  updateAccretionDisk(disk, 0, 0);
+  return mesh;
+}
+
+// Color shift palettes per layer
+const DISK_LAYER_COLORS = [
+  [0x88ccff, 0xaaeeff, 0x66aadd], // inner: cyan shift
+  [0xaa44ff, 0xcc66ff, 0x8822cc], // mid: purple shift
+  [0xff6633, 0xff8844, 0xdd4422], // outer: orange-red shift
+].map(palette => palette.map(hex => new THREE.Color(hex)));
+const _diskColor = new THREE.Color();
+
+function updateAccretionDisk(disk, time, dt) {
+  const mesh = disk.mesh;
+  mesh.position.copy(disk.planet.pos);
+  for (let i = 0; i < disk.particles.length; i++) {
+    const p = disk.particles[i];
+    p.angle += p.speed * dt;
+    // Shrink/grow pulse
+    _diskDummy.position.set(Math.cos(p.angle) * p.dist, p.yOff, Math.sin(p.angle) * p.dist);
+    _diskDummy.rotation.set(p.tiltX, p.angle + Math.PI / 2, 0);
+    _diskDummy.scale.setScalar(0.6 + Math.sin(time * 2.5 + p.phase) * 0.3);
+    _diskDummy.updateMatrix();
+    mesh.setMatrixAt(i, _diskDummy.matrix);
+
+    // Color shift - cycle through palette; flicker opacity
+    const colors = DISK_LAYER_COLORS[p.layer];
+    const ct = (Math.sin(time * 1.5 + p.phase) * 0.5 + 0.5) * (colors.length - 1);
+    const ci = Math.floor(ct);
+    _diskColor.copy(colors[ci]).lerp(colors[Math.min(ci + 1, colors.length - 1)], ct - ci);
+    _diskColor.multiplyScalar(p.baseOpacity * (0.5 + Math.sin(time * 3 + p.angle * 2) * 0.4));
+    mesh.setColorAt(i, _diskColor);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.instanceColor.needsUpdate = true;
 }
 
 function animateAccretionDisks(time, dt) {
-  // Color shift palettes per layer
-  const _c = new THREE.Color();
-  const _c2 = new THREE.Color();
-  const layerColors = [
-    [0x88ccff, 0xaaeeff, 0x66aadd], // inner: cyan shift
-    [0xaa44ff, 0xcc66ff, 0x8822cc], // mid: purple shift
-    [0xff6633, 0xff8844, 0xdd4422], // outer: orange-red shift
-  ];
-
-  for (const disk of accretionDisks) {
-    disk.group.position.copy(disk.planet.pos);
-
-    for (const p of disk.particles) {
-      p.angle += p.speed * dt;
-      p.mesh.position.x = Math.cos(p.angle) * p.dist;
-      p.mesh.position.z = Math.sin(p.angle) * p.dist;
-      p.mesh.rotation.y = p.angle + Math.PI / 2;
-
-      // Color shift - cycle through palette
-      const colors = layerColors[p.layer] || layerColors[0];
-      const ct = (Math.sin(time * 1.5 + p.phase) * 0.5 + 0.5);
-      const ci = Math.floor(ct * (colors.length - 1));
-      const cf = ct * (colors.length - 1) - ci;
-      _c.setHex(colors[ci]).lerp(_c2.setHex(colors[Math.min(ci + 1, colors.length - 1)]), cf);
-      p.mat.color.copy(_c);
-
-      // Shrink/grow pulse
-      const scale = 0.6 + Math.sin(time * 2.5 + p.phase) * 0.3;
-      p.mesh.scale.setScalar(scale);
-
-      // Flicker opacity
-      p.mat.opacity = p.baseOpacity * (0.5 + Math.sin(time * 3 + p.angle * 2) * 0.4);
-    }
-  }
+  for (const disk of accretionDisks) updateAccretionDisk(disk, time, dt);
 }
 
 function clearAccretionDisks() {
   for (const disk of accretionDisks) {
-    scene.remove(disk.group);
-    disk.group.traverse(c => { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); });
+    scene.remove(disk.mesh);
+    disk.mesh.geometry.dispose();
+    disk.mesh.material.dispose();
+    disk.mesh.dispose();
   }
   accretionDisks.length = 0;
 }
@@ -11025,6 +11039,9 @@ function createGolfPhysics() {
 
 const golfPhysics = createGolfPhysics();
 const PHYS_EV = golfPhysics.EV;
+// Scratch vectors shared by per-frame effects code (boost, abilities, trails), to avoid allocations
+const _vTemp1 = new THREE.Vector3();
+const _vTemp2 = new THREE.Vector3();
 let physWorld = null;       // the level as the engine sees it (rebuilt by loadLevel)
 let aimWorld = null;        // a second copy for aim previews, so they never disturb the live one
 const physState = golfPhysics.newState(); // the live ball; also carries the level clock (tick)
@@ -12486,176 +12503,6 @@ function animate() {
 
   // Update nudge UI visibility
   updateNudgeUI();
-
-  // Rotate gravity field rings slowly for visual interest
-  for (const g of gravityFieldMeshes) {
-    if (g.visible) {
-      g.children.forEach((ring, i) => {
-        ring.rotation.z += dt * 0.1 * (i % 2 === 0 ? 1 : -1);
-      });
-    }
-  }
-
-  // Animate optimal path
-  if (optimalAnimating && optimalPathPoints.length > 1) {
-    // Animate the ghost ball along the path
-    const speed = 120; // points per second
-    optimalAnimT += dt * speed;
-
-    // Loop the animation
-    const totalPts = optimalPathPoints.length;
-    const loopT = optimalAnimT % (totalPts + 40); // small pause at end
-    const idx = Math.min(Math.floor(loopT), totalPts - 1);
-
-    if (idx < totalPts) {
-      // Position ghost ball
-      const frac = loopT - Math.floor(loopT);
-      const nextIdx = Math.min(idx + 1, totalPts - 1);
-      optimalGhostBall.position.lerpVectors(optimalPathPoints[idx], optimalPathPoints[nextIdx], frac);
-      ghostMat.opacity = 0.6;
-
-      // Show line up to current point with fade-in
-      const showCount = Math.min(idx + 1, totalPts);
-      if (showCount > 1) {
-        updateDynamicLine(optimalPathLine, optimalPathPoints, showCount);
-        optimalPathLine.material.opacity = 0.35;
-      }
-    } else {
-      // In the pause gap — fade
-      ghostMat.opacity *= 0.9;
-      optimalPathLine.material.opacity *= 0.9;
-    }
-  }
-
-  // === UPDATE DUST PARTICLES ===
-  const hadDustParts = dustActiveParts.length > 0;
-  for (let i = dustActiveParts.length - 1; i >= 0; i--) {
-    const dp = dustActiveParts[i];
-    if (!dp) continue;
-    dp.pos.addScaledVector(dp.vel, dt);
-    dp.vel.multiplyScalar(0.94);
-    dp.life -= dt;
-    if (dp.life <= 0) {
-      _dummy.scale.set(0, 0, 0);
-      _dummy.updateMatrix();
-      dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
-      dustActiveParts.splice(i, 1);
-    } else {
-      const alpha = dp.life / dp.maxLife;
-      const s = alpha * 1.5;
-      _dummy.position.copy(dp.pos);
-      _dummy.scale.set(s, s, s);
-      _dummy.updateMatrix();
-      dustInstanced.setMatrixAt(dp.idx, _dummy.matrix);
-    }
-  }
-  if (hadDustParts) dustInstanced.instanceMatrix.needsUpdate = true;
-
-  // === UPDATE CELEBRATION INSTANCES ===
-  // Stars
-  const hadCelebrationStars = celebActive.stars.length > 0;
-  for (let i = celebActive.stars.length - 1; i >= 0; i--) {
-    const p = celebActive.stars[i];
-    _vTemp1.copy(p.vel).multiplyScalar(dt);
-    p.pos.add(_vTemp1);
-    p.vel.multiplyScalar(0.97);
-    p.life -= dt;
-    p.rotZ += p.spin * dt;
-    
-    if (p.life <= 0) {
-      _dummy.scale.set(0, 0, 0);
-      _dummy.updateMatrix();
-      starInstanced.setMatrixAt(p.idx, _dummy.matrix);
-      celebActive.stars.splice(i, 1);
-    } else {
-      const scale = Math.max(0, p.life / p.maxLife);
-      _dummy.position.copy(p.pos);
-      _dummy.rotation.set(0, 0, p.rotZ);
-      _dummy.scale.set(scale, scale, scale);
-      _dummy.updateMatrix();
-      starInstanced.setMatrixAt(p.idx, _dummy.matrix);
-    }
-  }
-  if (hadCelebrationStars) starInstanced.instanceMatrix.needsUpdate = true;
-
-  // Dots
-  const hadCelebrationDots = celebActive.dots.length > 0;
-  for (let i = celebActive.dots.length - 1; i >= 0; i--) {
-    const p = celebActive.dots[i];
-    _vTemp1.copy(p.vel).multiplyScalar(dt);
-    p.pos.add(_vTemp1);
-    p.vel.multiplyScalar(0.97);
-    p.life -= dt;
-    
-    if (p.life <= 0) {
-      _dummy.scale.set(0, 0, 0);
-      _dummy.updateMatrix();
-      dotInstanced.setMatrixAt(p.idx, _dummy.matrix);
-      celebActive.dots.splice(i, 1);
-    } else {
-      const scale = Math.max(0, p.life / p.maxLife);
-      _dummy.position.copy(p.pos);
-      _dummy.scale.set(scale, scale, scale);
-      _dummy.updateMatrix();
-      dotInstanced.setMatrixAt(p.idx, _dummy.matrix);
-    }
-  }
-  if (hadCelebrationDots) dotInstanced.instanceMatrix.needsUpdate = true;
-
-  // Rings
-  const hadCelebrationRings = celebActive.rings.length > 0;
-  for (let i = celebActive.rings.length - 1; i >= 0; i--) {
-    const p = celebActive.rings[i];
-    _vTemp1.copy(p.vel).multiplyScalar(dt);
-    p.pos.add(_vTemp1);
-    p.vel.multiplyScalar(0.97);
-    p.life -= dt;
-    p.scale += dt * 4;
-    
-    if (p.life <= 0) {
-      _dummy.scale.set(0, 0, 0);
-      _dummy.updateMatrix();
-      ringInstanced.setMatrixAt(p.idx, _dummy.matrix);
-      celebActive.rings.splice(i, 1);
-    } else {
-      _dummy.position.copy(p.pos);
-      _dummy.quaternion.setFromUnitVectors(_zAxis, p.dir);
-      _dummy.scale.set(p.scale, p.scale, p.scale);
-      _dummy.updateMatrix();
-      ringInstanced.setMatrixAt(p.idx, _dummy.matrix);
-    }
-  }
-  if (hadCelebrationRings) ringInstanced.instanceMatrix.needsUpdate = true;
-
-  // === UPDATE BOOST INSTANCES ===
-  const hadBoostParts = boostActiveParts.length > 0;
-  for (let i = boostActiveParts.length - 1; i >= 0; i--) {
-    const p = boostActiveParts[i];
-    p.life -= dt;
-    if (p.life <= 0) {
-      _dummy.scale.set(0, 0, 0);
-      _dummy.updateMatrix();
-      boostInstanced.setMatrixAt(p.idx, _dummy.matrix);
-      boostActiveParts.splice(i, 1);
-    } else {
-      const scale = Math.max(0, p.life / p.maxLife);
-      _dummy.position.copy(p.pos);
-      _dummy.scale.set(scale, scale, scale);
-      _dummy.updateMatrix();
-      boostInstanced.setMatrixAt(p.idx, _dummy.matrix);
-    }
-  }
-  if (hadBoostParts) boostInstanced.instanceMatrix.needsUpdate = true;
-
-  // === Planets: slow spin. Moving bodies are positioned by the physics engine; the rest bob gently ===
-  for (let i = 0; i < planetoids.length; i++) {
-    const p = planetoids[i];
-    p.mesh.rotation.y += dt * 0.08;
-    if (!p.isMoving) {
-      // visual only, physics stays at the base position
-      p.mesh.position.y = p.pos.y + Math.sin(time * 1.2 + i * 1.7) * p.radius * 0.012;
-    }
-  }
 
   // === Star twinkle ===
   starMat3.opacity = (0.2 + (currentLevel / 8) * 0.3) * (0.85 + Math.sin(time * 2.5) * 0.15);
