@@ -2,3 +2,10 @@
 
 # Local Netlify folder
 .netlify
+
+# Server dependencies and secrets never go in git or on the public site
+node_modules/
+.env
+.env.*
+*.pem
+*-service-account.json
