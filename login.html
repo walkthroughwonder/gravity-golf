@@ -97,6 +97,28 @@
   .back { margin-top: 24px; }
   .back a { color: rgba(200,180,255,0.3); font-size: 10px; letter-spacing: 2px; text-decoration: none; }
   .back a:hover { color: rgba(200,180,255,0.6); }
+  .forgot {
+    align-self: center; background: none; border: none; padding: 2px 6px; cursor: pointer;
+    font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 2px;
+    color: rgba(200,180,255,0.45); text-transform: uppercase; text-decoration: underline;
+  }
+  .forgot:hover { color: rgba(200,180,255,0.8); }
+  .forgot:disabled { opacity: 0.5; cursor: default; }
+  .confirm-modal {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(4,2,14,0.94); padding: 20px;
+  }
+  .confirm-modal.visible { display: flex; }
+  .confirm-modal .btn.danger { background: rgba(255,60,80,0.1); border-color: rgba(255,60,80,0.3); color: #ff6688; margin-bottom: 0; }
+  .confirm-modal .btn.danger:hover { background: rgba(255,60,80,0.2); }
+  .confirm-cancel {
+    margin-top: 20px; padding: 8px 24px; background: none;
+    border: 1px solid rgba(200,180,255,0.15); border-radius: 6px;
+    color: rgba(200,180,255,0.35); font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
+  }
+  .confirm-cancel:hover { border-color: rgba(200,180,255,0.4); color: rgba(200,180,255,0.6); }
 </style>
 </head>
 <body>
@@ -118,6 +140,7 @@
       <button class="email-btn" id="signInBtn">SIGN IN</button>
       <button class="email-btn" id="signUpBtn">SIGN UP</button>
     </div>
+    <button type="button" class="forgot" id="forgotBtn">Forgot password?</button>
     <div class="status" id="status"></div>
   </div>
   <div class="divider">OR</div>
@@ -140,6 +163,16 @@
 
 <div class="back"><a href="/">← BACK TO GAME</a></div>
 
+<!-- Guest sign-out confirmation -->
+<div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="card">
+    <h2 id="confirmTitle">SIGN OUT?</h2>
+    <div class="desc">You are playing as a guest. If you sign out, this guest account and its game history and stats are lost for good. They cannot be recovered.</div>
+    <button type="button" class="btn danger" id="confirmOk">SIGN OUT ANYWAY</button>
+  </div>
+  <button type="button" class="confirm-cancel" id="confirmCancel">← STAY SIGNED IN</button>
+</div>
+
 <script>
 const CONFIG = {
   apiKey: "AIzaSyDPyq1wk3l-aMRJcOFwzY8CmKN5cpN7XXc",
@@ -151,14 +184,29 @@ const CONFIG = {
   appId: "1:371434804348:web:98f1b3fd530bbf39c825f9"
 };
 firebase.initializeApp(CONFIG);
-firebase.auth().getRedirectResult().catch(() => {});
+// A failed Google redirect used to return the player signed out with no message
+firebase.auth().getRedirectResult().catch((e) => {
+  const s = document.getElementById('status');
+  s.textContent = 'Google sign-in did not complete. Please try again.'; s.className = 'status error';
+  console.error('Redirect sign-in failed:', e);
+});
+
+// Public player name: only a name the player confirmed in the game on this device
+// (localStorage 'gg_name_ok' = '<uid>|<name>'), otherwise the neutral default.
+// Never the email prefix and never the real name a Google profile carries.
+function shownPlayerName(user) {
+  let saved = null;
+  try { saved = localStorage.getItem('gg_name_ok'); } catch (e) {}
+  if (user.displayName && saved === user.uid + '|' + user.displayName) return user.displayName;
+  return 'Cosmonaut-' + user.uid.slice(0,5);
+}
 
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
     document.getElementById('loginCard').style.display = 'none';
     const li = document.getElementById('loggedIn');
     li.classList.add('visible');
-    document.getElementById('userName').textContent = user.displayName || ('Cosmonaut-' + user.uid.slice(0,5));
+    document.getElementById('userName').textContent = shownPlayerName(user);
     document.getElementById('userEmail').textContent = user.isAnonymous ? 'Guest account' : (user.email || '');
   } else {
     document.getElementById('loginCard').style.display = 'block';
@@ -173,7 +221,13 @@ document.getElementById('googleBtn').onclick = async () => {
     try {
       await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
     } catch(pe) {
-      if (pe.code === 'auth/popup-blocked' || pe.code === 'auth/popup-closed-by-user' || pe.code === 'auth/cancelled-popup-request') {
+      // Closing the popup is a cancel, not a failure: stop quietly, never force a redirect
+      if (pe.code === 'auth/popup-closed-by-user' || pe.code === 'auth/cancelled-popup-request') {
+        s.textContent = 'Sign-in cancelled'; s.className = 'status';
+        return;
+      }
+      // Only when a popup cannot open at all do we fall back to a full-page redirect
+      if (pe.code === 'auth/popup-blocked' || pe.code === 'auth/operation-not-supported-in-this-environment') {
         s.textContent = 'Redirecting...'; 
         await firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
         return;
@@ -185,11 +239,21 @@ document.getElementById('googleBtn').onclick = async () => {
   }
 };
 
+// Trimmed email, or '' after showing why it cannot be used (a pasted trailing space used to fail).
+function readEmail(s) {
+  const email = document.getElementById('email').value.trim();
+  if (!email) { s.textContent = 'Enter your email address'; s.className = 'status error'; return ''; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { s.textContent = 'Invalid email'; s.className = 'status error'; return ''; }
+  return email;
+}
+
 document.getElementById('signInBtn').onclick = async () => {
   const s = document.getElementById('status');
   try {
+    const email = readEmail(s);
+    if (!email) return;
     s.textContent = 'Signing in...'; s.className = 'status';
-    await firebase.auth().signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value);
+    await firebase.auth().signInWithEmailAndPassword(email, document.getElementById('pass').value);
     s.textContent = 'Success!'; s.className = 'status success';
   } catch(e) {
     s.textContent = e.code === 'auth/user-not-found' ? 'No account found' : e.code === 'auth/wrong-password' ? 'Wrong password' : e.code === 'auth/invalid-credential' ? 'Invalid credentials' : e.message;
@@ -202,10 +266,12 @@ document.getElementById('signUpBtn').onclick = async () => {
   const pass = document.getElementById('pass').value;
   if (pass.length < 6) { s.textContent = 'Password must be 6+ characters'; s.className = 'status error'; return; }
   try {
+    const email = readEmail(s);
+    if (!email) return;
     s.textContent = 'Creating account...'; s.className = 'status';
-    const email = document.getElementById('email').value;
-    const cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-    await cred.user.updateProfile({ displayName: email.split('@')[0].slice(0,12) });
+    // No display name is set: the public name is never derived from the email address.
+    // The player picks one in the game before a first leaderboard post.
+    await firebase.auth().createUserWithEmailAndPassword(email, pass);
     s.textContent = 'Account created!'; s.className = 'status success';
   } catch(e) {
     s.textContent = e.code === 'auth/email-already-in-use' ? 'Email already registered' : e.message;
@@ -214,10 +280,71 @@ document.getElementById('signUpBtn').onclick = async () => {
 };
 
 document.getElementById('guestBtn').onclick = () => {
-  firebase.auth().signInAnonymously().then(() => window.location.href = '/');
+  firebase.auth().signInAnonymously().then(() => window.location.href = '/').catch((e) => {
+    const s = document.getElementById('status');
+    s.textContent = 'Could not start a guest session. Check your connection and try again.'; s.className = 'status error';
+    console.error('Guest sign-in failed:', e);
+  });
 };
 
-document.getElementById('signOutBtn').onclick = () => firebase.auth().signOut();
+// Password reset. The answer is the same whether or not the address has an account,
+// so this form cannot be used to find out who is registered.
+document.getElementById('forgotBtn').onclick = async () => {
+  const btn = document.getElementById('forgotBtn');
+  const s = document.getElementById('status');
+  const email = document.getElementById('email').value.trim();
+  if (!email) { s.textContent = 'Enter your email address first'; s.className = 'status error'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { s.textContent = 'Invalid email'; s.className = 'status error'; return; }
+  btn.disabled = true;
+  s.textContent = 'Sending...'; s.className = 'status';
+  try {
+    await firebase.auth().sendPasswordResetEmail(email);
+  } catch(e) {
+    console.error('Password reset request failed:', e.code || e);
+    if (e.code === 'auth/invalid-email') {
+      s.textContent = 'Invalid email'; s.className = 'status error';
+      btn.disabled = false;
+      return;
+    }
+    if (e.code === 'auth/network-request-failed') {
+      // The request never reached the server, so this says nothing about the account
+      s.textContent = 'Could not reach the server. Check your connection and try again.'; s.className = 'status error';
+      btn.disabled = false;
+      return;
+    }
+    // Any other answer (no such account, too many requests ...) gets the neutral message below
+  }
+  btn.disabled = false;
+  s.textContent = 'If an account exists for that address, a reset email is on its way.';
+  s.className = 'status success';
+};
+
+// In-page confirmation (no window.confirm). Resolves true for "sign out anyway".
+let confirmResolve = null;
+function closeConfirm(result) {
+  document.getElementById('confirmModal').classList.remove('visible');
+  const resolve = confirmResolve;
+  confirmResolve = null;
+  if (resolve) resolve(result);
+}
+function confirmGuestSignOut() {
+  if (confirmResolve) closeConfirm(false);
+  document.getElementById('confirmModal').classList.add('visible');
+  document.getElementById('confirmCancel').focus(); // the safe choice is the default
+  return new Promise(resolve => { confirmResolve = resolve; });
+}
+document.getElementById('confirmOk').onclick = () => closeConfirm(true);
+document.getElementById('confirmCancel').onclick = () => closeConfirm(false);
+document.getElementById('confirmModal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { e.preventDefault(); closeConfirm(false); }
+});
+
+document.getElementById('signOutBtn').onclick = async () => {
+  const user = firebase.auth().currentUser;
+  // A guest account cannot be signed back into: its history is gone for good
+  if (user && user.isAnonymous && !(await confirmGuestSignOut())) return;
+  firebase.auth().signOut();
+};
 </script>
 </body>
 </html>
