@@ -13,7 +13,7 @@ const between = (a, b) => {
 };
 const P = new Function(between('// <golf-physics>', '// </golf-physics>') + '\nreturn createGolfPhysics();')();
 const { LEVELS, PRO_LEVELS } = new Function(
-  between('const LEVELS = [', '// ===================== UNLOCK SYSTEM') + '\nreturn { LEVELS, PRO_LEVELS };')();
+  between('const LEVELS = [', '// ===================== PRO COURSE: PURCHASE AND ACCESS') + '\nreturn { LEVELS, PRO_LEVELS };')();
 const ALL = [...LEVELS, ...PRO_LEVELS];
 
 const BALL_RADIUS = 0.225;

@@ -651,11 +651,14 @@
     flex-direction: column; align-items: center; justify-content: center;
     background: radial-gradient(ellipse at 50% 40%, rgba(20,10,50,0.97) 0%, rgba(4,2,14,0.99) 70%);
     backdrop-filter: blur(25px);
+    overflow-y: auto; padding: 24px 16px;
   }
   #unlockModal.visible { display: flex; }
+  #unlockModal [hidden] { display: none !important; }
   .unlock-card {
     background: rgba(123,92,255,0.06); border: 1px solid rgba(123,92,255,0.25);
-    border-radius: 16px; padding: 40px 50px; text-align: center; max-width: 380px;
+    border-radius: 16px; padding: 32px; text-align: center; width: 100%; max-width: 380px;
+    flex-shrink: 0;
   }
   .unlock-card h2 {
     font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 800;
@@ -665,7 +668,7 @@
     background-clip: text; text-transform: uppercase;
   }
   .unlock-card .unlock-desc {
-    font-family: 'Exo 2', sans-serif; font-size: 13px; color: rgba(200,180,255,0.5);
+    font-family: 'Exo 2', sans-serif; font-size: 14px; color: rgba(220,210,255,0.8);
     margin-bottom: 28px; line-height: 1.6;
   }
   .unlock-card .unlock-price {
@@ -673,7 +676,7 @@
     color: #44ffaa; margin-bottom: 6px;
   }
   .unlock-card .unlock-price-note {
-    font-size: 10px; letter-spacing: 2px; color: rgba(200,180,255,0.3);
+    font-size: 10px; letter-spacing: 2px; color: rgba(220,210,255,0.7);
     margin-bottom: 24px;
   }
   #buyBtn {
@@ -691,6 +694,12 @@
     transform: translateY(-1px);
   }
   #buyBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(10,90,45,0.7), 0 2px 6px rgba(0,0,0,0.3); }
+  #buyBtn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+  .checkout-note { font-size: 12px; line-height: 1.5; color: rgba(220,210,255,0.75); overflow-wrap: anywhere; margin-top: 8px; }
+  @media (max-height: 620px) {
+    #unlockModal { justify-content: flex-start; }
+    .unlock-card { padding: 20px; }
+  }
   .unlock-divider {
     display: flex; align-items: center; gap: 12px; margin: 16px 0;
     color: rgba(200,180,255,0.25); font-size: 10px; letter-spacing: 3px;
@@ -698,34 +707,32 @@
   .unlock-divider::before, .unlock-divider::after {
     content: ''; flex: 1; height: 1px; background: rgba(123,92,255,0.15);
   }
-  #codeInput {
-    font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
-    letter-spacing: 4px; text-align: center; width: 100%;
+  #purchaseAuth label { display: block; text-align: left; font-size: 12px; margin: 12px 0 6px; color: #ddd0ff; }
+  #purchaseAuth input {
+    font-family: 'Exo 2', sans-serif; font-size: 16px; width: 100%;
     background: rgba(123,92,255,0.06); border: 1px solid rgba(123,92,255,0.2);
-    border-radius: 8px; color: #c4a0ff; padding: 12px 16px; text-transform: uppercase;
-    outline: none; margin-bottom: 12px;
+    border-radius: 8px; color: #e6dbff; padding: 12px 16px;
+    outline: none; margin-bottom: 4px;
   }
-  #codeInput::placeholder { color: rgba(200,180,255,0.15); letter-spacing: 3px; font-size: 11px; }
-  #codeInput:focus { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 15px rgba(0,212,255,0.08); }
-  #redeemBtn {
-    display: block; width: 100%; padding: 10px; 
+  #purchaseAuth input:focus { border-color: rgba(0,212,255,0.6); }
+  .purchase-secondary {
+    display: block; width: 100%; min-height: 44px; padding: 10px;
     background: rgba(123,92,255,0.1); border: 1px solid rgba(123,92,255,0.25);
     border-radius: 8px; color: #c4a0ff; font-family: 'Orbitron', sans-serif;
     font-size: 11px; font-weight: 600; letter-spacing: 3px; cursor: pointer;
-    transition: all 0.3s; text-transform: uppercase;
+    transition: all 0.3s; text-transform: uppercase; margin-top: 10px;
   }
-  #redeemBtn:hover { background: rgba(123,92,255,0.2); border-color: rgba(123,92,255,0.4); }
-  #codeStatus {
-    font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 2px;
-    margin-top: 10px; min-height: 16px;
-  }
-  #codeStatus.success { color: #44ffaa; }
-  #codeStatus.error { color: #ff6677; }
+  .purchase-secondary:hover { background: rgba(123,92,255,0.2); border-color: rgba(123,92,255,0.4); }
+  .purchase-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+  #purchaseStatus { font-size: 13px; line-height: 1.5; margin-top: 16px; color: #ddd0ff; }
+  #purchaseStatus[data-phase="owned"] { color: #44ffaa; }
+  #purchaseStatus[data-phase="error"], #purchaseStatus[data-phase="revoked"] { color: #ff99aa; }
+  #unlockModal:has(#purchaseAuth:not([hidden])) { justify-content: flex-start; }
   #unlockClose {
-    margin-top: 24px; padding: 8px 24px; background: none;
-    border: 1px solid rgba(200,180,255,0.15); border-radius: 6px;
-    color: rgba(200,180,255,0.4); font-family: 'Orbitron', sans-serif;
-    font-size: 9px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
+    margin-top: 24px; min-height: 44px; padding: 8px 24px; background: none; flex-shrink: 0;
+    border: 1px solid rgba(200,180,255,0.25); border-radius: 6px;
+    color: rgba(200,180,255,0.7); font-family: 'Orbitron', sans-serif;
+    font-size: 11px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
   }
   #unlockClose:hover { border-color: rgba(200,180,255,0.4); color: rgba(200,180,255,0.7); }
   /* Pro badge on title screen */
@@ -2645,21 +2652,35 @@
   </div>
   <button id="postScoreBtn">POST TO LEADERBOARD</button>
 </div>
-<div id="unlockModal">
+<div id="unlockModal" role="dialog" aria-modal="true" aria-labelledby="unlockTitle" aria-describedby="unlockDescription">
   <div class="unlock-card">
-    <h2>PRO COURSE</h2>
-    <div class="unlock-desc">
+    <h2 id="unlockTitle">PRO COURSE</h2>
+    <div class="unlock-desc" id="unlockDescription">
       11 more holes with asteroid fields, black holes,<br>
       neutron alleys, and The Final Frontier.<br>
       Holes 9-19 — the real challenge begins.
     </div>
     <div class="unlock-price">$2.99</div>
-    <div class="unlock-price-note">ONE-TIME PURCHASE</div>
-    <button id="buyBtn">BUY NOW</button>
-    <div class="unlock-divider">HAVE A CODE?</div>
-    <input type="text" id="codeInput" placeholder="ENTER CODE" autocomplete="off">
-    <button id="redeemBtn">REDEEM</button>
-    <div id="codeStatus"></div>
+    <div class="unlock-price-note">ONE-TIME PURCHASE · NO SUBSCRIPTION</div>
+    <button id="buyBtn" disabled>BUY NOW</button>
+    <button id="playProBtn" class="purchase-secondary" hidden>PLAY PRO COURSE</button>
+    <p class="checkout-note" id="checkoutNote">Checking purchase availability...</p>
+    <p class="checkout-note" id="purchaseAccount" hidden></p>
+    <form id="purchaseAuth" hidden>
+      <p class="checkout-note">Sign in first, so your purchase is saved to your account and works on any device.</p>
+      <button id="purchaseGoogle" class="purchase-secondary" type="button" hidden>SIGN IN WITH GOOGLE</button>
+      <label for="purchaseEmail">Email</label>
+      <input type="email" id="purchaseEmail" autocomplete="email" required maxlength="254">
+      <label for="purchasePassword">Password</label>
+      <input type="password" id="purchasePassword" autocomplete="current-password" required minlength="6">
+      <button id="purchaseSignIn" class="purchase-secondary" type="submit">SIGN IN</button>
+      <button id="purchaseSignUp" class="purchase-secondary" type="button">CREATE ACCOUNT</button>
+      <button id="purchaseReset" class="purchase-secondary" type="button">RESET PASSWORD</button>
+    </form>
+    <div class="unlock-divider">ALREADY BOUGHT PRO?</div>
+    <button id="restoreBtn" class="purchase-secondary" disabled>RESTORE PURCHASE</button>
+    <button id="purchaseSignOut" class="purchase-secondary" hidden>SIGN OUT</button>
+    <div id="purchaseStatus" role="status" aria-live="polite"></div>
   </div>
   <button id="unlockClose">← BACK</button>
 </div>
@@ -5357,176 +5378,52 @@ const PRO_LEVELS = [
   },
 ];
 
-// ===================== UNLOCK SYSTEM =====================
-// Codes are validated against SHA-256 hashes so source inspection doesn't leak codes.
-// Generate codes in batches, send via Stripe post-purchase email.
-const UNLOCK_HASHES = [
-  // Placeholder hashes — replace with real ones from the code generator
-  // ──────────────────────────────────────────────────────────────────
-  // HOW TO GENERATE UNLOCK CODES:
-  //   1. Open browser console on your deployed site
-  //   2. Run: sha256('YOUR-CODE-HERE').then(h => console.log(h))
-  //   3. Copy the hash string into this array
-  //   4. Send 'YOUR-CODE-HERE' to the buyer (via Stripe confirmation page)
-  //
-  // Example workflow:
-  //   - You create code: COSMIC-7X9K
-  //   - Run: sha256('COSMIC-7X9K').then(h => console.log(h))
-  //   - Output: "a1b2c3d4..." ← put this in the array below
-  //   - Buyer enters COSMIC-7X9K in the game → matches → unlocked
-  //
-  // BATCH GENERATION (paste in console):
-  //   async function genCodes(n) {
-  //     for(let i=0; i<n; i++) {
-  //       const code = 'GG-' + Math.random().toString(36).substr(2,6).toUpperCase();
-  //       const hash = await sha256(code);
-  //       console.log(`Code: ${code}  Hash: "${hash}",`);
-  //     }
-  //   }
-  //   genCodes(20);
-  // ──────────────────────────────────────────────────────────────────
-];
+// ===================== PRO COURSE: PURCHASE AND ACCESS =====================
+// Pro is bought through the purchase API (netlify/functions/commerce.mts, client in
+// commerce-client.mjs). The player signs in with a permanent account, pays on Stripe, and the
+// server records the paid purchase on that account, so it restores on any device. A URL flag
+// or a browser storage value never proves a payment.
+const FREE_HOLE_COUNT = LEVELS.length; // read before Pro or the daily changes LEVELS
+// The production Firebase project is only used on the real site, so local copies and test
+// sites can never write players, scores or purchases into it.
+const LIVE_SERVICES_ENABLED = window.location.protocol === 'https:' &&
+  ['gravitygolf.xyz', 'www.gravitygolf.xyz'].includes(window.location.hostname);
+// Browsers that unlocked Pro before account purchases existed (gg_pro) keep it on that device.
+// It is not treated as a verified payment and is not copied into an account.
+let legacyProAccess = false;
+try { legacyProAccess = localStorage.getItem('gg_pro') === '1'; } catch (e) {}
+let proUnlocked = legacyProAccess;
+if (proUnlocked) LEVELS.push(...PRO_LEVELS);
+let commerceClient = null;
+let commerceState = { available: false, busy: false, signedIn: false, authRequired: false,
+  proVerified: false, phase: 'checking', message: 'Checking purchase availability...' };
 
-let proUnlocked = false;
-
-// SHA-256 hash function (browser native)
-async function sha256(message) {
-  const msgBuf = new TextEncoder().encode(message.toUpperCase().trim());
-  const hashBuf = await crypto.subtle.digest('SHA-256', msgBuf);
-  const hashArr = Array.from(new Uint8Array(hashBuf));
-  return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-// Expose for console code generation
-window.sha256 = sha256;
-
-async function validateUnlockCode(code) {
-  const hash = await sha256(code);
-  // Check against stored hashes
-  if (UNLOCK_HASHES.includes(hash)) {
-    unlockPro();
-    return true;
-  }
-  return false;
-}
-
-function unlockPro() {
-  proUnlocked = true;
-  // Merge pro levels into LEVELS
-  if (LEVELS.length <= 8) {
-    LEVELS.push(...PRO_LEVELS);
-  }
-  // Save to localStorage for persistence
-  try { localStorage.setItem('gg_pro', '1'); } catch(e) {}
-}
-
-function checkSavedUnlock() {
-  try {
-    if (localStorage.getItem('gg_pro') === '1') {
-      unlockPro();
-      return true;
-    }
-  } catch(e) {}
-  return false;
-}
-
-// Check on load
-checkSavedUnlock();
-
-// ===================== UNLOCK UI HANDLERS =====================
-// ──────────────────────────────────────────────────────────────
-// STRIPE SETUP:
-//   1. Create a Payment Link at https://dashboard.stripe.com/payment-links
-//   2. Product: "Gravity Golf Pro" — $2.99 one-time
-//   3. After payment → redirect to: https://gravitygolf.xyz?pro=1
-//   4. Paste your Payment Link URL below
-//   5. Test with card 4242 4242 4242 4242 (test mode)
-// ──────────────────────────────────────────────────────────────
-const STRIPE_PAYMENT_URL = 'https://buy.stripe.com/4gMeVe5PnaYT47i0Jo3Nm00';
-
-// Auto-unlock from Stripe redirect (?pro=1)
-(function checkStripeRedirect() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('pro') === '1') {
-    unlockPro();
-    // Clean URL so refreshing doesn't re-trigger
-    const clean = window.location.pathname + window.location.hash;
-    window.history.replaceState({}, '', clean);
-    // Show confirmation after a short delay (let game init)
-    setTimeout(() => {
-      const notif = document.createElement('div');
-      notif.style.cssText = `
-        position: fixed; top: 25%; left: 50%; transform: translate(-50%, -50%);
-        font-family: 'Orbitron', sans-serif; text-align: center; z-index: 200;
-        pointer-events: none; opacity: 1; transition: opacity 0.8s ease;
-      `;
-      notif.innerHTML = `
-        <div style="font-size: 24px; font-weight: 800; letter-spacing: 6px;
-          background: linear-gradient(135deg, #ffcc00, #ffe566, #ffaa00);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          filter: drop-shadow(0 0 20px rgba(255,200,40,0.5));">★ PRO UNLOCKED</div>
-        <div style="font-size: 11px; font-weight: 600; letter-spacing: 3px; margin-top: 8px;
-          color: #ffe566;">11 NEW HOLES ADDED</div>
-      `;
-      document.body.appendChild(notif);
-      setTimeout(() => { notif.style.opacity = '0'; }, 3000);
-      setTimeout(() => { notif.remove(); }, 4000);
-    }, 500);
-  }
-})();
-
-function showUnlockModal() {
-  document.getElementById('unlockModal').classList.add('visible');
-  document.getElementById('codeInput').value = '';
-  document.getElementById('codeStatus').textContent = '';
-  document.getElementById('codeStatus').className = '';
-}
-
-function hideUnlockModal() {
-  document.getElementById('unlockModal').classList.remove('visible');
-}
-
-// Buy button → opens Stripe Payment Link
-document.getElementById('buyBtn').addEventListener('click', () => {
-  if (STRIPE_PAYMENT_URL.includes('YOUR_PAYMENT_LINK')) {
-    document.getElementById('codeStatus').textContent = 'Payment link not configured yet';
-    document.getElementById('codeStatus').className = 'error';
-    return;
-  }
-  window.open(STRIPE_PAYMENT_URL, '_blank');
-});
-
-// Redeem code
-document.getElementById('redeemBtn').addEventListener('click', async () => {
-  const code = document.getElementById('codeInput').value;
-  if (!code.trim()) {
-    document.getElementById('codeStatus').textContent = 'Enter a code';
-    document.getElementById('codeStatus').className = 'error';
-    return;
-  }
-  document.getElementById('codeStatus').textContent = 'Validating...';
-  document.getElementById('codeStatus').className = '';
-
-  const valid = await validateUnlockCode(code);
-  if (valid) {
-    document.getElementById('codeStatus').textContent = '★ UNLOCKED! 11 NEW HOLES ADDED';
-    document.getElementById('codeStatus').className = 'success';
-    // Hide prompt button if visible
+// Called by the purchase client whenever verified access changes (sign-in, purchase,
+// restore, sign-out, refund).
+function applyProAccess(verified) {
+  const next = legacyProAccess || verified === true;
+  if (next === proUnlocked) return;
+  proUnlocked = next;
+  // The daily swaps LEVELS for its own holes and keeps the normal course aside: change that one.
+  const course = window._originalLevels || LEVELS;
+  course.splice(FREE_HOLE_COUNT);
+  if (proUnlocked) course.push(...PRO_LEVELS);
+  if (proUnlocked) {
     document.getElementById('unlockPrompt').style.display = 'none';
-    // Update title screen if visible
-    updateTitleProBadge();
     continueRoundAfterUnlock();
-    setTimeout(() => hideUnlockModal(), 1500);
   } else {
-    document.getElementById('codeStatus').textContent = 'Invalid code';
-    document.getElementById('codeStatus').className = 'error';
+    buildLevelSelect();
+    // Access ended (signed out, refunded) while on a Pro hole: back to a fresh round at hole 1
+    if (!dailyMode && gameMode === '1p' && !trainerActive && currentLevel >= FREE_HOLE_COUNT) startHoleFresh(0);
   }
-});
+  updateTitleProBadge();
+}
 
 // After an in-session unlock: the title level select gains holes 9-19, and a player standing on
 // the finished last free hole goes on to hole 9 with the round intact (not a stale end screen).
 function continueRoundAfterUnlock() {
   buildLevelSelect();
-  if (dailyMode || gameMode !== '1p' || currentLevel !== 7 || levelScores[7] === undefined) return;
+  if (dailyMode || gameMode !== '1p' || currentLevel !== FREE_HOLE_COUNT - 1 || levelScores[FREE_HOLE_COUNT - 1] === undefined) return;
   hideGameComplete();
   const btn = document.getElementById('nextHoleBtn');
   btn._showComplete = false;
@@ -5535,28 +5432,148 @@ function continueRoundAfterUnlock() {
   document.getElementById('message').style.display = 'block';
 }
 
-// Enter key on code input
-document.getElementById('codeInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('redeemBtn').click();
+function renderCommerce(state) {
+  commerceState = state;
+  const params = new URLSearchParams(window.location.search);
+  const buy = document.getElementById('buyBtn');
+  buy.hidden = proUnlocked;
+  buy.disabled = !state.available || state.busy || legacyProAccess || state.proVerified || params.get('pro') === '1';
+  buy.textContent = params.has('checkout_session_id') || state.phase === 'pending' ? 'CHECK PAYMENT STATUS' :
+    state.mode === 'test' ? 'TEST CHECKOUT · NO REAL MONEY' : 'BUY NOW';
+  document.getElementById('playProBtn').hidden = !proUnlocked;
+  document.querySelector('.unlock-price').textContent = proUnlocked ? 'PRO READY' : '$2.99';
+  document.querySelector('.unlock-price-note').textContent = proUnlocked
+    ? (state.proVerified ? 'SAVED TO YOUR ACCOUNT' : 'SAVED ON THIS BROWSER')
+    : 'ONE-TIME PURCHASE · NO SUBSCRIPTION';
+  document.getElementById('restoreBtn').disabled = !state.available || state.busy;
+  document.getElementById('purchaseAuth').hidden = !state.authRequired;
+  // One-tap Google sign-in uses the game's own sign-in, which only exists on the real site
+  document.getElementById('purchaseGoogle').hidden = state.mode !== 'live';
+  for (const id of ['purchaseGoogle', 'purchaseSignIn', 'purchaseSignUp', 'purchaseReset', 'purchaseSignOut']) {
+    document.getElementById(id).disabled = state.busy || !state.available;
+  }
+  document.getElementById('purchaseSignOut').hidden = !state.signedIn;
+  const account = document.getElementById('purchaseAccount');
+  account.hidden = !state.signedIn;
+  account.textContent = state.signedIn ? 'Signed in as ' + state.accountLabel : '';
+  document.getElementById('checkoutNote').textContent = legacyProAccess
+    ? 'Pro is unlocked on this browser from an earlier purchase.'
+    : state.mode === 'test' ? 'TEST SITE. No real payment is taken.'
+    : state.available ? 'Pro is saved to your account. Card details stay with Stripe.'
+    : 'Purchases are not available right now. The free course is ready to play.';
+  const status = document.getElementById('purchaseStatus');
+  status.textContent = state.message;
+  status.dataset.phase = state.phase;
+}
+
+async function initCommerce() {
+  const params = new URLSearchParams(window.location.search);
+  const returningFromCheckout = params.has('checkout_session_id') || params.has('checkout') || params.get('pro') === '1';
+  try {
+    const { createCommerceClient } = await import('./commerce-client.mjs');
+    commerceClient = createCommerceClient({
+      href: window.location.href, legacyAccess: legacyProAccess,
+      configureAuth(config) {
+        if (config.mode === 'live') {
+          if (!initFirebase()) throw new Error('Authentication unavailable');
+          return firebase.auth();
+        }
+        // Test site: a separate, named app for the test project. Production is never touched.
+        return firebase.initializeApp(config.firebase, 'gg-commerce-sandbox').auth();
+      },
+      onState: renderCommerce, onAccess: applyProAccess,
+      navigate: href => window.location.assign(href),
+      replaceUrl: href => window.history.replaceState({}, '', href),
+    });
+    await commerceClient.start();
+  } catch (e) {
+    renderCommerce({ ...commerceState, available: false, busy: false, phase: 'disabled',
+      message: 'Purchases are not available right now. The free course is ready to play.' });
+  }
+  if (returningFromCheckout) showUnlockModal();
+}
+
+let unlockReturnFocus = null;
+function showUnlockModal() {
+  unlockReturnFocus = document.activeElement;
+  document.getElementById('unlockModal').classList.add('visible');
+  renderCommerce(commerceState);
+  document.getElementById('unlockClose').focus();
+}
+
+function hideUnlockModal() {
+  document.getElementById('unlockModal').classList.remove('visible');
+  document.getElementById('purchasePassword').value = '';
+  if (unlockReturnFocus && unlockReturnFocus.isConnected) unlockReturnFocus.focus();
+}
+
+// Escape closes; Tab stays inside the dialog
+document.getElementById('unlockModal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    e.stopPropagation();
+    hideUnlockModal();
+  } else if (e.key === 'Tab') {
+    const focusable = [...document.getElementById('unlockModal').querySelectorAll('button:not(:disabled), input:not(:disabled)')]
+      .filter(node => node.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 });
 
-// Close modal
+document.getElementById('buyBtn').addEventListener('click', () => commerceClient?.buy());
+document.getElementById('restoreBtn').addEventListener('click', () => commerceClient?.restore());
+async function submitPurchaseAuth(create = false) {
+  if (!document.getElementById('purchaseAuth').reportValidity()) return;
+  const password = document.getElementById('purchasePassword');
+  const value = password.value;
+  password.value = '';
+  await commerceClient?.signIn(document.getElementById('purchaseEmail').value, value, create);
+}
+document.getElementById('purchaseAuth').addEventListener('submit', (e) => {
+  e.preventDefault();
+  void submitPurchaseAuth();
+});
+document.getElementById('purchaseSignUp').addEventListener('click', () => submitPurchaseAuth(true));
+document.getElementById('purchaseReset').addEventListener('click', () => {
+  const email = document.getElementById('purchaseEmail');
+  if (email.reportValidity()) void commerceClient?.resetPassword(email.value);
+});
+// The purchase client watches the same sign-in, so it checks the account's purchase by itself
+document.getElementById('purchaseGoogle').addEventListener('click', () => { void signInWithGoogle(); });
+document.getElementById('purchaseSignOut').addEventListener('click', () => commerceClient?.signOut());
+document.getElementById('playProBtn').addEventListener('click', () => {
+  if (!proUnlocked || onlineMode || trainerActive) return;
+  ensureAudio();
+  sfxClick();
+  hideUnlockModal();
+  // Already in the round that just reached hole 9: keep it. Otherwise start fresh at hole 9.
+  if (!dailyMode && gameMode === '1p' && currentLevel === FREE_HOLE_COUNT - 1 && levelScores[FREE_HOLE_COUNT - 1] !== undefined) return;
+  startHoleFresh(FREE_HOLE_COUNT);
+});
+
 document.getElementById('unlockClose').addEventListener('click', hideUnlockModal);
 
-// Unlock prompt button (shown after hole 5)
+// Unlock prompt button (shown at the end of the free course)
 document.getElementById('unlockPromptBtn').addEventListener('click', showUnlockModal);
 
-// Add Pro badge to title screen if already unlocked
+// Pro badge on the title screen while Pro is unlocked
 function updateTitleProBadge() {
   const titleH1 = document.querySelector('#titleScreen h1');
-  if (proUnlocked && !titleH1.querySelector('.pro-badge')) {
-    const badge = document.createElement('span');
-    badge.className = 'pro-badge';
-    badge.textContent = 'PRO';
-    titleH1.appendChild(badge);
+  const badge = titleH1.querySelector('.pro-badge');
+  if (proUnlocked && !badge) {
+    const el = document.createElement('span');
+    el.className = 'pro-badge';
+    el.textContent = 'PRO';
+    titleH1.appendChild(el);
+  } else if (!proUnlocked && badge) {
+    badge.remove();
   }
 }
 updateTitleProBadge();
+renderCommerce(commerceState);
 
 // ===================== TITLE PLANET BACKGROUND =====================
 // ===================== GALAXY SHADER BACKGROUND =====================
@@ -5842,24 +5859,32 @@ function buildLevelSelect() {
     btn.title = LEVELS[i].name;
     btn.addEventListener('click', () => {
       ensureAudio();
-      if (dailyMode) endDailyChallenge();
-      dailyMode = false;
-      gameMode = '1p';
-      currentPlayer = 0;
-      currentLevel = i;
-      totalScore = 0;
-      levelScores = [];
-  holeTimes = [];
-  artifactsCollected = 0;
-  levelArtifacts = [];
-      _currentRoundKey = null;
-      ballPickPhase = 2;
-      document.getElementById('titleScreen').classList.add('hidden');
-      applyBallColor(selectedBallColor);
-      loadLevel(i);
+      startHoleFresh(i);
     });
     container.appendChild(btn);
   }
+}
+
+// Start a fresh solo round at hole i (level select, PLAY PRO COURSE, losing Pro mid-round)
+function startHoleFresh(i) {
+  if (dailyMode) endDailyChallenge();
+  dailyMode = false;
+  gameMode = '1p';
+  currentPlayer = 0;
+  currentLevel = i;
+  totalScore = 0;
+  levelScores = [];
+  holeTimes = [];
+  artifactsCollected = 0;
+  levelArtifacts = [];
+  _currentRoundKey = null;
+  ballPickPhase = 2;
+  document.getElementById('totalScore').textContent = '0';
+  document.getElementById('titleScreen').classList.add('hidden');
+  document.getElementById('ballPicker').classList.add('hidden');
+  hideGameComplete();
+  applyBallColor(selectedBallColor);
+  loadLevel(i);
 }
 buildLevelSelect();
 
@@ -5904,6 +5929,7 @@ let onlineMode = false;    // True when playing online
 
 function initFirebase() {
   if (firebaseReady) return true;
+  if (!LIVE_SERVICES_ENABLED) return false; // never the production project from a local copy or test site
   try {
     if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") {
       console.warn("Firebase not configured — fill in FIREBASE_CONFIG");
@@ -7261,6 +7287,9 @@ async function postAndShowLB() {
 
 // Initialize auth on load
 setTimeout(initAuth, 100);
+// Purchase client: checks whether purchases are available, restores a signed-in account's Pro,
+// and verifies a return from Stripe checkout
+void initCommerce();
 
 // ===================== HOLE VISUALS (created once, repositioned per level) =====================
 function createHoleVisuals() {
@@ -12969,6 +12998,14 @@ window.render_game_to_text = () => JSON.stringify({
     combo: flightCombo,
     bestCombo: bestFlightCombo,
     bestGhostVisible: bestShotGhostLine.visible,
+  },
+  commerce: {
+    available: commerceState.available,
+    mode: commerceState.mode || null,
+    phase: commerceState.phase,
+    proUnlocked,
+    accessSource: commerceState.proVerified ? 'verified-account' : legacyProAccess ? 'legacy-device' : 'free',
+    holes: (window._originalLevels || LEVELS).length,
   },
   ability: {
     name: BALL_ABILITIES[selectedBallColor].name,
