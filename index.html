@@ -8867,6 +8867,12 @@ function updateFlightMastery(dt) {
 }
 
 function updateRouteChip() {
+  if (!pathAssistAllowed()) {
+    shotUsesPilotRoute = false;
+    routeChipEl.classList.remove('pilot');
+    routeChipEl.textContent = 'MANUAL AIM · NO ASSIST IN THE DAILY';
+    return;
+  }
   if (!assistBaselineReady) {
     routeChipEl.textContent = 'CALCULATING ASSIST';
     routeChipEl.classList.remove('pilot');
@@ -9883,8 +9889,14 @@ if (isMobileDevice) {
 }
 
 // ===================== SNAP TO OPTIMAL PATH =====================
+// The solver finds a near-perfect shot, so it would decide the daily leaderboard.
+// The daily is played without it; practice holes and the trainer keep it.
+function pathAssistAllowed() {
+  return !dailyMode;
+}
+
 function snapToOptimal(sourceBtn) {
-  if (!aimLocked || !ballOnPlanet) return;
+  if (!aimLocked || !ballOnPlanet || !pathAssistAllowed()) return;
   
   // Show computing state
   const allBtns = [document.getElementById('panelSnapBtn')].filter(Boolean);
@@ -12157,6 +12169,7 @@ function toggleOptimalPath() {
   }
 
   if (!ballOnPlanet || shotInFlight || gameWon || lostInSpace || introPlaying) return;
+  if (!pathAssistAllowed()) { sfxCancel(); return; }
 
   // Compute the path
   const btn = document.getElementById('optimalBtn');
