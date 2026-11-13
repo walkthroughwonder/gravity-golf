@@ -1707,17 +1707,6 @@
   }
 
   /* === Undo button === */
-  #undoBtn {
-    position: fixed; top: 40px; right: 8px; z-index: 10;
-    background: rgb(18,14,8); border: 2px solid rgba(200,170,60,0.4); border-radius: 8px;
-    color: rgba(220,195,100,0.7); padding: 6px 14px; cursor: pointer; font-family: 'Orbitron', sans-serif;
-    font-size: 9px; font-weight: 900; letter-spacing: 2px; transition: all 0.25s;
-    pointer-events: auto; text-transform: uppercase; display: none;
-    box-shadow: 0 2px 0 rgba(80,65,10,0.7), 0 3px 8px rgba(0,0,0,0.3);
-  }
-  #undoBtn:hover { background: rgb(40,32,10); color: #ffe566; border-color: rgba(255,210,60,0.6);
-    box-shadow: 0 3px 0 rgba(80,65,10,0.8), 0 5px 12px rgba(0,0,0,0.4); transform: translateY(-1px); }
-  #undoBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(100,55,15,0.7), 0 2px 6px rgba(0,0,0,0.3); }
 
   /* === Boost indicator === */
   #nudgeCounter {
@@ -2070,7 +2059,6 @@
     }
     #topRightBtns button { min-width: 44px; min-height: 44px; padding: 0 10px; font-size: 13px; letter-spacing: 0.5px; }
     #controlsBtn { display: none; }
-    #undoBtn { top: 32px; right: 6px; font-size: 6px; padding: 3px 7px; }
     #userBadge {
       top: calc(52px + env(safe-area-inset-top, 0px)); left: calc(4px + env(safe-area-inset-left, 0px));
       min-width: 44px; min-height: 44px; padding: 4px 12px; justify-content: center;
@@ -2142,7 +2130,6 @@
     /* Top-right buttons */
     #topRightBtns button { padding: 0 8px; }
     #controlsBtn { display: none; }
-    #undoBtn { top: 28px; right: 4px; font-size: 5.5px; padding: 2px 6px; border-radius: 6px; }
 
     /* Bottom buttons */
     #aimToggleBtn { display: none !important; }
@@ -6462,26 +6449,22 @@ async function signInAnonymously() {
   }
 }
 
+// Callers show a status line from the thrown error, so a failed start must throw too:
+// returning false here used to show "Signed in!" when the sign-in service never loaded.
+const AUTH_UNAVAILABLE = 'Could not reach the sign-in service. Check your connection and try again.';
+
 async function signInWithEmail(email, pass) {
-  if (!initFirebase()) return false;
-  try {
-    await firebase.auth().signInWithEmailAndPassword(email, pass);
-    return true;
-  } catch (e) {
-    throw e;
-  }
+  if (!initFirebase()) throw new Error(AUTH_UNAVAILABLE);
+  await firebase.auth().signInWithEmailAndPassword(email, pass);
+  return true;
 }
 
 async function signUpWithEmail(email, pass) {
-  if (!initFirebase()) return false;
-  try {
-    // No display name is set here: the public name is never derived from the email address.
-    // The player picks one in the player-name dialog before a first leaderboard post.
-    await firebase.auth().createUserWithEmailAndPassword(email, pass);
-    return true;
-  } catch (e) {
-    throw e;
-  }
+  if (!initFirebase()) throw new Error(AUTH_UNAVAILABLE);
+  // No display name is set here: the public name is never derived from the email address.
+  // The player picks one in the player-name dialog before a first leaderboard post.
+  await firebase.auth().createUserWithEmailAndPassword(email, pass);
+  return true;
 }
 
 // Returns true when the player was signed out, false when a guest chose to stay.
@@ -7266,7 +7249,8 @@ async function postAndShowLB() {
   }
   btn.textContent = 'POSTING...';
   try {
-    await postDailyScore(dailyTotalStrokes, dailyScores);
+    // false = not signed in or no database: nothing was written, so do not claim it was
+    if (!(await postDailyScore(dailyTotalStrokes, dailyScores))) throw new Error('Score was not posted');
     btn.textContent = 'VIEW LEADERBOARD';
     showLeaderboard();
   } catch (e) {

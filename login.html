@@ -239,11 +239,21 @@ document.getElementById('googleBtn').onclick = async () => {
   }
 };
 
+// Trimmed email, or '' after showing why it cannot be used (a pasted trailing space used to fail).
+function readEmail(s) {
+  const email = document.getElementById('email').value.trim();
+  if (!email) { s.textContent = 'Enter your email address'; s.className = 'status error'; return ''; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { s.textContent = 'Invalid email'; s.className = 'status error'; return ''; }
+  return email;
+}
+
 document.getElementById('signInBtn').onclick = async () => {
   const s = document.getElementById('status');
   try {
+    const email = readEmail(s);
+    if (!email) return;
     s.textContent = 'Signing in...'; s.className = 'status';
-    await firebase.auth().signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value);
+    await firebase.auth().signInWithEmailAndPassword(email, document.getElementById('pass').value);
     s.textContent = 'Success!'; s.className = 'status success';
   } catch(e) {
     s.textContent = e.code === 'auth/user-not-found' ? 'No account found' : e.code === 'auth/wrong-password' ? 'Wrong password' : e.code === 'auth/invalid-credential' ? 'Invalid credentials' : e.message;
@@ -256,8 +266,9 @@ document.getElementById('signUpBtn').onclick = async () => {
   const pass = document.getElementById('pass').value;
   if (pass.length < 6) { s.textContent = 'Password must be 6+ characters'; s.className = 'status error'; return; }
   try {
+    const email = readEmail(s);
+    if (!email) return;
     s.textContent = 'Creating account...'; s.className = 'status';
-    const email = document.getElementById('email').value;
     // No display name is set: the public name is never derived from the email address.
     // The player picks one in the game before a first leaderboard post.
     await firebase.auth().createUserWithEmailAndPassword(email, pass);
