@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Orbital Violin</title>
+  <meta name="description" content="An orbital mechanics instrument for solo violin samples.">
+  <meta name="theme-color" content="#03070a">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="app" aria-label="Orbital Violin interactive instrument">
+    <canvas id="orbitalCanvas"></canvas>
+
+    <section id="unlockScreen" class="unlock-screen">
+      <div class="unlock-card">
+        <p class="eyebrow">edwinrosero.com / instruments</p>
+        <h1>Orbital Violin</h1>
+        <p class="intro">Launch a glowing probe into resonant violin spheres. Stable orbits turn motion into bloom, gates, and shimmer.</p>
+        <button id="enterButton" type="button">Tap to enter orbit</button>
+        <p id="audioStatus" class="audio-status">Audio starts only after this gesture.</p>
+        <p id="moduleStatus" class="module-status" hidden></p>
+      </div>
+    </section>
+
+    <header class="top-hud" aria-live="polite">
+      <div>
+        <p class="eyebrow">Orbital Violin</p>
+        <h2 id="levelName">First Orbit</h2>
+      </div>
+      <button id="debugToggle" type="button" aria-pressed="false">Stats</button>
+    </header>
+
+    <section class="level-strip" aria-label="Prototype levels">
+      <button class="level-button active" type="button" data-level="0">I</button>
+      <button class="level-button" type="button" data-level="1">II</button>
+      <button class="level-button" type="button" data-level="2">III</button>
+    </section>
+
+    <section id="ambientHud" class="ambient-hud" aria-label="Player state">
+      <div class="ring-stat" style="--value: 0;" data-label="speed"><span>Speed</span></div>
+      <div class="ring-stat resonance" style="--value: 0;" data-label="resonance"><span>Res</span></div>
+      <div class="ring-stat stability" style="--value: 0;" data-label="stability"><span>Stable</span></div>
+      <div class="energy-arc"><span id="energyValue">100</span><small>energy</small></div>
+    </section>
+
+    <section id="debugPanel" class="debug-panel" hidden>
+      <dl>
+        <div><dt>Speed</dt><dd id="statSpeed">0.00</dd></div>
+        <div><dt>Angular Momentum</dt><dd id="statAngular">0.00</dd></div>
+        <div><dt>Orbit Stability</dt><dd id="statStability">0.00</dd></div>
+        <div><dt>Field Depth</dt><dd id="statField">0.00</dd></div>
+        <div><dt>Resonance</dt><dd id="statResonance">0.00</dd></div>
+        <div><dt>Energy</dt><dd id="statEnergy">100%</dd></div>
+        <div><dt>Nearest</dt><dd id="statNearest">none</dd></div>
+        <div><dt>Lock</dt><dd id="statLock">searching</dd></div>
+      </dl>
+    </section>
+
+    <section id="message" class="message">
+      <p id="goalText">Drag backward, release, and find a stable orbit.</p>
+    </section>
+  </main>
+
+  <script>
+    window.orbitalViolinModuleLoaded = false;
+    window.addEventListener("error", (event) => {
+      if (!String(event.filename || "").includes("orbital-violin")) return;
+      const status = document.getElementById("moduleStatus");
+      const button = document.getElementById("enterButton");
+      if (status) {
+        status.hidden = false;
+        status.textContent = "The instrument script did not load. Hard-refresh this page, and check that Three.js is reachable.";
+      }
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Instrument failed to load";
+      }
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      const reason = String(event.reason?.message || event.reason || "");
+      if (!reason.includes("three") && !reason.includes("orbital")) return;
+      const status = document.getElementById("moduleStatus");
+      const button = document.getElementById("enterButton");
+      if (status) {
+        status.hidden = false;
+        status.textContent = "The instrument dependencies did not load. Check internet/CDN access, then hard-refresh.";
+      }
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Dependency load failed";
+      }
+    });
+  </script>
+  <script type="module" src="./orbital-violin.js"></script>
+</body>
+</html>
