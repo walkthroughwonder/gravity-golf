@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "name": "cancel during compute",
+      "inputMs": 46
+    },
+    {
+      "name": "manual input cancels and is not overwritten",
+      "manualPower": "83"
+    },
+    {
+      "name": "reset discards old result"
+    },
+    {
+      "name": "fire ends planning pause and prevents stale aim"
+    },
+    {
+      "name": "worker-assisted shot still completes Hole 1 in one stroke"
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "buildManifestSha256": "1a3721d8a9e1910f4c02375434e9c2b4c1f42c19ba12ed1c468febe4c0746126",
+  "status": "passed"
+}

@@ -1,0 +1,25 @@
+{
+  "observedAtUtc": "2026-09-08T18:32:48Z",
+  "sourceUrl": "https://bizfileonline.sos.ca.gov/search/business",
+  "method": "Read-only Chrome search for epoch6 and expanded matching entity drawer; transcribed visible fields, not a certified extract.",
+  "entityName": "epoch6 LLC",
+  "entityNumber": "202464116233",
+  "initialFilingDate": "2024-10-08",
+  "entityType": "Limited Liability Company - CA",
+  "formedIn": "CALIFORNIA",
+  "status": "Active",
+  "standing": {
+    "SOS": "Good",
+    "FTB": "Good",
+    "Agent": "Good",
+    "VCFCF": "Good"
+  },
+  "statementOfInformationDueDate": "2026-10-31",
+  "registeredAgent": "ZENBUSINESS INC.",
+  "limitations": [
+    "Current public registry observation, not an official certified certificate.",
+    "Does not establish EIN issuance, tax balances, game asset ownership, developer enrollment or store compliance.",
+    "No login, filing, certificate purchase, access request or entity change was performed.",
+    "Personal addresses and private mailbox/provider records were intentionally omitted."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "input": "source/gameplay-raw.webm",
+  "output": "gravity-golf-first-shot.mp4",
+  "sourceSha256": "dc515aec84aaeb16247faa43847f89231797ed7a54180d75a68fad67e5656ece",
+  "outputSha256": "82ba7ba59deac79ec8afa8f76961859b86b2bf09b2dc6f0699dc020edc1ae0c1",
+  "durationSeconds": 10,
+  "size": "1080x1920",
+  "fps": 30,
+  "provenance": "720x1280 canvas capture with the game audio mix, upscaled. DOM HUD excluded from video; UI screenshots retained. Physics and game state unmodified.",
+  "edits": [
+    "Real-time chronological footage, no speed changes or fabricated outcome",
+    "Title 0-1.7s; verified result 3.9-6s; end card 6-10s",
+    "Common original audio/video timestamps retained; only audio edge fades",
+    "Final-frame hold allowed only after completion if capture ends before 10s"
+  ],
+  "releaseStatus": "PRIVATE DRAFT. Owner approval, current live availability and soundtrack rights review required before posting."
+}

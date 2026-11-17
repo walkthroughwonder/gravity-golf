@@ -1,0 +1,106 @@
+{
+  "checkedAt": "2026-09-08T07:25:36.153Z",
+  "url": "https://gravitygolf.xyz/",
+  "method": "Credential-free public HTTPS download; source analysis only, not gameplay or purchase execution.",
+  "sha256": "c2e7e19c395692b7b3709c238589ee4dc19fa0c1fb6a54934987bcbd4480847e",
+  "capturedLocalSha256": "e82bc346d3052451bdf847a1aad837ab22ad541095b3f17c9bfb406faa5d6b75",
+  "freeHoles": 8,
+  "additionalHoles": 11,
+  "totalHoles": 19,
+  "arrays": [
+    {
+      "name": "LEVELS",
+      "exactMatchToLocal": true,
+      "holes": [
+        {
+          "name": "FIRST CONTACT",
+          "par": 1
+        },
+        {
+          "name": "GENTLE APPROACH",
+          "par": 2
+        },
+        {
+          "name": "OVER THE MOON",
+          "par": 3
+        },
+        {
+          "name": "SPACE STATION APPROACH",
+          "par": 3
+        },
+        {
+          "name": "GRAVITY WELL",
+          "par": 4
+        },
+        {
+          "name": "THE SLINGSHOT",
+          "par": 4
+        },
+        {
+          "name": "ASTEROID FIELD",
+          "par": 4
+        },
+        {
+          "name": "GRAVITY SLINGSHOT EXPRESS",
+          "par": 5
+        }
+      ]
+    },
+    {
+      "name": "PRO_LEVELS",
+      "exactMatchToLocal": true,
+      "holes": [
+        {
+          "name": "DEEP SPACE ODYSSEY",
+          "par": 5
+        },
+        {
+          "name": "BLACK HOLE GAUNTLET",
+          "par": 6
+        },
+        {
+          "name": "TWIN SUNS",
+          "par": 5
+        },
+        {
+          "name": "THE FUNNEL",
+          "par": 5
+        },
+        {
+          "name": "ORBITAL DANCE",
+          "par": 5
+        },
+        {
+          "name": "DARK CORRIDOR",
+          "par": 6
+        },
+        {
+          "name": "PINBALL WIZARD",
+          "par": 5
+        },
+        {
+          "name": "GRAVITY CANYON",
+          "par": 6
+        },
+        {
+          "name": "NEUTRON ALLEY",
+          "par": 6
+        },
+        {
+          "name": "EVENT HORIZON",
+          "par": 6
+        },
+        {
+          "name": "THE FINAL FRONTIER",
+          "par": 6
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "No authenticated revenue data",
+    "No payment, fulfillment or restoration verified",
+    "No new guest gameplay session tested on production",
+    "No publication or deployment"
+  ]
+}

@@ -46,10 +46,10 @@
   .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(123,92,255,0.08); }
   .stat-label { font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: rgba(200,180,255,0.4); text-transform: uppercase; }
   .stat-val { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 800; color: #ffe566; }
-  .game-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(123,92,255,0.06); }
-  .game-date { font-size: 9px; color: rgba(200,180,255,0.3); letter-spacing: 1px; }
-  .game-mode { font-family: 'Orbitron', sans-serif; font-size: 9px; color: rgba(200,180,255,0.4); letter-spacing: 1px; }
-  .game-score { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; }
+  .game-row { display: flex; gap: 8px; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(123,92,255,0.06); }
+  .game-date { flex-shrink: 0; font-size: 9px; color: rgba(200,180,255,0.3); letter-spacing: 1px; }
+  .game-mode { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Orbitron', sans-serif; font-size: 9px; color: rgba(200,180,255,0.4); letter-spacing: 1px; }
+  .game-score { flex-shrink: 0; white-space: nowrap; font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; }
   .game-score.under { color: #44ffaa; }
   .game-score.over { color: #ff6688; }
   .game-score.even { color: rgba(200,180,255,0.6); }
@@ -68,7 +68,8 @@
   .not-signed-in p { color: rgba(200,180,255,0.4); margin-bottom: 16px; }
   .not-signed-in a { color: #c4a0ff; }
   #loading { font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(200,180,255,0.3); letter-spacing: 3px; }
-  #content { display: none; }
+  #content { display: none; width: 100%; max-width: 460px; min-width: 0; }
+  .preview-notice { max-width: 420px; color: #e4cf8c; font-size: 13px; line-height: 1.7; text-align: center; }
 </style>
 </head>
 <body>
@@ -76,10 +77,14 @@
 <div class="sub">My Stats</div>
 
 <div id="loading">LOADING...</div>
+<p class="preview-notice" id="previewNotice" role="status" hidden></p>
+<div class="links" id="previewLinks" style="display:none;">
+  <a href="./index.html" class="link play">BACK TO GAME</a>
+</div>
 
 <div id="notSignedIn" class="not-signed-in" style="display:none;">
   <p>Sign in to track your games</p>
-  <a href="/login.html" class="link play">SIGN IN</a>
+  <a href="./login.html" class="link play">SIGN IN</a>
 </div>
 
 <div id="content">
@@ -105,12 +110,28 @@
   </div>
 
   <div class="links">
-    <a href="/" class="link play">▶ PLAY</a>
+    <a href="./index.html" class="link play">▶ PLAY</a>
     <button class="link out" id="signOutBtn">SIGN OUT</button>
   </div>
 </div>
 
 <script>
+(() => {
+// No production profile reads or sign-out actions in an isolated preview.
+const liveAccountsEnabled = ['https://gravitygolf.xyz', 'https://www.gravitygolf.xyz'].includes(window.location.origin);
+if (!liveAccountsEnabled || typeof firebase === 'undefined' || typeof firebase.auth !== 'function' || typeof firebase.database !== 'function') {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('notSignedIn').style.display = 'none';
+  document.getElementById('signOutBtn').disabled = true;
+  const notice = document.getElementById('previewNotice');
+  notice.textContent = liveAccountsEnabled
+    ? 'Account services are unavailable. Reload to try again, or return to the game.'
+    : 'Local preview: live profiles and statistics are disabled. No production player records are loaded here.';
+  notice.hidden = false;
+  document.getElementById('previewLinks').style.display = 'flex';
+  return;
+}
 const CONFIG = {
   apiKey: "AIzaSyDPyq1wk3l-aMRJcOFwzY8CmKN5cpN7XXc",
   authDomain: "gravity-golf-6ec4f.firebaseapp.com",
@@ -124,8 +145,15 @@ firebase.initializeApp(CONFIG);
 const db = firebase.database();
 firebase.auth().getRedirectResult().catch(() => {});
 
+let profileRequest = 0;
 firebase.auth().onAuthStateChanged(async user => {
+  const request = ++profileRequest;
   document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('notSignedIn').style.display = 'none';
+  for (const id of ['name', 'email', 'avatar', 'history']) document.getElementById(id).replaceChildren();
+  for (const id of ['sGames', 'sHIO', 'sTotal']) document.getElementById(id).textContent = '0';
+  for (const id of ['sBest', 'sAvg']) document.getElementById(id).textContent = '—';
   if (!user) {
     document.getElementById('notSignedIn').style.display = 'block';
     return;
@@ -135,14 +163,33 @@ firebase.auth().onAuthStateChanged(async user => {
   document.getElementById('name').textContent = user.displayName || ('Cosmonaut-' + user.uid.slice(0,5));
   document.getElementById('email').textContent = user.isAnonymous ? 'Guest account' : (user.email || '');
   const av = document.getElementById('avatar');
-  if (user.photoURL) av.innerHTML = '<img src="' + user.photoURL + '" alt="">';
-  else av.textContent = (user.displayName || '?').charAt(0).toUpperCase();
+  const initial = (user.displayName || '?').charAt(0).toUpperCase();
+  av.textContent = initial;
+  if (typeof user.photoURL === 'string') {
+    try {
+      const url = new URL(user.photoURL);
+      if (url.protocol === 'https:' && !url.username && !url.password) {
+        const img = document.createElement('img');
+        img.alt = '';
+        img.referrerPolicy = 'no-referrer';
+        img.src = url.href;
+        img.addEventListener('error', () => {
+          if (img.parentNode === av) av.textContent = initial;
+        }, { once: true });
+        av.replaceChildren(img);
+      }
+    } catch { /* Keep the initial for an invalid profile URL. */ }
+  }
 
   // Load games
   try {
     const snap = await db.ref('users/' + user.uid + '/games').orderByChild('date').limitToLast(30).once('value');
+    if (request !== profileRequest) return;
     const games = [];
-    snap.forEach(c => games.push(c.val()));
+    snap.forEach(c => {
+      const g = c.val();
+      if (g && Number.isSafeInteger(g.total) && g.total >= 0 && Number.isSafeInteger(g.diff)) games.push(g);
+    });
     games.reverse();
 
     let best = Infinity, total = 0, hio = 0;
@@ -165,16 +212,24 @@ firebase.auth().onAuthStateChanged(async user => {
       for (const g of games) {
         const row = document.createElement('div');
         row.className = 'game-row';
-        const d = new Date(g.date);
+        const d = new Date(typeof g.date === 'number' ? g.date : NaN);
         const cls = g.diff < 0 ? 'under' : g.diff > 0 ? 'over' : 'even';
         const label = g.diff === 0 ? 'E' : (g.diff > 0 ? '+' + g.diff : '' + g.diff);
-        row.innerHTML = '<span class="game-date">' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>' +
-          '<span class="game-mode">' + (g.mode||'1P').toUpperCase() + ' · ' + (g.holes||'?') + 'H</span>' +
-          '<span class="game-score ' + cls + '">' + g.total + ' (' + label + ')</span>';
+        for (const [className, value] of [
+          ['game-date', Number.isFinite(d.getTime()) ? d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : 'Unknown'],
+          ['game-mode', (typeof g.mode === 'string' ? g.mode : '1P').toUpperCase() + ' · ' + (Number.isSafeInteger(g.holes) ? g.holes : '?') + 'H'],
+          ['game-score ' + cls, g.total + ' (' + label + ')'],
+        ]) {
+          const span = document.createElement('span');
+          span.className = className;
+          span.textContent = value;
+          row.appendChild(span);
+        }
         hist.appendChild(row);
       }
     }
   } catch(e) {
+    if (request !== profileRequest) return;
     document.getElementById('history').innerHTML = '<div class="empty">Could not load data</div>';
   }
 });
@@ -182,6 +237,7 @@ firebase.auth().onAuthStateChanged(async user => {
 document.getElementById('signOutBtn').onclick = () => {
   firebase.auth().signOut().then(() => window.location.href = '/login.html');
 };
+})();
 </script>
 </body>
 </html>

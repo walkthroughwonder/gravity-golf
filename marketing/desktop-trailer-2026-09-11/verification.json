@@ -1,0 +1,25 @@
+{
+  "status": "private-video-files-verified",
+  "outputSha256": "1c946515a809e52f3881a61dd31a53f1134067540fe9c5fedfa7415f51e04bb0",
+  "currentPackageAndSourceMatch": true,
+  "genuineInputReceipts": true,
+  "width": 1920,
+  "height": 1080,
+  "outputFps": 30,
+  "rawCaptureFps": 25,
+  "duration": 30,
+  "frames": 900,
+  "videoBitrate": 7947156,
+  "audio": {
+    "codec": "aac",
+    "sampleRate": 48000,
+    "channels": 2,
+    "integratedLUFS": -18.9,
+    "truePeakDbFS": -4.9,
+    "humanListeningComplete": false
+  },
+  "fullDecodePassed": true,
+  "fastStart": true,
+  "ownerApproved": false,
+  "storeAccepted": false
+}

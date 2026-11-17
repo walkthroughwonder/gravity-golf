@@ -1,0 +1,1142 @@
+{
+  "startedAt": "2026-09-10T16:49:03.679Z",
+  "completedAt": "2026-09-10T16:49:20.133Z",
+  "status": "private-review-candidates",
+  "executablePath": "/Users/edwin/Downloads/Gravity Golf Updates/desktop/out/Gravity Golf Prototype-darwin-arm64/Gravity Golf Prototype.app/Contents/MacOS/gravity-golf",
+  "archiveSha256": "fa0993ca459de311dce5364161480b366d4445787351f85461ed1b1ccf77fd49",
+  "source": {
+    "edition": "desktop-prototype",
+    "sourceCommit": "74f29f63efd2d88d81c1b58400f523861346b2bb",
+    "sourceContainsUncommittedChanges": true,
+    "sourceIndexSha256": "3ea77ad782f6145d5ba3423914c8450f54a327672045dbef0f586af1abf4a00a",
+    "dependencies": {
+      "@electron/packager": "20.3.0",
+      "@fontsource-variable/exo-2": "5.3.0",
+      "@fontsource-variable/orbitron": "5.3.0",
+      "electron": "44.3.0",
+      "three": "0.172.0"
+    },
+    "inputs": {
+      "index.html": "3ea77ad782f6145d5ba3423914c8450f54a327672045dbef0f586af1abf4a00a",
+      "desktop/package.json": "b47aa37841356af31ed0eb99c89d4b5ed92273b7d3736370152b92d85c425c03",
+      "desktop/package-lock.json": "b9fac5632338b0133d0fe8b47ab8741efed8d446c3bcd72a908ba91611b80cb1",
+      "desktop/scripts/build.mjs": "1e21466d643a93b1c2f416f232bfc260a87ba7639ac8bfadb6350ed98b9147e2",
+      "desktop/scripts/transform.mjs": "2e15e7472c9139581e78d30420c52ae592933cd6d594fa6e34c18542f2d7054c",
+      "desktop/scripts/package.mjs": "7943c2f33e1bba9e58a7ce14f371c21ee743da7e2d1eeee8f6b6066b7bac22ef",
+      "soundtrack.mp3": "7373e5b93eceee09f3f9dfd51c261492fe2ff95cfd03e2e85d6ab47ba3c5492e",
+      "desktop/src/desktop.mjs": "f131824cd54debb60aae0816bd1578cbc5dc23927ae76b54ab499e813480b831",
+      "desktop/src/desktop.css": "65ab40799245a9408e855b9df309ea81fbf1e80fbec38f279e36e077fd859759",
+      "desktop/src/notices.html": "6ee1d26fce2589626604e5276e7e4a0965cb24d5fcb0eab363a862be6347f340",
+      "licenses/three-0.172.0-LICENSE.txt": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454",
+      "licenses/orbitron-OFL.txt": "ab609b0e110d622435ff337cdf233288556e011bbf9bd0550be98846c0630819",
+      "licenses/exo-2-OFL.txt": "7f95a8eeecc6904ffc81cd10cc8ebc7fcee72a67922924bf45f02dff03b88127",
+      "desktop/node_modules/electron/dist/LICENSE": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d",
+      "desktop/node_modules/electron/dist/LICENSES.chromium.html": "a62dabd1c6ef1327365b2a3fdffb806222684a746dcb8f4afd1c1f690eba5535",
+      "desktop/node_modules/@fontsource-variable/orbitron/files/orbitron-latin-wght-normal.woff2": "c25a9f9da5d9f3db1bf2a01474722dc9b377675b7bbab6d0dfda6902794fd1ed",
+      "desktop/node_modules/@fontsource-variable/exo-2/files/exo-2-latin-wght-normal.woff2": "4a259dde317e08aa5d37e6eb684e222ae833516b2a0fccba36ee5e36224f16be",
+      "desktop/src/main.mjs": "933c2b3d92df297139f3bcb2a19babfbcb979ec247cb41814e6c858c4c25c0aa",
+      "desktop/src/content.mjs": "f7123cf507a16c7b8c292b60b5532993a1bec5d73a639cca81852cd8164c9f62"
+    },
+    "files": {
+      "index.html": {
+        "bytes": 132610,
+        "sha256": "ac5af0840409558d6c8f0e9ea10dcd584b5e7f66958b8dd3dc562e8b6fdc3d20"
+      },
+      "game.mjs": {
+        "bytes": 384119,
+        "sha256": "ade6dc8cf2a6d9c6830804b362d9b584996f696fba6974112af0a55e70335b95"
+      },
+      "soundtrack.mp3": {
+        "bytes": 32782076,
+        "sha256": "7373e5b93eceee09f3f9dfd51c261492fe2ff95cfd03e2e85d6ab47ba3c5492e"
+      },
+      "desktop.mjs": {
+        "bytes": 1345,
+        "sha256": "f131824cd54debb60aae0816bd1578cbc5dc23927ae76b54ab499e813480b831"
+      },
+      "desktop.css": {
+        "bytes": 1726,
+        "sha256": "c606bf0e471fdaca136261c3b42c676edd756ac27b9c2f8b1cbc660fbc162bd8"
+      },
+      "notices.html": {
+        "bytes": 1469,
+        "sha256": "6ee1d26fce2589626604e5276e7e4a0965cb24d5fcb0eab363a862be6347f340"
+      },
+      "licenses/three-0.172.0-LICENSE.txt": {
+        "bytes": 1081,
+        "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+      },
+      "licenses/orbitron-OFL.txt": {
+        "bytes": 4426,
+        "sha256": "ab609b0e110d622435ff337cdf233288556e011bbf9bd0550be98846c0630819"
+      },
+      "licenses/exo-2-OFL.txt": {
+        "bytes": 4386,
+        "sha256": "7f95a8eeecc6904ffc81cd10cc8ebc7fcee72a67922924bf45f02dff03b88127"
+      },
+      "licenses/electron-LICENSE.txt": {
+        "bytes": 1096,
+        "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+      },
+      "licenses/chromium.html": {
+        "bytes": 20111209,
+        "sha256": "a62dabd1c6ef1327365b2a3fdffb806222684a746dcb8f4afd1c1f690eba5535"
+      },
+      "fonts/orbitron-latin-wght-normal.woff2": {
+        "bytes": 11800,
+        "sha256": "c25a9f9da5d9f3db1bf2a01474722dc9b377675b7bbab6d0dfda6902794fd1ed"
+      },
+      "fonts/exo-2-latin-wght-normal.woff2": {
+        "bytes": 40896,
+        "sha256": "4a259dde317e08aa5d37e6eb684e222ae833516b2a0fccba36ee5e36224f16be"
+      },
+      "vendor/three/build/three.module.js": {
+        "bytes": 575699,
+        "sha256": "2ac776db82c8cb8075433c63085028142f3e86e20016a0308b28943e8dbea238"
+      },
+      "vendor/three/build/three.core.js": {
+        "bytes": 754325,
+        "sha256": "c269806166c61cc3ddf6f19b05fc31a50f6bdfc85902eaed723e972f9bb3e163"
+      },
+      "vendor/three/examples/jsm/controls/OrbitControls.js": {
+        "bytes": 32471,
+        "sha256": "64088a1d7b040c980f61de9a5de74daa21b282eaabb853ed1d52dafa62ec0418"
+      },
+      "vendor/three/examples/jsm/postprocessing/EffectComposer.js": {
+        "bytes": 4619,
+        "sha256": "b841bb040e0ea3637e446781dbfa1a398595c8cccebfc6326fe5d4be469fbfe9"
+      },
+      "vendor/three/examples/jsm/shaders/CopyShader.js": {
+        "bytes": 571,
+        "sha256": "4e3346db194db56a596cd074e9bdb39fb5eb52040c333e0d29dc4eb1324d3b1d"
+      },
+      "vendor/three/examples/jsm/postprocessing/ShaderPass.js": {
+        "bytes": 1576,
+        "sha256": "3b28a1ee27e0eb96c0eab137a1f442ccf127a926904eced2d51e125ec44af781"
+      },
+      "vendor/three/examples/jsm/postprocessing/Pass.js": {
+        "bytes": 1706,
+        "sha256": "b3c6128340eaa37e40a6a2f1b738e894c855239417d50959759b34a2b5e89f92"
+      },
+      "vendor/three/examples/jsm/postprocessing/MaskPass.js": {
+        "bytes": 2231,
+        "sha256": "328cf7db0da5d9be83ffe39d54b01d5ac1fddf108cc98182ddbb056f5c8b537f"
+      },
+      "vendor/three/examples/jsm/postprocessing/RenderPass.js": {
+        "bytes": 1941,
+        "sha256": "6c9b8a539ea16e898f65e4760f14937ef9ea94043bd9842c141e0301f41903e8"
+      },
+      "vendor/three/examples/jsm/postprocessing/UnrealBloomPass.js": {
+        "bytes": 12410,
+        "sha256": "42928edf22ebb441888e1cc21487e6e37a827d99a209b17afccd2823024e9372"
+      },
+      "vendor/three/examples/jsm/shaders/LuminosityHighPassShader.js": {
+        "bytes": 1147,
+        "sha256": "9f4866f9abb2d96fd83eec46ba4bf2165b22155a7a37ff425c0f60eba18007cb"
+      }
+    }
+  },
+  "runtime": {
+    "node": "24.20.0",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.8",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.2",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "149",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "0.0.0",
+    "simdjson": "4.6.6",
+    "simdutf": "7.7.0",
+    "sqlite": "3.53.4",
+    "tz": "2025c",
+    "undici": "7.29.0",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "15.2.124.19-electron.0",
+    "zlib": "1.3.2.1-motley",
+    "zstd": "1.6.0",
+    "electron": "44.3.0",
+    "chrome": "152.0.7977.78"
+  },
+  "viewport": {
+    "width": 1920,
+    "height": 1080,
+    "dpr": 1
+  },
+  "nativeContentSize": [
+    1684,
+    1000
+  ],
+  "method": "Packaged macOS app, disposable profile, renderer viewport set to 1920x1080 because macOS clamps native window size. Real course-picker/mouse/fire input. Read-only state snapshots. Unretouched CSS-pixel screenshots; no post-capture upscaling, gameplay, DOM, score or camera-state injection. Built-in aim assistance remains enabled.",
+  "errors": [],
+  "externalRendererRequests": [],
+  "requests": [
+    "gg://game/desktop.css",
+    "gg://game/game.mjs",
+    "gg://game/desktop.mjs",
+    "gg://game/fonts/orbitron-latin-wght-normal.woff2",
+    "gg://game/vendor/three/build/three.module.js",
+    "gg://game/vendor/three/examples/jsm/controls/OrbitControls.js",
+    "gg://game/vendor/three/examples/jsm/postprocessing/EffectComposer.js",
+    "gg://game/vendor/three/examples/jsm/postprocessing/RenderPass.js",
+    "gg://game/vendor/three/examples/jsm/postprocessing/UnrealBloomPass.js",
+    "gg://game/vendor/three/examples/jsm/shaders/CopyShader.js",
+    "gg://game/vendor/three/examples/jsm/postprocessing/ShaderPass.js",
+    "gg://game/vendor/three/examples/jsm/postprocessing/MaskPass.js",
+    "gg://game/vendor/three/examples/jsm/postprocessing/Pass.js",
+    "gg://game/vendor/three/examples/jsm/shaders/LuminosityHighPassShader.js",
+    "gg://game/index.html",
+    "gg://game/vendor/three/build/three.core.js",
+    "gg://game/fonts/exo-2-latin-wght-normal.woff2",
+    "gg://game/soundtrack.mp3"
+  ],
+  "inputs": [
+    {
+      "at": "2026-09-10T16:49:05.089Z",
+      "action": "click",
+      "selector": "#ballGrid .ball-option:first-child"
+    },
+    {
+      "at": "2026-09-10T16:49:05.142Z",
+      "action": "click",
+      "selector": "#pickerProBtn"
+    },
+    {
+      "at": "2026-09-10T16:49:05.177Z",
+      "action": "choose-hole",
+      "hole": 3,
+      "label": "3"
+    },
+    {
+      "at": "2026-09-10T16:49:10.390Z",
+      "action": "aim-ball",
+      "x": 662,
+      "y": 753
+    },
+    {
+      "at": "2026-09-10T16:49:11.225Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    },
+    {
+      "at": "2026-09-10T16:49:12.289Z",
+      "action": "reload"
+    },
+    {
+      "at": "2026-09-10T16:49:12.439Z",
+      "action": "click",
+      "selector": "#ballGrid .ball-option:first-child"
+    },
+    {
+      "at": "2026-09-10T16:49:12.473Z",
+      "action": "click",
+      "selector": "#pickerProBtn"
+    },
+    {
+      "at": "2026-09-10T16:49:12.508Z",
+      "action": "choose-hole",
+      "hole": 6,
+      "label": "6"
+    },
+    {
+      "at": "2026-09-10T16:49:17.809Z",
+      "action": "aim-ball",
+      "x": 600,
+      "y": 792
+    },
+    {
+      "at": "2026-09-10T16:49:19.075Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    }
+  ],
+  "captures": [
+    {
+      "file": "hole-03-overview.png",
+      "phase": "overview",
+      "at": "2026-09-10T16:49:10.387Z",
+      "title": "OVER THE MOON",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "fb8096f3e5a38d468e6e7274b64291993a42f9168976fff8a0071ca85b8e8eb2",
+      "inputCount": 3,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": false,
+        "hole": 3,
+        "strokes": 0,
+        "par": 3,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": -1.05,
+          "y": 3.5,
+          "z": 0.7,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 662,
+            "y": 753
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "after": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": false,
+        "hole": 3,
+        "strokes": 0,
+        "par": 3,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": -1.05,
+          "y": 3.5,
+          "z": 0.7,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 662,
+            "y": 753
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      }
+    },
+    {
+      "file": "hole-03-aim.png",
+      "phase": "aim",
+      "at": "2026-09-10T16:49:11.222Z",
+      "title": "OVER THE MOON",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "297f107af7bd015435e75272a7c9268d0a934067e8a47eea07b2725c2b60a083",
+      "inputCount": 4,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "aiming",
+        "introPlaying": false,
+        "hole": 3,
+        "strokes": 0,
+        "par": 3,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": -1.05,
+          "y": 3.5,
+          "z": 0.7,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 662,
+            "y": 753
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 23.22
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "after": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "aiming",
+        "introPlaying": false,
+        "hole": 3,
+        "strokes": 0,
+        "par": 3,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": -1.05,
+          "y": 3.5,
+          "z": 0.7,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 662,
+            "y": 753
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 21.1
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      }
+    },
+    {
+      "file": "hole-03-flight.png",
+      "phase": "flight",
+      "at": "2026-09-10T16:49:12.287Z",
+      "title": "OVER THE MOON",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "0933a15d179801f160cff16ade31e5d06cd0b6137cf8de73719410f228ca1b95",
+      "inputCount": 5,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 3,
+        "strokes": 1,
+        "par": 3,
+        "timeDisplay": "0.8",
+        "ball": {
+          "x": 7.76,
+          "y": 8.37,
+          "z": 0.92,
+          "speed": 9.16,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 955,
+            "y": 564
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 21.1
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "after": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 3,
+        "strokes": 1,
+        "par": 3,
+        "timeDisplay": "0.9",
+        "ball": {
+          "x": 8.73,
+          "y": 8.79,
+          "z": 0.91,
+          "speed": 8.83,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 955,
+            "y": 562
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 21.1
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      }
+    },
+    {
+      "file": "hole-06-overview.png",
+      "phase": "overview",
+      "at": "2026-09-10T16:49:17.806Z",
+      "title": "THE SLINGSHOT",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "49205b69093010a952d4998306ee869236dbcbba0eeee6a7f2f85f160d001665",
+      "inputCount": 9,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": false,
+        "hole": 6,
+        "strokes": 0,
+        "par": 4,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0.63,
+          "y": 3.15,
+          "z": -0.31,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 600,
+            "y": 792
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "after": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": false,
+        "hole": 6,
+        "strokes": 0,
+        "par": 4,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0.63,
+          "y": 3.15,
+          "z": -0.31,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 600,
+            "y": 792
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      }
+    },
+    {
+      "file": "hole-06-aim.png",
+      "phase": "aim",
+      "at": "2026-09-10T16:49:19.073Z",
+      "title": "THE SLINGSHOT",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "ec8816c0d8f1ecd4a1fabb802623473dbdb57b37c563596be9822ebf25175e63",
+      "inputCount": 10,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "aiming",
+        "introPlaying": false,
+        "hole": 6,
+        "strokes": 0,
+        "par": 4,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0.63,
+          "y": 3.15,
+          "z": -0.31,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 600,
+            "y": 792
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 14.35
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "after": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "aiming",
+        "introPlaying": false,
+        "hole": 6,
+        "strokes": 0,
+        "par": 4,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0.63,
+          "y": 3.15,
+          "z": -0.31,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 600,
+            "y": 792
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 25
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      }
+    },
+    {
+      "file": "hole-06-flight.png",
+      "phase": "flight",
+      "at": "2026-09-10T16:49:20.130Z",
+      "title": "THE SLINGSHOT",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "851d401984689b8373a6f10634981937304acda8c50a1fdd4a7259a7c39df150",
+      "inputCount": 11,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 6,
+        "strokes": 1,
+        "par": 4,
+        "timeDisplay": "0.8",
+        "ball": {
+          "x": 12.7,
+          "y": 4.22,
+          "z": 6.79,
+          "speed": 13.96,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 942,
+            "y": 560
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 26.73
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "after": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 6,
+        "strokes": 1,
+        "par": 4,
+        "timeDisplay": "0.9",
+        "ball": {
+          "x": 14.25,
+          "y": 4.18,
+          "z": 7.23,
+          "speed": 13.67,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 939,
+            "y": 560
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 26.95
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      }
+    }
+  ]
+}

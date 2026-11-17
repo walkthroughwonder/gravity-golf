@@ -1,0 +1,1357 @@
+{
+  "source": {
+    "url": "http://127.0.0.1:8770/",
+    "sha256": "e82bc346d3052451bdf847a1aad837ab22ad541095b3f17c9bfb406faa5d6b75",
+    "localWip": true
+  },
+  "viewport": {
+    "width": 720,
+    "height": 1280
+  },
+  "renderer": "metal",
+  "capture": "Unmodified game canvas plus its final Web Audio mix; no desktop or microphone capture.",
+  "inputs": [
+    {
+      "action": "click",
+      "target": "#playBtn",
+      "at": 3171.400000035763,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": true,
+        "hole": 1,
+        "strokes": 0,
+        "par": 1,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0,
+          "y": 3.73,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 1066,
+            "y": 763
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": true,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "action": "click",
+      "target": "#skipBtn",
+      "at": 3206.5,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": true,
+        "hole": 1,
+        "strokes": 0,
+        "par": 1,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0,
+          "y": 3.73,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 1065,
+            "y": 761
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "action": "click-ball",
+      "at": 7055.600000023842,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "aiming",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 0,
+        "par": 1,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0,
+          "y": 3.73,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 157,
+            "y": 803
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "action": "click",
+      "target": "#fireBtn",
+      "at": 8803.300000011921,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0,
+          "y": 3.73,
+          "z": 0,
+          "speed": 22.15,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 204,
+            "y": 766
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    }
+  ],
+  "samples": [
+    {
+      "at": 7050.700000047684,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 0,
+        "par": 1,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0,
+          "y": 3.73,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 157,
+            "y": 803
+          }
+        },
+        "aim": {
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 9056,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "0.2",
+        "ball": {
+          "x": 3.48,
+          "y": 4.3,
+          "z": 0,
+          "speed": 21.89,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 353,
+            "y": 643
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 9308.600000023842,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "0.4",
+        "ball": {
+          "x": 8.92,
+          "y": 4.94,
+          "z": -0.01,
+          "speed": 22.04,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 360,
+            "y": 635
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 9561,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "0.7",
+        "ball": {
+          "x": 14.63,
+          "y": 5.19,
+          "z": -0.01,
+          "speed": 24.14,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 9813.5,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "0.9",
+        "ball": {
+          "x": 21.36,
+          "y": 4.46,
+          "z": -0.02,
+          "speed": 31.85,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 360,
+            "y": 636
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 10065.700000047684,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.2",
+        "ball": {
+          "x": 27.09,
+          "y": 3.07,
+          "z": -0.01,
+          "speed": 9.22,
+          "onPlanet": false,
+          "onPlanetIndex": -1,
+          "onPlanetType": null,
+          "screen": {
+            "x": 360,
+            "y": 635
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 10318.100000023842,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.4",
+        "ball": {
+          "x": 28.04,
+          "y": 2.15,
+          "z": -0.01,
+          "speed": 4.13,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 664
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 10570.400000035763,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "flight",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.8",
+        "ball": {
+          "x": 28.35,
+          "y": 1.64,
+          "z": -0.01,
+          "speed": 3.57,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 666
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 10822.900000035763,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 11074.5,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 11326.700000047684,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 11579.100000023842,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 11830.700000047684,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 12082.900000035763,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 12442.700000047684,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    },
+    {
+      "at": 16945.200000047684,
+      "state": {
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": false,
+          "accessSource": "free",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 1,
+        "par": 1,
+        "timeDisplay": "1.9",
+        "ball": {
+          "x": 28.5,
+          "y": 0,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 1,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 360,
+            "y": 640
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "SOLAR MAGNET",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      }
+    }
+  ],
+  "errors": [],
+  "requestsFailed": [],
+  "recorder": {
+    "startedAt": 7049.700000047684,
+    "audioContextState": "running",
+    "canvas": {
+      "width": 720,
+      "height": 1280
+    },
+    "requestedFps": 30,
+    "mimeType": "video/webm;codecs=vp8,opus"
+  },
+  "finishedAt": "2026-09-08T07:09:51.907Z"
+}

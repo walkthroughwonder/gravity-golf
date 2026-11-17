@@ -1,0 +1,62 @@
+{
+  "recordType": "agent-observed-test-receipt",
+  "completedByUtc": "2026-09-10T03:45:47Z",
+  "localDate": "2026-09-09",
+  "timezone": "America/Los_Angeles",
+  "environment": {
+    "origin": "http://localhost:8888/",
+    "mode": "test",
+    "firebaseProject": "gravity-golf-test",
+    "browser": "Codex In-app Browser",
+    "storage": "existing local Netlify Blobs records with process-only emulator compatibility layer",
+    "publicIndexSha256": "5c2118d665f320a152c48b038e9d5cde7ac1740c73a8054ee50ab04b6b1cfda0",
+    "commerceCoreSha256": "e35189cb9358172b3b265064eebc93d7dd8ba88c657dba2a807d47d15ea1cb8d",
+    "runtimeSourceMatchesClone": true
+  },
+  "observations": {
+    "initiallyFreeAndSignedOut": true,
+    "checkoutReturnParameterSupplied": false,
+    "firstSignInDisplayedGenericError": true,
+    "firstSignInErrorCause": null,
+    "diagnosticRetryWithSameSyntheticCredentialsSucceeded": true,
+    "firebaseSignInStatus": 200,
+    "firebaseAccountLookupStatus": 200,
+    "signOutRemovedPaidActionAndAccountLabel": true,
+    "signedOutReloadStayedFree": true,
+    "reauthenticationRestoredPaidAccess": true,
+    "signedInReloadRestoredPaidAccess": true,
+    "authenticatedEntitlementStatuses": [200, 200, 200],
+    "subsequentCapturedNetworkFailures": 0,
+    "restoredCourseEntry": {
+      "hole": 9,
+      "name": "Deep Space Odyssey",
+      "par": 5,
+      "strokes": 0,
+      "artifactDisplay": "0 / 19",
+      "visuallyInspected": true
+    },
+    "anonymousEntitlementStatus": 401,
+    "envFileStatus": 404,
+    "backendSourceStatus": 404
+  },
+  "cleanup": {
+    "runtimeAndListenerExitCode": 0,
+    "noListenersOn8888_8889_8890": true,
+    "savedCommerceMode": "disabled",
+    "envIgnoredAndMode0600": true,
+    "publicBuildContainsNoProviderSecrets": true,
+    "publicFileCount": 12,
+    "gameTabMarkedForHandoff": true
+  },
+  "notPerformed": [
+    "new checkout or payment",
+    "new account or password reset",
+    "credential or permission change",
+    "production access or deployment",
+    "physical second-device test",
+    "hosted storage durability or concurrency test",
+    "refund or dispute acceptance",
+    "paid-course completion or performance benchmark"
+  ],
+  "independentCustomerRevenueVerified": false
+}

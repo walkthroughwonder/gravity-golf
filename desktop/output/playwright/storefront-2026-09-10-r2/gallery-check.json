@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "allFiveOriginalImagesLoaded": true,
+      "horizontalOverflow": false,
+      "imageFile": "/tmp/gravitygolf-portal-fix/gallery-1280.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "allFiveOriginalImagesLoaded": true,
+      "horizontalOverflow": false,
+      "imageFile": "/tmp/gravitygolf-portal-fix/gallery-390.png"
+    }
+  ],
+  "errors": [],
+  "externalRequests": []
+}

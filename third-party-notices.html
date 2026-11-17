@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Third-Party Notices | Gravity Golf</title>
+  <meta name="description" content="License texts and acknowledgments for Gravity Golf's web dependencies.">
+  <style>
+    :root { color-scheme: dark; --ink: #f7edd2; --muted: #c9bda1; --gold: #edcc79; --line: #645335; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: radial-gradient(ellipse at top left, #302311, #100e0a 65%); font: 18px/1.65 Georgia, serif; min-height: 100vh; }
+    main { max-width: 860px; margin: auto; padding: 48px 24px 64px; }
+    a { color: var(--gold); text-underline-offset: 4px; overflow-wrap: anywhere; }
+    a:focus-visible, summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 5px; }
+    .brand, .number { font: 12px/1.5 'Courier New', monospace; letter-spacing: 3px; text-transform: uppercase; }
+    .brand { display: inline-block; padding: 8px 0; }
+    h1, h2 { font-family: Palatino, 'Palatino Linotype', Georgia, serif; font-weight: normal; line-height: 1.15; }
+    h1 { font-size: clamp(36px, 7vw, 60px); margin: 32px 0 20px; }
+    h2 { font-size: 28px; margin: 8px 0 14px; }
+    p { color: var(--muted); margin: 0 0 18px; }
+    .components { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 36px 0; }
+    section { border-top: 1px solid var(--line); padding-top: 18px; min-width: 0; }
+    .number { color: var(--gold); }
+    .license { display: inline-block; padding: 8px 0; }
+    footer { border-top: 1px solid var(--line); padding-top: 24px; font-size: 15px; }
+    @media (max-width: 600px) { main { padding: 28px 20px 40px; } .components { grid-template-columns: 1fr; gap: 22px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="brand" href="./index.html">Gravity Golf / Back to game</a>
+    <h1>Third-party notices</h1>
+    <p>Gravity Golf's web edition uses the following open-source components. Full license texts are included with this build.</p>
+    <div class="components">
+      <section aria-labelledby="three">
+        <span class="number">01 / Rendering</span>
+        <h2 id="three">Three.js 0.172.0</h2>
+        <p>3D rendering and OrbitControls. Loaded from jsDelivr using a pinned version.</p>
+        <a class="license" href="./licenses/three-0.172.0-LICENSE.txt">Read the MIT license</a>
+      </section>
+      <section aria-labelledby="firebase">
+        <span class="number">02 / Account SDK</span>
+        <h2 id="firebase">Firebase JS SDK 10.12.0</h2>
+        <p>App, Authentication and Realtime Database compatibility SDKs. Loaded from Google's CDN using a pinned version.</p>
+        <a class="license" href="./licenses/firebase-10.12.0-LICENSE.txt">Read the upstream license file</a>
+        <p>The upstream file includes Apache 2.0 and a BSD 3-Clause notice for Protocol Buffers. Including the full file does not mean every Firebase product is used here.</p>
+      </section>
+      <section aria-labelledby="orbitron">
+        <span class="number">03 / Display type</span>
+        <h2 id="orbitron">Orbitron</h2>
+        <p>The Orbitron Project Authors. Served by Google Fonts under the SIL Open Font License 1.1. Orbitron is a Reserved Font Name.</p>
+        <a class="license" href="./licenses/orbitron-OFL.txt">Read the Orbitron font license</a>
+      </section>
+      <section aria-labelledby="exo">
+        <span class="number">04 / Interface type</span>
+        <h2 id="exo">Exo 2</h2>
+        <p>The Exo 2 Project Authors. Served by Google Fonts under the SIL Open Font License 1.1.</p>
+        <a class="license" href="./licenses/exo-2-OFL.txt">Read the Exo 2 font license</a>
+      </section>
+    </div>
+    <footer>
+      <p>These licenses apply only to the named third-party components. They do not grant a license to Gravity Golf's original game code, music, artwork or branding.</p>
+      <p>This page covers the web dependencies above, not a native app's SDK inventory. Existing upstream copyright and attribution notices remain applicable.</p>
+    </footer>
+  </main>
+</body>
+</html>

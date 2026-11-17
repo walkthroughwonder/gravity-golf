@@ -1,4 +1,9 @@
 .DS_Store
-
-# Local Netlify folder
 .netlify
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.pem
+*-service-account.json

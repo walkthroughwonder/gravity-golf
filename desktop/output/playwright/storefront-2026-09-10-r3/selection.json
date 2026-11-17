@@ -1,0 +1,12 @@
+{
+  "status": "private-review-only",
+  "archiveSha256": "1f5bc92bcdb81a9e8913b75f203cfd801440c11d258d1eeabe3822c80719ae04",
+  "screenshots": [
+    { "file": "capture-main/hole-01-aim.png", "title": "First Contact", "note": "Actual assisted route preview and original golden controls." },
+    { "file": "capture-main/hole-11-aim.png", "title": "Twin Suns", "note": "A later authored course with two orange worlds and a gravity hazard." },
+    { "file": "capture-additional/hole-06-flight.png", "title": "The Slingshot", "note": "Actual first shot in flight, with ball trail and boost/stabilize controls." },
+    { "file": "capture-main/hole-05-aim.png", "title": "Gravity Well", "note": "Planning an assisted shot with the gravity well and destination visible." },
+    { "file": "capture-additional/hole-03-flight.png", "title": "Over the Moon", "note": "Actual first shot in flight among smaller worlds." }
+  ],
+  "additionalReviewFrames": ["capture-main/hole-08-overview.png", "capture-main/hole-10-aim.png"]
+}

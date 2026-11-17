@@ -1,0 +1,82 @@
+{
+  "checks": [
+    {
+      "name": "cancel during compute",
+      "inputMs": 34
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "buildManifestSha256": "95b51772d401ace73ffabfa4f4ced2fbed56c63d42d9f95b71dd18bc8bd6d951",
+  "status": "failed",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///private/tmp/gravitygolf-aim-worker-2026-09-11/desktop/tests/aim-runtime.mjs:56:10",
+  "failureState": {
+    "desktop": {
+      "edition": "prototype",
+      "dailyMode": false,
+      "courseHoles": 19
+    },
+    "usageData": {
+      "active": false,
+      "consent": "unknown",
+      "queuedEventsThisPage": 0
+    },
+    "commerce": {
+      "freeHoles": 8,
+      "proHoles": 11,
+      "proUnlocked": true,
+      "accessSource": "desktop-full-course",
+      "purchasePhase": "disabled",
+      "liveServices": false,
+      "offerVisible": false
+    },
+    "coordinateSystem": "Three.js world coordinates; +Y is up.",
+    "mode": "aiming",
+    "introPlaying": false,
+    "hole": 11,
+    "strokes": 0,
+    "par": 5,
+    "timeDisplay": "0.0",
+    "ball": {
+      "x": 0,
+      "y": 3.23,
+      "z": 0,
+      "speed": 0,
+      "onPlanet": true,
+      "onPlanetIndex": 0,
+      "onPlanetType": "start",
+      "screen": {
+        "x": 365,
+        "y": 584
+      }
+    },
+    "aim": {
+      "calculating": true,
+      "assisted": false,
+      "pilotRoute": false,
+      "deviation": 0,
+      "previewClosestHazard": 6.05
+    },
+    "mastery": {
+      "style": 0,
+      "combo": 0,
+      "bestCombo": 0,
+      "bestGhostVisible": false
+    },
+    "ability": {
+      "name": "STABILIZE",
+      "used": false,
+      "activeSeconds": 0,
+      "disabledForDaily": false
+    },
+    "trainer": {
+      "visible": false,
+      "active": false,
+      "complete": false,
+      "step": -1,
+      "expected": null
+    },
+    "artifactAvailable": true,
+    "boosts": 6
+  }
+}

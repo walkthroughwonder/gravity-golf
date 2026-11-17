@@ -5,12 +5,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gravity Golf</title>
-<link rel="manifest" href="/manifest.json">
+<meta name="description" content="Bend shots around planets in Gravity Golf. Play 8 free holes and take on the Daily Challenge, right in your browser.">
+<link rel="canonical" href="https://gravitygolf.xyz/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Gravity Golf">
+<meta property="og:title" content="Gravity Golf | Play Free Space Golf">
+<meta property="og:description" content="Bend shots around planets. Play 8 free holes and take on the Daily Challenge in your browser.">
+<meta property="og:url" content="https://gravitygolf.xyz/">
+<meta property="og:image" content="https://gravitygolf.xyz/icon-512.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="Gravity Golf's golden golf ball with orbiting rings against a dark space background.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gravity Golf | Play Free Space Golf">
+<meta name="twitter:description" content="Bend shots around planets. Play 8 free holes and take on the Daily Challenge in your browser.">
+<meta name="twitter:image" content="https://gravitygolf.xyz/icon-512.png">
+<meta name="twitter:image:alt" content="Gravity Golf's golden golf ball with orbiting rings against a dark space background.">
+<link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gravity Golf">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <!-- Firebase SDK (compat mode for simplicity) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -417,6 +434,12 @@
     text-transform: uppercase; white-space: nowrap; pointer-events: none;
   }
   #titleScreen .title-credit .sol-credit, #ballPicker .title-credit .sol-credit { color: rgba(255,215,80,0.38); }
+  .title-credit .notices-link {
+    display: inline-flex; align-items: center; min-height: 24px; padding: 2px 6px;
+    color: #c9b780; font-size: 9px; letter-spacing: 1px; pointer-events: auto;
+    text-underline-offset: 3px;
+  }
+  .title-credit .notices-link:focus-visible { outline: 2px solid #ffe680; outline-offset: 2px; }
   .mode-btn {
     display: block; width: 260px; margin-bottom: 16px; padding: 16px 0;
     background: rgb(255,230,120);
@@ -634,11 +657,13 @@
     flex-direction: column; align-items: center; justify-content: center;
     background: radial-gradient(ellipse at 50% 40%, rgba(20,10,50,0.97) 0%, rgba(4,2,14,0.99) 70%);
     backdrop-filter: blur(25px);
+    overflow-y: auto; padding: 24px 16px;
   }
   #unlockModal.visible { display: flex; }
   .unlock-card {
     background: rgba(123,92,255,0.06); border: 1px solid rgba(123,92,255,0.25);
-    border-radius: 16px; padding: 40px 50px; text-align: center; max-width: 380px;
+    border-radius: 16px; padding: 32px; text-align: center; width: 100%; max-width: 380px;
+    flex-shrink: 0;
   }
   .unlock-card h2 {
     font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 800;
@@ -648,7 +673,7 @@
     background-clip: text; text-transform: uppercase;
   }
   .unlock-card .unlock-desc {
-    font-family: 'Exo 2', sans-serif; font-size: 13px; color: rgba(200,180,255,0.5);
+    font-family: 'Exo 2', sans-serif; font-size: 14px; color: rgba(220,210,255,0.8);
     margin-bottom: 28px; line-height: 1.6;
   }
   .unlock-card .unlock-price {
@@ -656,7 +681,7 @@
     color: #44ffaa; margin-bottom: 6px;
   }
   .unlock-card .unlock-price-note {
-    font-size: 10px; letter-spacing: 2px; color: rgba(200,180,255,0.3);
+    font-size: 10px; letter-spacing: 2px; color: rgba(220,210,255,0.7);
     margin-bottom: 24px;
   }
   #buyBtn {
@@ -674,6 +699,34 @@
     transform: translateY(-1px);
   }
   #buyBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(10,90,45,0.7), 0 2px 6px rgba(0,0,0,0.3); }
+  #buyBtn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+  .checkout-note { font-size: 12px; line-height: 1.5; color: rgba(220,210,255,0.75); overflow-wrap: anywhere; }
+  #pickerProBtn {
+    margin-top: 16px; padding: 10px 18px; border: 1px solid rgba(255,215,80,0.35);
+    border-radius: 8px; background: transparent; color: #ffe566;
+    font-family: 'Exo 2', sans-serif; font-size: 13px; cursor: pointer;
+  }
+  #pickerProBtn:hover, #pickerProBtn:focus-visible { border-color: #ffe566; }
+  #usageSettingsBtn { margin-top: 8px; padding: 7px 12px; border: 0; background: none; color: #a99dbf;
+    font-family: 'Exo 2', sans-serif; font-size: 11px; cursor: pointer; }
+  #usageQuickOffBtn { position: fixed; bottom: 10px; right: 10px; z-index: 125; padding: 7px 9px;
+    background: #100b20; border: 1px solid #776443; border-radius: 6px; color: #e3d9f5;
+    font: 10px 'Exo 2', sans-serif; cursor: pointer; }
+  #usageQuickOffBtn[hidden] { display: none; }
+  #usageDialog { width: min(440px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto;
+    margin: auto; padding: 28px; color: #e3d9f5; background: #100b20; border: 1px solid #776443; border-radius: 16px; }
+  #usageDialog::backdrop { background: rgba(4,2,14,0.85); }
+  #usageDialog h2 { font: 700 17px 'Orbitron', sans-serif; color: #ffe566; line-height: 1.5; }
+  #usageDialog p { font: 14px/1.6 'Exo 2', sans-serif; margin-top: 16px; }
+  .usage-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .usage-actions button { flex: 1; min-width: 140px; padding: 12px 8px; border: 1px solid #897453;
+    border-radius: 8px; background: #261c15; color: #ffe9b8; font: 600 11px 'Exo 2', sans-serif; cursor: pointer; }
+  .usage-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #usageClose { background: none; border: 0; color: #cec2e0; cursor: pointer; margin-top: 18px; padding: 8px; }
+  @media (max-height: 620px) {
+    #unlockModal { justify-content: flex-start; }
+    .unlock-card { padding: 20px; }
+  }
   .unlock-divider {
     display: flex; align-items: center; gap: 12px; margin: 16px 0;
     color: rgba(200,180,255,0.25); font-size: 10px; letter-spacing: 3px;
@@ -681,29 +734,28 @@
   .unlock-divider::before, .unlock-divider::after {
     content: ''; flex: 1; height: 1px; background: rgba(123,92,255,0.15);
   }
-  #codeInput {
-    font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
-    letter-spacing: 4px; text-align: center; width: 100%;
+  #purchaseAuth label { display: block; text-align: left; font-size: 12px; margin: 12px 0 6px; color: #ddd0ff; }
+  #purchaseAuth input {
+    font-family: 'Exo 2', sans-serif; font-size: 16px; width: 100%;
     background: rgba(123,92,255,0.06); border: 1px solid rgba(123,92,255,0.2);
-    border-radius: 8px; color: #c4a0ff; padding: 12px 16px; text-transform: uppercase;
+    border-radius: 8px; color: #e6dbff; padding: 12px 16px;
     outline: none; margin-bottom: 12px;
   }
-  #codeInput::placeholder { color: rgba(200,180,255,0.15); letter-spacing: 3px; font-size: 11px; }
-  #codeInput:focus { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 15px rgba(0,212,255,0.08); }
-  #redeemBtn {
+  #purchaseAuth input:focus { border-color: rgba(0,212,255,0.6); }
+  .purchase-secondary {
     display: block; width: 100%; padding: 10px; 
     background: rgba(123,92,255,0.1); border: 1px solid rgba(123,92,255,0.25);
     border-radius: 8px; color: #c4a0ff; font-family: 'Orbitron', sans-serif;
     font-size: 11px; font-weight: 600; letter-spacing: 3px; cursor: pointer;
-    transition: all 0.3s; text-transform: uppercase;
+    transition: all 0.3s; text-transform: uppercase; margin-top: 10px;
   }
-  #redeemBtn:hover { background: rgba(123,92,255,0.2); border-color: rgba(123,92,255,0.4); }
-  #codeStatus {
-    font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 2px;
-    margin-top: 10px; min-height: 16px;
-  }
-  #codeStatus.success { color: #44ffaa; }
-  #codeStatus.error { color: #ff6677; }
+  .purchase-secondary:hover { background: rgba(123,92,255,0.2); border-color: rgba(123,92,255,0.4); }
+  .purchase-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+  #unlockModal [hidden] { display: none !important; }
+  #purchaseStatus { font-size: 13px; line-height: 1.5; margin-top: 16px; color: #ddd0ff; }
+  #purchaseStatus[data-phase="owned"] { color: #44ffaa; }
+  #purchaseStatus[data-phase="error"], #purchaseStatus[data-phase="revoked"] { color: #ff99aa; }
+  #unlockModal:has(#purchaseAuth:not([hidden])) { justify-content: flex-start; }
   #unlockClose {
     margin-top: 24px; padding: 8px 24px; background: none;
     border: 1px solid rgba(200,180,255,0.15); border-radius: 6px;
@@ -928,11 +980,12 @@
   }
   .stats-game-row {
     display: flex; justify-content: space-between; align-items: center;
+    gap: 8px;
     padding: 8px 0; border-bottom: 1px solid rgba(123,92,255,0.06);
   }
-  .stats-game-date { font-size: 11px; color: rgba(200,180,255,0.3); letter-spacing: 1px; }
-  .stats-game-mode { font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(200,180,255,0.4); letter-spacing: 2px; }
-  .stats-game-score { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; }
+  .stats-game-date { flex-shrink: 0; font-size: 11px; color: rgba(200,180,255,0.3); letter-spacing: 1px; }
+  .stats-game-mode { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(200,180,255,0.4); letter-spacing: 2px; }
+  .stats-game-score { flex-shrink: 0; white-space: nowrap; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; }
   .stats-game-score.under { color: #44ffaa; -webkit-text-fill-color: #44ffaa; }
   .stats-game-score.over { color: #ff6688; -webkit-text-fill-color: #ff6688; }
   .stats-game-score.even { color: rgba(200,180,255,0.6); -webkit-text-fill-color: rgba(200,180,255,0.6); }
@@ -2414,25 +2467,36 @@
   <button id="nextHoleBtn">NEXT HOLE</button>
   <button id="retryHoleBtn">RETRY HOLE</button>
   <div id="unlockPrompt">
-    <button id="unlockPromptBtn">★ UNLOCK HOLES 6-18</button>
+    <button id="unlockPromptBtn">VIEW PRO COURSE</button>
   </div>
   <button id="postScoreBtn">POST TO LEADERBOARD</button>
 </div>
-<div id="unlockModal">
+<div id="unlockModal" role="dialog" aria-modal="true" aria-labelledby="unlockTitle" aria-describedby="unlockDescription">
   <div class="unlock-card">
-    <h2>PRO COURSE</h2>
-    <div class="unlock-desc">
-      13 more holes with asteroid fields, black holes,<br>
-      neutron alleys, and The Final Frontier.<br>
-      Holes 9-19 — the real challenge begins.
+    <h2 id="unlockTitle">PRO COURSE</h2>
+    <div class="unlock-desc" id="unlockDescription">
+      Continue into deep space, black hole gauntlets,
+      Neutron Alley, and The Final Frontier.
     </div>
     <div class="unlock-price">$2.99</div>
-    <div class="unlock-price-note">ONE-TIME PURCHASE</div>
-    <button id="buyBtn">BUY NOW</button>
-    <div class="unlock-divider">HAVE A CODE?</div>
-    <input type="text" id="codeInput" placeholder="ENTER CODE" autocomplete="off">
-    <button id="redeemBtn">REDEEM</button>
-    <div id="codeStatus"></div>
+    <div class="unlock-price-note">ONE-TIME PURCHASE · NO SUBSCRIPTION</div>
+    <button id="buyBtn" disabled>CONTINUE TO STRIPE</button>
+    <button id="playProBtn" class="purchase-secondary" hidden>PLAY PRO COURSE</button>
+    <p class="checkout-note" id="checkoutNote">Checking purchase availability...</p>
+    <p class="checkout-note" id="purchaseAccount" hidden></p>
+    <div class="unlock-divider">ALREADY OWN PRO?</div>
+    <button id="restoreBtn" class="purchase-secondary" disabled>RESTORE / CHECK PURCHASE</button>
+    <form id="purchaseAuth" hidden>
+      <label for="purchaseEmail">Email</label>
+      <input type="email" id="purchaseEmail" autocomplete="email" required maxlength="254">
+      <label for="purchasePassword">Password</label>
+      <input type="password" id="purchasePassword" autocomplete="current-password" required>
+      <button id="purchaseSignIn" class="purchase-secondary" type="submit">SIGN IN</button>
+      <button id="purchaseSignUp" class="purchase-secondary" type="button">CREATE ACCOUNT</button>
+      <button id="purchaseReset" class="purchase-secondary" type="button">RESET PASSWORD</button>
+    </form>
+    <button id="purchaseSignOut" class="purchase-secondary" hidden>SIGN OUT</button>
+    <div id="purchaseStatus" role="status" aria-live="polite"></div>
   </div>
   <button id="unlockClose">← BACK</button>
 </div>
@@ -2543,6 +2607,7 @@
   <div class="title-credit">
     <span>© 2026 EPOCH6. All rights reserved.</span>
     <span class="sol-credit">Made with 5.6 Sol</span>
+    <a class="notices-link" href="./third-party-notices.html" target="_blank" rel="noopener noreferrer" aria-label="Third-party notices (opens in a new tab)">Third-party notices</a>
   </div>
 </div>
 
@@ -2594,11 +2659,29 @@
     <div id="ballLoreText">The legendary golden orb. Said to carry the blessing of the cosmos itself.</div>
   </div>
   <button id="playBtn">TEE OFF</button>
+  <button id="pickerProBtn">VIEW PRO COURSE</button>
+  <button id="usageSettingsBtn">USAGE DATA: OFF</button>
   <div class="title-credit">
     <span>© 2026 EPOCH6. All rights reserved.</span>
     <span class="sol-credit">Made with 5.6 Sol</span>
+    <a class="notices-link" href="./third-party-notices.html" target="_blank" rel="noopener noreferrer" aria-label="Third-party notices (opens in a new tab)">Third-party notices</a>
   </div>
 </div>
+
+<button id="usageQuickOffBtn" hidden>USAGE DATA: ON</button>
+<dialog id="usageDialog" aria-labelledby="usageTitle" aria-describedby="usageDescription">
+  <h2 id="usageTitle">Help improve Gravity Golf?</h2>
+  <p id="usageDescription">Optional Google Analytics measures training, holes played and the Pro checkout flow.
+    It uses cookies to identify browser visits. Google also receives connection data.</p>
+  <p>These game events do not include your email, account ID, card details or checkout session ID.
+    Your choice does not affect free or Pro access. You can turn this off here at any time.</p>
+  <p id="usageStatus" role="status" aria-live="polite">Usage data is off in this preview.</p>
+  <div class="usage-actions">
+    <button id="usageDeny">KEEP OFF</button>
+    <button id="usageAllow" disabled>ALLOW USAGE DATA</button>
+  </div>
+  <button id="usageClose">BACK TO GAME</button>
+</dialog>
 
 <div id="instructions" class="launch-lab">
   <div class="trainer-card">
@@ -3817,6 +3900,25 @@ const wormholes = []; // array of { a: {pos, mesh, ring, particles}, b: {pos, me
 const WORMHOLE_RADIUS = 1.8; // trigger radius
 const WORMHOLE_COOLDOWN = 0.5; // seconds before ball can re-enter
 let wormholeCooldown = 0;
+let wormholeGlowTexture = null;
+
+function getWormholeGlowTexture() {
+  if (wormholeGlowTexture) return wormholeGlowTexture;
+  // One small, shared alpha mask avoids square glows and per-portal texture uploads.
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.4, 'rgba(255,255,255,0.6)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 64, 64);
+  wormholeGlowTexture = new THREE.CanvasTexture(canvas);
+  wormholeGlowTexture.generateMipmaps = false;
+  wormholeGlowTexture.minFilter = THREE.LinearFilter;
+  return wormholeGlowTexture;
+}
 
 function createWormholePortal(pos, colorA, colorB) {
   const group = new THREE.Group();
@@ -3840,8 +3942,9 @@ function createWormholePortal(pos, colorA, colorB) {
 
   // Glow sprite
   const spriteMat = new THREE.SpriteMaterial({
+    map: getWormholeGlowTexture(),
     color: colorA, transparent: true, opacity: 0.15,
-    blending: THREE.AdditiveBlending
+    blending: THREE.AdditiveBlending, depthWrite: false
   });
   const sprite = new THREE.Sprite(spriteMat);
   sprite.scale.set(5, 5, 1);
@@ -5051,188 +5154,279 @@ const PRO_LEVELS = [
   },
 ];
 
-// ===================== UNLOCK SYSTEM =====================
-// Codes are validated against SHA-256 hashes so source inspection doesn't leak codes.
-// Generate codes in batches, send via Stripe post-purchase email.
-const UNLOCK_HASHES = [
-  // Placeholder hashes — replace with real ones from the code generator
-  // ──────────────────────────────────────────────────────────────────
-  // HOW TO GENERATE UNLOCK CODES:
-  //   1. Open browser console on your deployed site
-  //   2. Run: sha256('YOUR-CODE-HERE').then(h => console.log(h))
-  //   3. Copy the hash string into this array
-  //   4. Send 'YOUR-CODE-HERE' to the buyer (via Stripe confirmation page)
-  //
-  // Example workflow:
-  //   - You create code: COSMIC-7X9K
-  //   - Run: sha256('COSMIC-7X9K').then(h => console.log(h))
-  //   - Output: "a1b2c3d4..." ← put this in the array below
-  //   - Buyer enters COSMIC-7X9K in the game → matches → unlocked
-  //
-  // BATCH GENERATION (paste in console):
-  //   async function genCodes(n) {
-  //     for(let i=0; i<n; i++) {
-  //       const code = 'GG-' + Math.random().toString(36).substr(2,6).toUpperCase();
-  //       const hash = await sha256(code);
-  //       console.log(`Code: ${code}  Hash: "${hash}",`);
-  //     }
-  //   }
-  //   genCodes(20);
-  // ──────────────────────────────────────────────────────────────────
-];
-
-let proUnlocked = false;
-
-// SHA-256 hash function (browser native)
-async function sha256(message) {
-  const msgBuf = new TextEncoder().encode(message.toUpperCase().trim());
-  const hashBuf = await crypto.subtle.digest('SHA-256', msgBuf);
-  const hashArr = Array.from(new Uint8Array(hashBuf));
-  return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+// ===================== FUNNEL MEASUREMENT =====================
+let funnelAnalytics = null;
+let funnelState = { active: false, available: false, consent: 'unknown', count: 0 };
+function trackFunnel(name, values = {}) {
+  try { funnelAnalytics?.track(name, values); } catch(e) {}
 }
-// Expose for console code generation
-window.sha256 = sha256;
-
-async function validateUnlockCode(code) {
-  const hash = await sha256(code);
-  // Check against stored hashes
-  if (UNLOCK_HASHES.includes(hash)) {
-    unlockPro();
-    return true;
-  }
-  // Also accept master key for testing (remove in production)
-  if (hash === await sha256('GRAVITYGOLF-MASTER-2026')) {
-    unlockPro();
-    return true;
-  }
-  return false;
+function renderFunnelState(state) {
+  funnelState = state;
+  document.getElementById('usageSettingsBtn').textContent = `USAGE DATA: ${state.active ? 'ON' : 'OFF'}`;
+  document.getElementById('usageQuickOffBtn').hidden = !state.active;
+  document.getElementById('usageAllow').disabled = !state.available || state.active;
+  document.getElementById('usageAllow').textContent = state.withdrawn ? 'ALLOW NEXT VISIT' : 'ALLOW USAGE DATA';
+  document.getElementById('usageDeny').textContent = state.active ? 'TURN OFF' : 'KEEP OFF';
+  document.getElementById('usageStatus').textContent = state.privacyRequested ?
+    'Your browser privacy preference keeps optional usage data off.' : !state.available ?
+    'Usage data is off. No analytics property is configured for this preview.' : state.failed ?
+    'Usage data could not connect. Gameplay and purchases are unaffected.' : state.withdrawn ?
+    state.consent === 'granted' ? 'Allowed for your next visit. Data stays off for the rest of this game.' :
+      'Usage data is off. No more game events will be sent. Your game has not been restarted.' :
+    state.active ? 'Usage data is on for this browser. Turning it off removes this analytics installation\'s cookies.' :
+      'Usage data is off. Nothing from earlier in this game will be sent if you allow it now.';
 }
-
-function unlockPro() {
-  proUnlocked = true;
-  // Merge pro levels into LEVELS
-  if (LEVELS.length <= 8) {
-    LEVELS.push(...PRO_LEVELS);
-  }
-  // Save to localStorage for persistence
-  try { localStorage.setItem('gg_pro', '1'); } catch(e) {}
-}
-
-function checkSavedUnlock() {
+async function initFunnelAnalytics() {
   try {
-    if (localStorage.getItem('gg_pro') === '1') {
-      unlockPro();
-      return true;
-    }
-  } catch(e) {}
-  return false;
+    if (!['https:', 'http:'].includes(window.location.protocol)) return;
+    const { createFunnelAnalytics, loadGoogleTag } = await import('./funnel-analytics.mjs');
+    const response = await fetch('./analytics-config.json', { cache: 'no-store' });
+    if (!response.ok) return;
+    const config = await response.json();
+    let storage;
+    try { storage = window.localStorage; } catch(e) {}
+    funnelAnalytics = createFunnelAnalytics({ config, href: window.location.href, storage,
+      privacyRequested: navigator.globalPrivacyControl === true || navigator.doNotTrack === '1',
+      loadTag: loadGoogleTag, onState: renderFunnelState });
+  } catch(e) { renderFunnelState(funnelState); }
+}
+function showUsageSettings() {
+  renderFunnelState(funnelState);
+  document.getElementById('usageDialog').showModal();
+}
+document.getElementById('usageSettingsBtn').addEventListener('click', showUsageSettings);
+document.getElementById('usageQuickOffBtn').addEventListener('click', showUsageSettings);
+document.getElementById('usageClose').addEventListener('click', () => document.getElementById('usageDialog').close());
+document.getElementById('usageAllow').addEventListener('click', () => funnelAnalytics?.choose('granted'));
+document.getElementById('usageDeny').addEventListener('click', () => funnelAnalytics?.choose('denied'));
+window.addEventListener('storage', event => {
+  if (event.key === null || event.key === funnelAnalytics?.consentKey) funnelAnalytics?.refreshConsent();
+});
+function funnelGameMode() { return onlineMode ? 'online' : dailyMode ? 'daily' : gameMode === '2p' ? 'local2p' : 'single'; }
+function trackGameplayShot() {
+  if (trainerActive) return;
+  const mode = funnelGameMode();
+  trackFunnel('gg_first_shot', { mode });
+  trackFunnel('gg_hole_started', { mode, hole: currentLevel + 1 });
+}
+function trackGameplayCompletion() {
+  if (trainerActive || strokes < 1) return;
+  const mode = funnelGameMode();
+  trackFunnel('gg_hole_completed', { mode, hole: currentLevel + 1, strokes, par: LEVELS[currentLevel].par });
+  if (mode === 'single' && currentLevel === FREE_HOLE_COUNT - 1 &&
+      Array.from({ length: FREE_HOLE_COUNT - 1 }, (_, i) => levelScores[i]).every(score => score > 0)) {
+    trackFunnel('gg_free_course_completed');
+  }
 }
 
-// Check on load
-checkSavedUnlock();
+// ===================== COURSE OFFER =====================
+// Capture the authored course counts before Pro or Daily mode mutates LEVELS.
+const FREE_HOLE_COUNT = LEVELS.length;
+const PRO_HOLE_COUNT = PRO_LEVELS.length;
+const PRO_HOLE_RANGE = `${FREE_HOLE_COUNT + 1}-${FREE_HOLE_COUNT + PRO_HOLE_COUNT}`;
+const PRO_UNLOCK_LABEL = `UNLOCK HOLES ${PRO_HOLE_RANGE}`;
+const LIVE_SERVICES_ENABLED = window.location.protocol === 'https:' &&
+  ['gravitygolf.xyz', 'www.gravitygolf.xyz'].includes(window.location.hostname);
+
+document.getElementById('unlockDescription').textContent =
+  `${PRO_HOLE_COUNT} more holes. Explore deep space, black hole gauntlets, Neutron Alley, ` +
+  `and The Final Frontier. Holes ${PRO_HOLE_RANGE}.`;
+document.getElementById('unlockPromptBtn').textContent = PRO_UNLOCK_LABEL;
+document.getElementById('pickerProBtn').textContent = `PRO COURSE · ${PRO_HOLE_COUNT} MORE HOLES · $2.99`;
+// Keep old device access without claiming it is a verified payment or migrating it
+// into a Firebase account. New purchases never write or trust gg_pro as proof.
+let legacyProAccess = false;
+try { legacyProAccess = localStorage.getItem('gg_pro') === '1'; } catch(e) {}
+let proUnlocked = legacyProAccess;
+if (legacyProAccess) LEVELS.push(...PRO_LEVELS);
+let commerceClient = null;
+let commerceState = { available: false, busy: false, signedIn: false, authRequired: false,
+  proVerified: false, phase: 'checking', message: 'Checking purchase availability...' };
+
+function resetCommerceRound(index) {
+  currentLevel = index;
+  totalScore = 0;
+  levelScores = [];
+  holeTimes = [];
+  artifactsCollected = 0;
+  levelArtifacts = [];
+  _currentRoundKey = null;
+  resetSessionStats();
+  document.getElementById('totalScore').textContent = '0';
+  hideGameComplete();
+  loadLevel(index);
+}
+
+function applyVerifiedPro(verified) {
+  const next = legacyProAccess || verified === true;
+  if (next === proUnlocked) return;
+  proUnlocked = next;
+  // Daily Challenge temporarily replaces LEVELS. Change its saved normal course,
+  // never the active five-hole daily course.
+  const course = window._originalLevels || LEVELS;
+  course.splice(FREE_HOLE_COUNT);
+  if (proUnlocked) course.push(...PRO_LEVELS);
+  if (!dailyMode) {
+    buildLevelSelect();
+    if (!proUnlocked && currentLevel >= FREE_HOLE_COUNT) resetCommerceRound(0);
+    else if (proUnlocked && currentLevel === FREE_HOLE_COUNT - 1 && gameWon) {
+      const nextButton = document.getElementById('nextHoleBtn');
+      nextButton._showComplete = false;
+      nextButton.textContent = 'NEXT HOLE';
+    }
+  }
+  document.getElementById('unlockPrompt').style.display = 'none';
+  updateTitleProBadge();
+}
+
+function renderCommerce(state) {
+  commerceState = state;
+  const buy = document.getElementById('buyBtn');
+  const params = new URLSearchParams(window.location.search);
+  buy.disabled = !state.available || state.busy || legacyProAccess || state.proVerified || params.get('pro') === '1';
+  buy.hidden = proUnlocked;
+  buy.textContent = params.has('checkout_session_id') || state.phase === 'pending' ? 'CHECK PAYMENT STATUS' :
+    state.mode === 'test' ? 'TEST STRIPE CHECKOUT' : 'CONTINUE TO STRIPE';
+  document.getElementById('playProBtn').hidden = !proUnlocked;
+  document.querySelector('.unlock-price').textContent = proUnlocked ? 'PRO READY' : '$2.99';
+  document.querySelector('.unlock-price-note').textContent = proUnlocked ?
+    state.proVerified ? 'LINKED TO YOUR ACCOUNT' : 'SAVED ON THIS BROWSER' :
+    'ONE-TIME PURCHASE · NO SUBSCRIPTION';
+  document.getElementById('restoreBtn').disabled = !state.available || state.busy;
+  document.getElementById('purchaseAuth').hidden = !state.authRequired;
+  for (const id of ['purchaseSignIn', 'purchaseSignUp', 'purchaseReset', 'purchaseSignOut']) {
+    document.getElementById(id).disabled = state.busy || !state.available;
+  }
+  document.getElementById('purchaseSignOut').hidden = !state.signedIn;
+  const account = document.getElementById('purchaseAccount');
+  account.hidden = !state.signedIn;
+  account.textContent = state.signedIn ? `Account: ${state.accountLabel}` : '';
+  document.getElementById('checkoutNote').textContent = legacyProAccess ?
+    'Legacy Pro access is preserved on this browser. Account restore still needs purchase verification.' :
+    state.mode === 'test' ? 'SANDBOX ONLY. No real payment. Uses a separate test account.' :
+    state.available ? 'Your account keeps your purchase. Card details stay with Stripe.' :
+    'Local preview: checkout is disabled until the purchase service is configured.';
+  const status = document.getElementById('purchaseStatus');
+  status.textContent = state.message;
+  status.dataset.phase = state.phase;
+}
+
+async function initCommerce() {
+  const returnParams = new URLSearchParams(window.location.search);
+  const returningFromCheckout = returnParams.has('checkout_session_id') || returnParams.has('checkout') ||
+    returnParams.get('pro') === '1';
+  try {
+    const { createCommerceClient } = await import('./commerce-client.mjs');
+    commerceClient = createCommerceClient({ href: window.location.href, legacyAccess: legacyProAccess,
+      configureAuth(config) {
+        if (config.mode === 'live') {
+          if (!initFirebase()) throw new Error('Authentication unavailable');
+          return firebase.auth();
+        }
+        // A named test app never initializes production auth or its database.
+        return firebase.initializeApp(config.firebase, 'gg-commerce-sandbox').auth();
+      },
+      onState: renderCommerce, onAccess: applyVerifiedPro, onEvent: trackFunnel,
+      navigate: href => window.location.assign(href),
+      replaceUrl: href => window.history.replaceState({}, '', href),
+    });
+    await commerceClient.start();
+    if (returningFromCheckout) showUnlockModal('checkout_return');
+  } catch(e) {
+    renderCommerce({ ...commerceState, available: false, phase: 'disabled',
+      message: 'Purchases are unavailable in this preview. The free course is ready to play.' });
+  }
+}
 
 // ===================== UNLOCK UI HANDLERS =====================
-// ──────────────────────────────────────────────────────────────
-// STRIPE SETUP:
-//   1. Create a Payment Link at https://dashboard.stripe.com/payment-links
-//   2. Product: "Gravity Golf Pro" — $2.99 one-time
-//   3. After payment → redirect to: https://gravitygolf.xyz?pro=1
-//   4. Paste your Payment Link URL below
-//   5. Test with card 4242 4242 4242 4242 (test mode)
-// ──────────────────────────────────────────────────────────────
-const STRIPE_PAYMENT_URL = 'https://buy.stripe.com/4gMeVe5PnaYT47i0Jo3Nm00';
 
-// Auto-unlock from Stripe redirect (?pro=1)
-(function checkStripeRedirect() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('pro') === '1') {
-    unlockPro();
-    // Clean URL so refreshing doesn't re-trigger
-    const clean = window.location.pathname + window.location.hash;
-    window.history.replaceState({}, '', clean);
-    // Show confirmation after a short delay (let game init)
-    setTimeout(() => {
-      const notif = document.createElement('div');
-      notif.style.cssText = `
-        position: fixed; top: 25%; left: 50%; transform: translate(-50%, -50%);
-        font-family: 'Orbitron', sans-serif; text-align: center; z-index: 200;
-        pointer-events: none; opacity: 1; transition: opacity 0.8s ease;
-      `;
-      notif.innerHTML = `
-        <div style="font-size: 24px; font-weight: 800; letter-spacing: 6px;
-          background: linear-gradient(135deg, #ffcc00, #ffe566, #ffaa00);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          filter: drop-shadow(0 0 20px rgba(255,200,40,0.5));">★ PRO UNLOCKED</div>
-        <div style="font-size: 11px; font-weight: 600; letter-spacing: 3px; margin-top: 8px;
-          color: #ffe566;">13 NEW HOLES ADDED</div>
-      `;
-      document.body.appendChild(notif);
-      setTimeout(() => { notif.style.opacity = '0'; }, 3000);
-      setTimeout(() => { notif.remove(); }, 4000);
-    }, 500);
-  }
-})();
-
-function showUnlockModal() {
+let unlockReturnFocus = null;
+function showUnlockModal(placement = 'free_end') {
+  trackFunnel('gg_pro_offer_viewed', { placement });
+  unlockReturnFocus = document.activeElement;
   document.getElementById('unlockModal').classList.add('visible');
-  document.getElementById('codeInput').value = '';
-  document.getElementById('codeStatus').textContent = '';
-  document.getElementById('codeStatus').className = '';
+  renderCommerce(commerceState);
+  document.getElementById('unlockClose').focus();
 }
 
 function hideUnlockModal() {
   document.getElementById('unlockModal').classList.remove('visible');
+  document.getElementById('purchasePassword').value = '';
+  if (unlockReturnFocus && unlockReturnFocus.isConnected) unlockReturnFocus.focus();
 }
 
-// Buy button → opens Stripe Payment Link
-document.getElementById('buyBtn').addEventListener('click', () => {
-  if (STRIPE_PAYMENT_URL.includes('YOUR_PAYMENT_LINK')) {
-    document.getElementById('codeStatus').textContent = 'Payment link not configured yet';
-    document.getElementById('codeStatus').className = 'error';
-    return;
-  }
-  window.open(STRIPE_PAYMENT_URL, '_blank');
-});
-
-// Redeem code
-document.getElementById('redeemBtn').addEventListener('click', async () => {
-  const code = document.getElementById('codeInput').value;
-  if (!code.trim()) {
-    document.getElementById('codeStatus').textContent = 'Enter a code';
-    document.getElementById('codeStatus').className = 'error';
-    return;
-  }
-  document.getElementById('codeStatus').textContent = 'Validating...';
-  document.getElementById('codeStatus').className = '';
-
-  const valid = await validateUnlockCode(code);
-  if (valid) {
-    document.getElementById('codeStatus').textContent = '★ UNLOCKED! 13 NEW HOLES ADDED';
-    document.getElementById('codeStatus').className = 'success';
-    // Hide prompt button if visible
-    document.getElementById('unlockPrompt').style.display = 'none';
-    // Update title screen if visible
-    updateTitleProBadge();
-    setTimeout(() => hideUnlockModal(), 1500);
-  } else {
-    document.getElementById('codeStatus').textContent = 'Invalid code';
-    document.getElementById('codeStatus').className = 'error';
+document.getElementById('unlockModal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    e.stopPropagation();
+    hideUnlockModal();
+  } else if (e.key === 'Tab') {
+    const focusable = [...document.getElementById('unlockModal').querySelectorAll('button:not(:disabled), input:not(:disabled)')]
+      .filter(node => node.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 });
 
-// Enter key on code input
-document.getElementById('codeInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('redeemBtn').click();
+document.getElementById('buyBtn').addEventListener('click', () => commerceClient?.buy());
+document.getElementById('restoreBtn').addEventListener('click', () => commerceClient?.restore());
+async function submitPurchaseAuth(create = false) {
+  const form = document.getElementById('purchaseAuth');
+  if (!form.reportValidity()) return;
+  const password = document.getElementById('purchasePassword');
+  const value = password.value;
+  password.value = '';
+  await commerceClient?.signIn(document.getElementById('purchaseEmail').value, value, create);
+}
+document.getElementById('purchaseAuth').addEventListener('submit', e => {
+  e.preventDefault();
+  void submitPurchaseAuth();
+});
+document.getElementById('purchaseSignUp').addEventListener('click', () => submitPurchaseAuth(true));
+document.getElementById('purchaseReset').addEventListener('click', () => {
+  const email = document.getElementById('purchaseEmail');
+  if (email.reportValidity()) void commerceClient?.resetPassword(email.value);
+});
+document.getElementById('purchaseSignOut').addEventListener('click', () => commerceClient?.signOut());
+document.getElementById('playProBtn').addEventListener('click', () => {
+  if (!proUnlocked || onlineMode || trainerActive) return;
+  ensureAudio();
+  sfxClick();
+  if (dailyMode) endDailyChallenge();
+  gameMode = '1p';
+  currentPlayer = 0;
+  ballPickPhase = 2;
+  hideUnlockModal();
+  document.getElementById('ballPicker').classList.add('hidden');
+  document.getElementById('titleScreen').classList.add('hidden');
+  instructionsEl.className = 'launch-lab';
+  applyBallColor(selectedBallColor);
+  resetCommerceRound(FREE_HOLE_COUNT);
+  updateTurnIndicator();
 });
 
 // Close modal
 document.getElementById('unlockClose').addEventListener('click', hideUnlockModal);
 
-// Unlock prompt button (shown after hole 5)
-document.getElementById('unlockPromptBtn').addEventListener('click', showUnlockModal);
+// Unlock prompt button (shown at the end of the free course)
+document.getElementById('unlockPromptBtn').addEventListener('click', () => showUnlockModal('free_end'));
+document.getElementById('pickerProBtn').addEventListener('click', () => {
+  ensureAudio();
+  sfxClick();
+  showUnlockModal('picker');
+});
 
 // Add Pro badge to title screen if already unlocked
 function updateTitleProBadge() {
+  document.getElementById('pickerProBtn').textContent = proUnlocked ? 'PRO COURSE / MANAGE ACCESS' :
+    `PRO COURSE · ${PRO_HOLE_COUNT} MORE HOLES · $2.99`;
   const titleH1 = document.querySelector('#titleScreen h1');
   if (proUnlocked && !titleH1.querySelector('.pro-badge')) {
     const badge = document.createElement('span');
@@ -5240,8 +5434,10 @@ function updateTitleProBadge() {
     badge.textContent = 'PRO';
     titleH1.appendChild(badge);
   }
+  if (!proUnlocked) titleH1.querySelector('.pro-badge')?.remove();
 }
 updateTitleProBadge();
+renderCommerce(commerceState);
 
 // ===================== TITLE PLANET BACKGROUND =====================
 // ===================== GALAXY SHADER BACKGROUND =====================
@@ -5516,7 +5712,7 @@ function buildLevelSelect() {
   container.querySelectorAll('.lvl-btn').forEach(b => b.remove());
   for (let i = 0; i < LEVELS.length; i++) {
     const btn = document.createElement('button');
-    btn.className = 'lvl-btn' + (i >= 9 ? ' pro' : '');
+    btn.className = 'lvl-btn' + (i >= FREE_HOLE_COUNT ? ' pro' : '');
     btn.textContent = i + 1;
     btn.title = LEVELS[i].name;
     btn.addEventListener('click', () => {
@@ -5582,6 +5778,7 @@ let roomListener = null;   // Active listener for cleanup
 let onlineMode = false;    // True when playing online
 
 function initFirebase() {
+  if (!LIVE_SERVICES_ENABLED) return false;
   if (firebaseReady) return true;
   try {
     if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") {
@@ -5947,6 +6144,41 @@ document.getElementById('lobbyBack').addEventListener('click', () => {
 
 // ===================== AUTH SYSTEM =====================
 let currentUser = null;  // { uid, displayName, photoURL, isAnonymous }
+let statsRequest = 0;
+
+function appendProfileText(parent, className, value) {
+  const span = document.createElement('span');
+  span.className = className;
+  span.textContent = value;
+  parent.appendChild(span);
+  return span;
+}
+
+function renderProfileAvatar(container, photoURL, displayName) {
+  container.textContent = (displayName || '?').charAt(0).toUpperCase();
+  if (typeof photoURL !== 'string') return;
+  try {
+    const url = new URL(photoURL);
+    if (url.protocol !== 'https:' || url.username || url.password) return;
+    const img = document.createElement('img');
+    img.alt = '';
+    img.referrerPolicy = 'no-referrer';
+    img.src = url.href;
+    // A failed request must not replace a newer user's avatar.
+    img.addEventListener('error', () => {
+      if (img.parentNode === container) container.textContent = (displayName || '?').charAt(0).toUpperCase();
+    }, { once: true });
+    container.replaceChildren(img);
+  } catch { /* Keep the initial when a profile URL is invalid. */ }
+}
+
+function clearAccountStats() {
+  statsRequest++;
+  document.getElementById('statsPanel').classList.remove('visible');
+  document.getElementById('statsHistory').replaceChildren();
+  for (const id of ['stGamesPlayed', 'stHolesInOne', 'stTotalStrokes']) document.getElementById(id).textContent = '0';
+  for (const id of ['stBestRound', 'stAvgScore']) document.getElementById(id).textContent = '—';
+}
 
 function initAuth() {
   if (!initFirebase()) return;
@@ -5957,6 +6189,7 @@ function initAuth() {
     }
   }).catch(() => {});
   firebase.auth().onAuthStateChanged((user) => {
+    if (currentUser?.uid !== user?.uid) clearAccountStats();
     if (user) {
       currentUser = {
         uid: user.uid,
@@ -5967,24 +6200,24 @@ function initAuth() {
       updateUserBadge();
     } else {
       currentUser = null;
-      document.getElementById('userBadge').classList.remove('visible');
-      document.getElementById('titleAuth').style.display = 'block';
-      document.getElementById('titleProfile').style.display = 'none';
+      updateUserBadge();
     }
   });
 }
 
 function updateUserBadge() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    document.getElementById('userBadge').classList.remove('visible');
+    document.getElementById('titleAuth').style.display = 'block';
+    document.getElementById('titleProfile').style.display = 'none';
+    for (const id of ['ubAvatar', 'ubName', 'tpAvatar', 'tpName', 'tpEmail']) document.getElementById(id).replaceChildren();
+    return;
+  }
   const badge = document.getElementById('userBadge');
   const avatar = document.getElementById('ubAvatar');
   const name = document.getElementById('ubName');
   name.textContent = currentUser.displayName;
-  if (currentUser.photoURL) {
-    avatar.innerHTML = `<img src="${currentUser.photoURL}" alt="">`;
-  } else {
-    avatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
-  }
+  renderProfileAvatar(avatar, currentUser.photoURL, currentUser.displayName);
   badge.classList.add('visible');
 
   // Update title screen auth
@@ -5993,11 +6226,7 @@ function updateUserBadge() {
   tp.style.display = 'block';
   document.getElementById('tpName').textContent = currentUser.displayName;
   const tpAvatar = document.getElementById('tpAvatar');
-  if (currentUser.photoURL) {
-    tpAvatar.innerHTML = `<img src="${currentUser.photoURL}" alt="">`;
-  } else {
-    tpAvatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
-  }
+  renderProfileAvatar(tpAvatar, currentUser.photoURL, currentUser.displayName);
   // Show email for email users
   const fbUser = firebase.auth().currentUser;
   const email = fbUser && fbUser.email ? fbUser.email : '';
@@ -6052,8 +6281,8 @@ async function signUpWithEmail(email, pass) {
   if (!initFirebase()) return false;
   try {
     const cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-    // Set display name from email prefix
-    const name = email.split('@')[0].slice(0, 12);
+    // New public handles must not disclose part of the player's email address.
+    const name = 'Cosmonaut-' + cred.user.uid.slice(0, 5);
     await cred.user.updateProfile({ displayName: name });
     return true;
   } catch (e) {
@@ -6064,9 +6293,8 @@ async function signUpWithEmail(email, pass) {
 function signOut() {
   if (firebase.auth) firebase.auth().signOut();
   currentUser = null;
-  document.getElementById('userBadge').classList.remove('visible');
-  document.getElementById('titleAuth').style.display = 'block';
-  document.getElementById('titleProfile').style.display = 'none';
+  clearAccountStats();
+  updateUserBadge();
 }
 
 // Auth modal handlers
@@ -6246,8 +6474,11 @@ async function loadGameHistory() {
 
 // ===================== STATS PANEL =====================
 async function showStatsPanel() {
-  console.log('Opening stats panel, currentUser:', currentUser ? currentUser.uid : 'null', 'db:', !!db);
-  const games = await loadGameHistory();
+  const request = ++statsRequest;
+  const user = currentUser;
+  const history = await loadGameHistory();
+  if (request !== statsRequest || currentUser !== user) return;
+  const games = history.filter(g => g && Number.isSafeInteger(g.total) && g.total >= 0 && Number.isSafeInteger(g.diff));
   
   // Compute summary stats
   const gamesPlayed = games.length;
@@ -6277,19 +6508,21 @@ async function showStatsPanel() {
   
   // Render history
   const histDiv = document.getElementById('statsHistory');
-  histDiv.innerHTML = '';
+  histDiv.replaceChildren();
   if (games.length === 0) {
     histDiv.innerHTML = '<div class="stats-none">No games yet — go play!</div>';
   } else {
     for (const g of games.slice(0, 10)) {
       const row = document.createElement('div');
       row.className = 'stats-game-row';
-      const d = new Date(g.date);
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const d = new Date(typeof g.date === 'number' ? g.date : NaN);
+      const dateStr = Number.isFinite(d.getTime()) ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown';
       const diffClass = g.diff < 0 ? 'under' : g.diff > 0 ? 'over' : 'even';
       const diffLabel = g.diff === 0 ? 'E' : (g.diff > 0 ? '+' + g.diff : '' + g.diff);
-      const statusTag = g.complete ? '' : ' · ' + (g.holes || '?') + 'H';
-      row.innerHTML = `<span class="stats-game-date">${dateStr}</span><span class="stats-game-mode">${(g.mode || '1p').toUpperCase()}${statusTag}</span><span class="stats-game-score ${diffClass}">${g.total} (${diffLabel})</span>`;
+      const statusTag = g.complete ? '' : ' · ' + (Number.isSafeInteger(g.holes) ? g.holes : '?') + 'H';
+      appendProfileText(row, 'stats-game-date', dateStr);
+      appendProfileText(row, 'stats-game-mode', (typeof g.mode === 'string' ? g.mode : '1p').toUpperCase() + statusTag);
+      appendProfileText(row, 'stats-game-score ' + diffClass, g.total + ' (' + diffLabel + ')');
       histDiv.appendChild(row);
     }
   }
@@ -6299,6 +6532,7 @@ async function showStatsPanel() {
 
 document.getElementById('statsClose').addEventListener('click', () => {
   sfxClick();
+  statsRequest++;
   document.getElementById('statsPanel').classList.remove('visible');
 });
 
@@ -6488,6 +6722,7 @@ function endDailyChallenge() {
     window._originalLevels = null;
   }
   dailyMode = false;
+  buildLevelSelect();
 }
 
 // ===================== LEADERBOARD =====================
@@ -6533,6 +6768,8 @@ function renderLeaderboard(entries) {
   const body = document.getElementById('lbBody');
   const dateEl = document.getElementById('lbDate');
   dateEl.textContent = getDailyDateString();
+  entries = entries.filter(e => e && Number.isSafeInteger(e.strokes) && e.strokes >= 0 && Number.isSafeInteger(e.par) && e.par >= 0);
+  body.replaceChildren();
 
   if (entries.length === 0) {
     body.innerHTML = '<div class="lb-empty">No scores yet today. Be the first!</div>';
@@ -6541,10 +6778,15 @@ function renderLeaderboard(entries) {
   }
 
   // Sort by strokes ascending
-  entries.sort((a, b) => a.strokes - b.strokes || a.timestamp - b.timestamp);
+  entries.sort((a, b) => a.strokes - b.strokes || (Number.isFinite(a.timestamp) ? a.timestamp : 0) - (Number.isFinite(b.timestamp) ? b.timestamp : 0));
 
-  const totalPar = entries[0]?.par || 0;
-  let html = '<div class="lb-row header"><span class="lb-rank">#</span><span class="lb-name">PLAYER</span><span class="lb-strokes">STR</span><span class="lb-diff">+/-</span></div>';
+  const header = document.createElement('div');
+  header.className = 'lb-row header';
+  appendProfileText(header, 'lb-rank', '#');
+  appendProfileText(header, 'lb-name', 'PLAYER');
+  appendProfileText(header, 'lb-strokes', 'STR');
+  appendProfileText(header, 'lb-diff', '+/-');
+  body.appendChild(header);
 
   let myRank = -1;
   entries.forEach((e, i) => {
@@ -6564,15 +6806,14 @@ function renderLeaderboard(entries) {
 
     const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
 
-    html += `<div class="${rowClass}">
-      <span class="lb-rank">${medal}</span>
-      <span class="lb-name">${e.name || 'Anonymous'}</span>
-      <span class="lb-strokes">${e.strokes}</span>
-      <span class="lb-diff ${diffClass}">${diffLabel}</span>
-    </div>`;
+    const row = document.createElement('div');
+    row.className = rowClass;
+    appendProfileText(row, 'lb-rank', medal);
+    appendProfileText(row, 'lb-name', typeof e.name === 'string' && e.name ? e.name : 'Anonymous');
+    appendProfileText(row, 'lb-strokes', e.strokes);
+    appendProfileText(row, 'lb-diff ' + diffClass, diffLabel);
+    body.appendChild(row);
   });
-
-  body.innerHTML = html;
 
   const yrEl = document.getElementById('lbYourRank');
   if (myRank > 0) {
@@ -7332,6 +7573,7 @@ function loadTrainerDrill() {
 }
 
 function beginInteractiveTrainer() {
+  trackFunnel('gg_trainer_started');
   ensureAudio();
   trainerActive = true;
   instructionsEl.className = 'launch-lab visible training';
@@ -7340,6 +7582,7 @@ function beginInteractiveTrainer() {
 }
 
 function exitInteractiveTrainer() {
+  if (!trainerCompleted) trackFunnel('gg_trainer_skipped');
   clearTimeout(trainerResetTimer);
   trainerActive = false;
   trainerCompleted = false;
@@ -7393,6 +7636,7 @@ function registerTrainerEvent(eventName) {
 
 function completeInteractiveTrainer() {
   if (!trainerActive || trainerCompleted) return;
+  trackFunnel('gg_trainer_completed');
   trainerCompleted = true;
   trainerStep = TRAINER_STEPS.length;
   holeScored = true;
@@ -8234,7 +8478,7 @@ function updateFlightMastery(dt) {
 
 function updateRouteChip() {
   if (!assistBaselineReady) {
-    routeChipEl.textContent = 'CALCULATING ASSIST';
+    routeChipEl.textContent = aimSearchPending ? 'CALCULATING ASSIST' : 'MANUAL AIM';
     routeChipEl.classList.remove('pilot');
     return;
   }
@@ -8801,6 +9045,7 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
   if (gameWon || lostInSpace || !ballOnPlanet || spaceHeld || introPlaying) return;
 
   if (isBallHit(e)) {
+    cancelAimSearch();
     // Always start a new aim when clicking the ball, even if aim was locked
     if (aimLocked) {
       aimLocked = false;
@@ -8917,6 +9162,8 @@ function updateKeyHud(key, pressed) {
 
 // W = pan camera (hold) — swaps left-click from orbit to pan
 window.addEventListener('keydown', (e) => {
+  if (document.getElementById('usageDialog').open) return;
+  if (document.getElementById('unlockModal').classList.contains('visible')) return;
   if (e.key === 'w' || e.key === 'W') {
     e.preventDefault();
     if (!spaceHeld) {
@@ -9077,6 +9324,7 @@ function fireLockedShot() {
   strokes++;
   document.getElementById('strokeCount').textContent = strokes;
   // Reset boosts per turn
+  trackGameplayShot();
   if (!hasInfiniteBoost) boostsRemaining = BOOSTS_PER_TURN;
   // Clear trail for new shot
   flightTrailPositions.length = 0;
@@ -9113,6 +9361,7 @@ function fireLockedShot() {
 }
 
 function cancelLockedAim() {
+  cancelAimSearch();
   document.getElementById('gameBottomBar').classList.remove('aiming');
   aimLocked = false;
   powerOscillating = false;
@@ -9205,21 +9454,127 @@ if (isMobileDevice) {
 }
 
 // ===================== SNAP TO OPTIMAL PATH =====================
-function snapToOptimal(sourceBtn) {
+// One request at a time. Termination stops CPU work as well as ignoring stale replies.
+function createAimTaskRunner(createWorker, fallback) {
+  let worker = null, pending = null, sequence = 0;
+  function stopWorker() {
+    if (worker) worker.terminate();
+    worker = null;
+  }
+  function finish(value) {
+    if (!pending) return;
+    clearTimeout(pending.timeout);
+    cancelAnimationFrame(pending.frame);
+    const resolve = pending.resolve;
+    pending = null;
+    resolve(value);
+  }
+  function cancel() {
+    if (pending) stopWorker();
+    finish(null);
+  }
+  function fail() {
+    stopWorker();
+    finish(null);
+  }
+  function run(snapshot) {
+    cancel();
+    return new Promise(resolve => {
+      const id = ++sequence;
+      pending = { id, resolve, frame: 0, timeout: setTimeout(fail, 30000) };
+      if (fallback) {
+        // Preserve standalone file:// previews where module workers are unavailable.
+        pending.frame = requestAnimationFrame(() => {
+          try { finish(fallback()); } catch { fail(); }
+        });
+        return;
+      }
+      try {
+        if (!worker) {
+          worker = createWorker();
+          const activeWorker = worker;
+          worker.onmessage = ({ data }) => {
+            if (!pending || data.id !== pending.id) return;
+            if (data.error) fail();
+            else finish(data.result);
+          };
+          worker.onerror = event => { event.preventDefault(); if (worker === activeWorker) fail(); };
+          worker.onmessageerror = () => { if (worker === activeWorker) fail(); };
+        }
+        worker.postMessage({ id, snapshot });
+      } catch { fail(); }
+    });
+  }
+  return { run, cancel };
+}
+
+const aimTaskRunner = createAimTaskRunner(
+  () => new Worker(new URL('./aim-worker.mjs', import.meta.url), { type: 'module' }),
+  location.protocol === 'file:' || typeof Worker === 'undefined' ? () => findOptimalPath() : null
+);
+let aimSearchRevision = 0;
+let aimSearchPending = false;
+
+function resetAimSearchButtons() {
+  const snap = document.getElementById('panelSnapBtn');
+  if (snap) { snap.classList.remove('computing'); snap.textContent = '⟡ SNAP OPTIMAL'; }
+  const preview = document.getElementById('optimalBtn');
+  preview.style.pointerEvents = '';
+  preview.textContent = optimalPathVisible ? 'HIDE OPTIMAL PATH' : 'PREVIEW OPTIMAL PATH';
+}
+
+function cancelAimSearch() {
+  aimSearchRevision++;
+  aimTaskRunner.cancel();
+  aimSearchPending = false;
+  resetAimSearchButtons();
+  updateRouteChip();
+}
+
+async function requestOptimalPath() {
+  const revision = ++aimSearchRevision;
+  const level = currentLevel;
+  const planet = ballOnPlanet;
+  const goal = goalPlanet;
+  const start = ball.position.clone();
+  const snapshot = {
+    startPos: start.toArray(), holePos: holePos.toArray(),
+    planetIndex: planetoids.indexOf(planet), homeIndex: planetoids.indexOf(homePlanet),
+    goalIndex: planetoids.indexOf(goal),
+    planetoids: planetoids.map(p => ({ pos: p.pos.toArray(), radius: p.radius, gravityStrength: p.gravityStrength })),
+    ballRadius, levelPowerMult, SURFACE_FRICTION, CAPTURE_SPEED, MAX_DIST
+  };
+  aimSearchPending = true;
+  updateRouteChip();
+  const result = await aimTaskRunner.run(snapshot);
+  if (revision !== aimSearchRevision) return null;
+  aimSearchPending = false;
+  resetAimSearchButtons();
+  updateRouteChip();
+  // Surface motion or a different course can invalidate a result even without user input.
+  if (!result || currentLevel !== level || ballOnPlanet !== planet || goalPlanet !== goal ||
+      gameWon || lostInSpace || ball.position.distanceToSquared(start) > 0.0001) return null;
+  return {
+    points: result.points.map(point => new THREE.Vector3().copy(point)),
+    launchDir: result.launchDir ? new THREE.Vector3().copy(result.launchDir) : null,
+    power: result.power
+  };
+}
+
+async function snapToOptimal(sourceBtn) {
   if (!aimLocked || !ballOnPlanet) return;
   
   // Show computing state
   const allBtns = [document.getElementById('panelSnapBtn')].filter(Boolean);
   allBtns.forEach(b => { b.classList.add('computing'); b.textContent = '⟡ COMPUTING...'; });
   
-  requestAnimationFrame(() => {
-    const result = findOptimalPath();
-    
-    allBtns.forEach(b => { b.classList.remove('computing'); b.textContent = '⟡ SNAP OPTIMAL'; });
+    const result = await requestOptimalPath();
+    if (!result || !aimLocked || !ballOnPlanet) return;
+    const revision = aimSearchRevision;
     
     if (!result.launchDir || result.points.length < 2) {
       allBtns.forEach(b => { b.textContent = '⟡ NO PATH'; });
-      setTimeout(() => allBtns.forEach(b => { b.textContent = '⟡ SNAP OPTIMAL'; }), 1200);
+      setTimeout(() => { if (revision === aimSearchRevision) resetAimSearchButtons(); }, 1200);
       return;
     }
     
@@ -9251,7 +9606,7 @@ function snapToOptimal(sourceBtn) {
         const rightComp = result.launchDir.dot(frame.right);
         const azimuth = Math.atan2(rightComp, fwdComp) * 180 / Math.PI;
         const elevation = Math.asin(Math.max(-1, Math.min(1, nComp))) * 180 / Math.PI;
-        sliderX.value = Math.round(azimuth);
+        sliderX.value = Math.round(-azimuth); // Slingshot slider stores pull, not launch direction.
         sliderY.value = Math.round(Math.max(0, Math.min(80, elevation)));
         sliderZ.value = 0;
         valX.textContent = sliderX.value + '°';
@@ -9277,8 +9632,7 @@ function snapToOptimal(sourceBtn) {
     
     // Flash confirmation
     allBtns.forEach(b => { b.textContent = '⟡ LOCKED!'; });
-    setTimeout(() => allBtns.forEach(b => { b.textContent = '⟡ SNAP OPTIMAL'; }), 800);
-  });
+    setTimeout(() => { if (revision === aimSearchRevision) resetAimSearchButtons(); }, 800);
 }
 
 // ===================== SLIDER AIM PANEL =====================
@@ -9453,6 +9807,7 @@ function onSliderInput() {
   valPwr.textContent = sliderPwr.value + '%';
   
   if (sliderAimActive && aimLocked) {
+    cancelAimSearch();
     updateAimFromSliders();
     updateManualRouteState();
     registerTrainerEvent('adjust');
@@ -9689,12 +10044,17 @@ document.getElementById('scorecardClose').addEventListener('click', () => {
 // === Game Complete Screen ===
 function showGameComplete(title, isFreeEnd) {
   const gc = document.getElementById('gameCompleteScreen');
-  gc.querySelector('.gc-title').textContent = title || 'COURSE COMPLETE';
+  const playedCount = LEVELS.reduce((count, lvl, i) => count + (levelScores[i] !== undefined ? 1 : 0), 0);
+  const targetCount = isFreeEnd ? Math.min(FREE_HOLE_COUNT, LEVELS.length) : LEVELS.length;
+  const completeCourse = playedCount === targetCount;
+  gc.querySelector('.gc-title').textContent = completeCourse ? (title || 'COURSE COMPLETE') : 'ROUND SUMMARY';
 
-  const totalPar = LEVELS.reduce((a, l) => a + l.par, 0);
+  // Course-picker rounds can be partial: unplayed holes do not contribute par.
+  const totalPar = LEVELS.reduce((sum, lvl, i) => sum + (levelScores[i] !== undefined ? lvl.par : 0), 0);
   const diff = totalScore - totalPar;
   const scoreLabel = diff === 0 ? 'EVEN PAR' : (diff > 0 ? '+' + diff + ' OVER PAR' : diff + ' UNDER PAR');
-  document.getElementById('gcScore').textContent = totalScore + ' STROKES · ' + scoreLabel;
+  const progressLabel = completeCourse ? '' : ' · ' + playedCount + '/' + targetCount + ' HOLES PLAYED';
+  document.getElementById('gcScore').textContent = totalScore + ' STROKES · ' + scoreLabel + progressLabel;
 
   // Toggle buttons: unlock vs play again/home
   const playAgainBtn = document.getElementById('gcPlayAgain');
@@ -9702,12 +10062,12 @@ function showGameComplete(title, isFreeEnd) {
   let gcUnlockBtn = document.getElementById('gcUnlockBtn');
   
   if (isFreeEnd) {
-    playAgainBtn.style.display = 'none';
-    homeBtn.style.display = 'none';
+    playAgainBtn.style.display = '';
+    homeBtn.style.display = '';
     if (!gcUnlockBtn) {
       gcUnlockBtn = document.createElement('button');
       gcUnlockBtn.id = 'gcUnlockBtn';
-      gcUnlockBtn.textContent = '★ UNLOCK HOLES 9-19';
+      gcUnlockBtn.textContent = PRO_UNLOCK_LABEL;
       gcUnlockBtn.style.cssText = `
         background: linear-gradient(135deg, #ffcc00, #ffaa00);
         color: #1a1400; -webkit-text-fill-color: #1a1400;
@@ -9941,7 +10301,7 @@ document.getElementById('nextHoleBtn').addEventListener('click', () => {
     if (dailyMode) {
       showGameComplete('DAILY COMPLETE');
     } else {
-      const isFreeEnd = !dailyMode && currentLevel === 7 && !proUnlocked;
+      const isFreeEnd = !dailyMode && currentLevel === FREE_HOLE_COUNT - 1 && !proUnlocked;
       showGameComplete(isFreeEnd ? 'FREE COURSE COMPLETE' : 'COURSE COMPLETE', isFreeEnd);
     }
     return;
@@ -10038,6 +10398,8 @@ const _vTemp1 = new THREE.Vector3();
 const _vTemp2 = new THREE.Vector3();
 
 function physicsStep(dt) {
+  // The old synchronous search held this state too; only physics pauses, not rendering or input.
+  if (aimSearchPending) return;
   if (gameWon || lostInSpace) return;
 
   const subDt = dt / PHYSICS_STEPS;
@@ -10231,6 +10593,7 @@ function physicsStep(dt) {
       }
       holeScored = true;
       // Record hole completion time
+      trackGameplayCompletion();
       holeElapsed = holeStartTime > 0 ? (performance.now() - holeStartTime) / 1000 : 0;
       holeTimes[currentLevel] = holeElapsed;
       if (!gameWon) {
@@ -10333,7 +10696,7 @@ function physicsStep(dt) {
         recordSessionHole(currentLevel, strokes, par);
         saveHoleProgress(); // Save after each hole
         const isLast = currentLevel >= LEVELS.length - 1;
-        const isFreeEnd = !dailyMode && currentLevel === 7 && !proUnlocked;
+        const isFreeEnd = !dailyMode && currentLevel === FREE_HOLE_COUNT - 1 && !proUnlocked;
         const medals = recordHoleMastery(currentLevel, strokes, par);
         const styleSub = holeStyleScore > 0 ? ' · ' + holeStyleScore.toLocaleString() + ' STYLE' : '';
         const sub = strokes + (strokes === 1 ? ' STROKE' : ' STROKES') + styleSub + consolationSub;
@@ -11285,7 +11648,8 @@ function findOptimalPath() {
   return { points: finalResult.points, launchDir: finalDir, power: bestP };
 }
 
-function toggleOptimalPath() {
+async function toggleOptimalPath() {
+  if (!ballOnPlanet || gameWon || lostInSpace) return;
   if (optimalAnimating) {
     // Turn off
     hideOptimalPath();
@@ -11297,9 +11661,9 @@ function toggleOptimalPath() {
   btn.textContent = 'COMPUTING...';
   btn.style.pointerEvents = 'none';
 
-  // Use requestAnimationFrame so the UI updates before the heavy computation
-  requestAnimationFrame(() => {
-    const optimalResult = findOptimalPath();
+    const optimalResult = await requestOptimalPath();
+    if (!optimalResult) return;
+    const revision = aimSearchRevision;
     optimalPathPoints = optimalResult.points;
     lastOptimalLaunchDir = optimalResult.launchDir ? optimalResult.launchDir.clone() : null;
     lastOptimalPower = optimalResult.power || 0;
@@ -11307,7 +11671,7 @@ function toggleOptimalPath() {
 
     if (optimalPathPoints.length < 2) {
       btn.textContent = 'NO PATH FOUND';
-      setTimeout(() => { btn.textContent = 'PREVIEW OPTIMAL PATH'; }, 1500);
+      setTimeout(() => { if (revision === aimSearchRevision) resetAimSearchButtons(); }, 1500);
       return;
     }
 
@@ -11321,10 +11685,10 @@ function toggleOptimalPath() {
     optimalPathLine.geometry.dispose();
     optimalPathLine.geometry = new THREE.BufferGeometry().setFromPoints(optimalPathPoints);
     optimalPathLine.material.opacity = 0.0;
-  });
 }
 
 function hideOptimalPath() {
+  cancelAimSearch();
   optimalAnimating = false;
   optimalPathVisible = false;
   optimalPathLine.material.opacity = 0.0;
@@ -11339,6 +11703,7 @@ document.getElementById('optimalBtn').addEventListener('click', toggleOptimalPat
 // ===================== ANIMATION LOOP =====================
 const clock = new THREE.Clock();
 let time = 0;
+let planetOrbitTime = 0;
 
 let _idleSkip = false;
 let _idleAccumulatedDt = 0;
@@ -11373,6 +11738,7 @@ function animate() {
   const dt = Math.min(rawDt + _idleAccumulatedDt, 0.05);
   _idleAccumulatedDt = 0;
   time += dt;
+  if (!aimSearchPending) planetOrbitTime += dt;
 
   // Animate background Earth rotation and clouds
   if (bgStarGroup.visible) {
@@ -12016,7 +12382,9 @@ function animate() {
     p.mesh.rotation.y += dt * 0.08; // slow spin
     const bobPhase = i * 1.7;
 
-    if (p.radius < 0.8 && p.radius > 0.02 && currentLevel >= 5) {
+    if (aimSearchPending) {
+      p.mesh.position.copy(p.pos);
+    } else if (p.radius < 0.8 && p.radius > 0.02 && currentLevel >= 5) {
       // Throttle orbit calc to ~30fps on mobile
       if (isTouchDevice && (i % 2 !== Math.floor(time * 30) % 2)) {
         // Skip this frame for this moon (stagger across moons)
@@ -12033,9 +12401,9 @@ function animate() {
       const speedX = 0.3 + (i % 7) * 0.06;
       const speedY = 0.25 + (i % 5) * 0.07;
       const speedZ = 0.35 + (i % 3) * 0.05;
-      const ox = Math.sin(time * speedX + seed1) * orbitRadius;
-      const oy = Math.sin(time * speedY + seed2) * orbitRadius * 0.6;
-      const oz = Math.cos(time * speedZ + seed3) * orbitRadius * 0.8;
+      const ox = Math.sin(planetOrbitTime * speedX + seed1) * orbitRadius;
+      const oy = Math.sin(planetOrbitTime * speedY + seed2) * orbitRadius * 0.6;
+      const oz = Math.cos(planetOrbitTime * speedZ + seed3) * orbitRadius * 0.8;
       // Update both mesh and physics position
       p.pos.set(p._basePos.x + ox, p._basePos.y + oy, p._basePos.z + oz);
       p.mesh.position.copy(p.pos);
@@ -12120,6 +12488,16 @@ function animate() {
 }
 
 window.render_game_to_text = () => JSON.stringify({
+  usageData: { active: funnelState.active, consent: funnelState.consent, queuedEventsThisPage: funnelState.count },
+  commerce: {
+    freeHoles: FREE_HOLE_COUNT,
+    proHoles: PRO_HOLE_COUNT,
+    proUnlocked,
+    accessSource: commerceState.proVerified ? 'verified-account' : legacyProAccess ? 'legacy-device' : 'free',
+    purchasePhase: commerceState.phase,
+    liveServices: LIVE_SERVICES_ENABLED,
+    offerVisible: document.getElementById('unlockModal').classList.contains('visible'),
+  },
   coordinateSystem: 'Three.js world coordinates; +Y is up.',
   mode: gameWon ? 'hole_complete' : aimLocked ? 'aiming' : shotInFlight ? 'flight' : 'ready',
   introPlaying,
@@ -12144,6 +12522,7 @@ window.render_game_to_text = () => JSON.stringify({
     })(),
   },
   aim: {
+    calculating: aimSearchPending,
     assisted: assistBaselineReady,
     pilotRoute: shotUsesPilotRoute,
     deviation: Number(manualAimDeviation.toFixed(1)),
@@ -12212,6 +12591,8 @@ document.getElementById('mode1p').click();
 loadLevel(0);
 
 animate();
+void initCommerce();
+void initFunnelAnalytics();
 
 // Resize handler
 window.addEventListener('resize', () => {

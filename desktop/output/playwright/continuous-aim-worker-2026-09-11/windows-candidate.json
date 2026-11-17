@@ -1,0 +1,19 @@
+{
+  "status": "packaged-and-integrity-checked-only",
+  "platform": "win32",
+  "architecture": "x64",
+  "electronVersion": "44.3.0",
+  "sourceIndexSha256": "28fa9b52e6c046715c4b8ddbe7106d31054525bd300d66f8b2d20d6d7adb2e01",
+  "asarSha256": "dd0753e970b79ea92998563d17c1b42e3ae1e91b7584313f5a4cda67bf3a4ffd",
+  "sameAsTestedMacArchive": true,
+  "executableSha256": "7347c2a37bcbf556286783a7f9c05bcd5ee0a7345aa90b8d6c231d4d4a23deb4",
+  "executableFormat": "PE32+ executable (GUI) x86-64, for MS Windows",
+  "packageConfigSha256": "b47aa37841356af31ed0eb99c89d4b5ed92273b7d3736370152b92d85c425c03",
+  "packageLockSha256": "b9fac5632338b0133d0fe8b47ab8741efed8d446c3bcd72a908ba91611b80cb1",
+  "packagingScriptSha256": "7943c2f33e1bba9e58a7ce14f371c21ee743da7e2d1eeee8f6b6066b7bac22ef",
+  "windowsExecuted": false,
+  "signedRelease": false,
+  "storeUploaded": false,
+  "releaseApproved": false,
+  "handling": "Keep the whole Gravity Golf Prototype-win32-x64 folder together; the executable alone is not a complete app."
+}

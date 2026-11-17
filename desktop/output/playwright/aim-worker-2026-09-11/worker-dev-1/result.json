@@ -1,0 +1,234 @@
+{
+  "method": "No video capture. PerformanceObserver and requestAnimationFrame monitoring only; normal UI input. No solver, physics, score, camera or game-clock changes.",
+  "startedAt": "2026-09-11T18:33:46.005Z",
+  "sourceIndexSha256": "2d2dd3ce1afb6b89e922ac42fbb9268723ea31f9aef5c8608b702b4f437b19f6",
+  "archiveSha256": null,
+  "buildManifestSha256": "1815cab28c7425f310f64018cd591708c67236f03d59be1da12ee862243b5d28",
+  "developmentBuild": true,
+  "executablePath": "/tmp/gravitygolf-aim-worker-2026-09-11/desktop/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+  "samples": [
+    {
+      "hole": 1,
+      "clickCallMs": 6,
+      "inputToAssistMs": 165.80000007152557,
+      "maxRafGapMs": 16.80000000000109,
+      "longestTaskMs": 0,
+      "frames": 47,
+      "before": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "ready",
+        "introPlaying": false,
+        "hole": 1,
+        "strokes": 0,
+        "par": 1,
+        "timeDisplay": "0.0",
+        "ball": {
+          "x": 0,
+          "y": 3.73,
+          "z": 0,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 0,
+          "onPlanetType": "start",
+          "screen": {
+            "x": 789,
+            "y": 678
+          }
+        },
+        "aim": {
+          "calculating": false,
+          "assisted": false,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": null
+        },
+        "mastery": {
+          "style": 0,
+          "combo": 0,
+          "bestCombo": 0,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": false,
+        "boosts": 6
+      },
+      "timing": {
+        "frames": [
+          10239.1,
+          10255.8,
+          10272.5,
+          10289.2,
+          10305.9,
+          10322.5,
+          10339.1,
+          10355.9,
+          10372.5,
+          10389.2,
+          10405.8,
+          10422.5,
+          10439.2,
+          10455.9,
+          10472.5,
+          10489.1,
+          10505.8,
+          10522.5,
+          10539.2,
+          10555.8,
+          10572.5,
+          10589.1,
+          10605.8,
+          10622.6,
+          10639.2,
+          10655.8,
+          10672.5,
+          10689.2,
+          10705.8,
+          10722.5,
+          10739.2,
+          10755.9,
+          10772.5,
+          10789.2,
+          10805.9,
+          10822.5,
+          10839.2,
+          10855.8,
+          10872.5,
+          10889,
+          10905.8,
+          10922.5,
+          10939.2,
+          10955.8,
+          10972.5,
+          10989.2,
+          11005.9
+        ],
+        "tasks": [],
+        "changes": [
+          {
+            "at": 10530.100000023842,
+            "text": "MANUAL AIM"
+          },
+          {
+            "at": 10530.899999976158,
+            "text": "CALCULATING ASSIST"
+          },
+          {
+            "at": 10694.899999976158,
+            "text": "MANUAL AIM"
+          },
+          {
+            "at": 10695.100000023842,
+            "text": "ASSISTED ROUTE"
+          }
+        ],
+        "inputAt": 10529.299999952316,
+        "enabled": false,
+        "after": {
+          "desktop": {
+            "edition": "prototype",
+            "dailyMode": false,
+            "courseHoles": 19
+          },
+          "usageData": {
+            "active": false,
+            "consent": "unknown",
+            "queuedEventsThisPage": 0
+          },
+          "commerce": {
+            "freeHoles": 8,
+            "proHoles": 11,
+            "proUnlocked": true,
+            "accessSource": "desktop-full-course",
+            "purchasePhase": "disabled",
+            "liveServices": false,
+            "offerVisible": false
+          },
+          "coordinateSystem": "Three.js world coordinates; +Y is up.",
+          "mode": "aiming",
+          "introPlaying": false,
+          "hole": 1,
+          "strokes": 0,
+          "par": 1,
+          "timeDisplay": "0.0",
+          "ball": {
+            "x": 0,
+            "y": 3.73,
+            "z": 0,
+            "speed": 0,
+            "onPlanet": true,
+            "onPlanetIndex": 0,
+            "onPlanetType": "start",
+            "screen": {
+              "x": 789,
+              "y": 678
+            }
+          },
+          "aim": {
+            "calculating": false,
+            "assisted": true,
+            "pilotRoute": false,
+            "deviation": 0,
+            "previewClosestHazard": null
+          },
+          "mastery": {
+            "style": 0,
+            "combo": 0,
+            "bestCombo": 0,
+            "bestGhostVisible": false
+          },
+          "ability": {
+            "name": "STABILIZE",
+            "used": false,
+            "activeSeconds": 0,
+            "disabledForDaily": false
+          },
+          "trainer": {
+            "visible": false,
+            "active": false,
+            "complete": false,
+            "step": -1,
+            "expected": null
+          },
+          "artifactAvailable": false,
+          "boosts": 6
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "status": "failed",
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at /private/tmp/gravitygolf-aim-latency-2026-09-11/measure.mjs:69:16",
+  "completedAt": "2026-09-11T18:34:35.930Z"
+}

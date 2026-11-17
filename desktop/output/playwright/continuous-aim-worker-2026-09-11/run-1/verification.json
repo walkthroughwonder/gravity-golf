@@ -1,0 +1,145 @@
+{
+  "status": "verified-course-smoke",
+  "reportSha256": "661fac9d67bf721160f5336e88cdc1349f50b5ba613046bbcf6304c66db859bc",
+  "verifierSha256": "b22737d9c5585afa2f375602740381ba8acb35abcfe1cc9b92a456224e83a470",
+  "sourceIndexSha256": "28fa9b52e6c046715c4b8ddbe7106d31054525bd300d66f8b2d20d6d7adb2e01",
+  "archiveSha256": "dd0753e970b79ea92998563d17c1b42e3ae1e91b7584313f5a4cda67bf3a4ffd",
+  "scores": [
+    1,
+    2,
+    2,
+    4,
+    2,
+    3,
+    2,
+    2,
+    5,
+    4,
+    4,
+    10,
+    2,
+    3,
+    3,
+    2,
+    3,
+    4,
+    4
+  ],
+  "total": 62,
+  "par": 87,
+  "difference": -25,
+  "recordedShots": 62,
+  "obstacleLaunches": 32,
+  "boostAttempts": 7,
+  "maxAimWaitMs": 3666,
+  "longestShotMs": 23038,
+  "elapsedSeconds": 749.887,
+  "replayReset": true,
+  "images": {
+    "hole-01-complete.png": {
+      "sha256": "906cf1b35b500011f57b0df988ee5c3a3b13235741f9698933557e41c4631f93",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-02-complete.png": {
+      "sha256": "8d73c382e1f239569615b707d4c8d751db2cf69ddf8ef5546c410a515454ec3d",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-03-complete.png": {
+      "sha256": "1ced23d8023164731a8a202234ebbcb1a51121bf4802ccae7a42bad23ed2773a",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-04-complete.png": {
+      "sha256": "7ee65ec34ff8d774abb2dfa060d985ad53e782c06491cb4661fa7d2a534960ea",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-05-complete.png": {
+      "sha256": "d09b42fccc08beb5af7ad448f5f15aca7739829a26a967aef100a80a713dd91a",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-06-complete.png": {
+      "sha256": "b173b896f07d027a2512c63a8554cb557f1d85c15889625837c5f8a222839b45",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-07-complete.png": {
+      "sha256": "d36d30b0f995a52b4fe2cbebd704cc2f7c9bc71b34c33ba893d65f09ad49e77c",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-08-complete.png": {
+      "sha256": "f7f901a1977cd1ebb272cc06e344917cf94fd2db45616037430f528a1baa8f5e",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-09-complete.png": {
+      "sha256": "9fb6b87d8841f046740735921529d89a86d0bbff86fcfda7c6227fdce4056881",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-10-complete.png": {
+      "sha256": "dc097f0adf506b346ae3a79a913f05b14ae299c8f975c6fb76a5240f2b289d25",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-11-complete.png": {
+      "sha256": "b624488bcc56f82ca39c30fd08f82341a49e67423fcf91ba6c852d9a1edc7212",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-12-complete.png": {
+      "sha256": "5966fce32c4798c99dde866d3099a5625d87777e6eaca45b03f4775a8be7670b",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-13-complete.png": {
+      "sha256": "9ec21c727e77b0c3f274cfe35307f3bf321fd3be911ce22e76a73a4c79fff73a",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-14-complete.png": {
+      "sha256": "a052b1e4fe10475e579916ab8d6727a2d9cba55b703fe57d68104293dfcb52bb",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-15-complete.png": {
+      "sha256": "00169c5b86a8d7933a13158d7e2fa40165fcaa8ef9376e254777e8f6797105c4",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-16-complete.png": {
+      "sha256": "e2de936776d26c7ffc1fde5dea883458dc34d15ad8c360c28b488aabecacc3a2",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-17-complete.png": {
+      "sha256": "299df424c5e038fc3290eb5b1bcf411854fc8b95b772384e741be6934304fd06",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-18-complete.png": {
+      "sha256": "1aa13ebb5027038240d56d3e7098d9ac356870bf3c41503a9aa9d6aeb28079ad",
+      "width": 1280,
+      "height": 800
+    },
+    "hole-19-complete.png": {
+      "sha256": "314e79cf37a7d2c8555bf2e64e6bd70e6e9e98bd94b6a15327f489e9f984c136",
+      "width": 1280,
+      "height": 800
+    },
+    "final-scorecard.png": {
+      "sha256": "dfc9d41d2b15e4481beef456b096e25564b6ca0846d71d3a579306ab96501264",
+      "width": 1280,
+      "height": 800
+    },
+    "final-scorecard-narrow.png": {
+      "sha256": "201eb542b8c3e68e7374256d66f1fc9236039d0d240a8dedb5be331a77006044",
+      "width": 390,
+      "height": 844
+    }
+  }
+}

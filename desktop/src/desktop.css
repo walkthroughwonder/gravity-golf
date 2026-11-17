@@ -1,0 +1,19 @@
+#unlockModal, #unlockPrompt, #authModal, #userBadge, #titleAuth, #titleProfile,
+#modeOnline, #mode2p, #statsPanel, #leaderboard, #postScoreBtn, #installBtn,
+#liveMetrics, #usageSettingsBtn, #usageQuickOffBtn, #usageDialog { display: none !important; }
+#desktopCourse {
+  margin: auto; width: min(600px, 90vw); max-height: 85vh; overflow: auto;
+  padding: 30px; color: #f4df9d; background: linear-gradient(145deg, #211b10, #08070c);
+  border: 1px solid #806c32; border-radius: 18px; font-family: 'Exo 2', sans-serif;
+}
+#desktopCourse::backdrop { background: #000a; }
+#desktopCourse h2 { font: 700 20px 'Orbitron', sans-serif; letter-spacing: 3px; }
+#desktopCourse p { margin: 12px 0 22px; color: #c5bfae; }
+#desktopCourse #levelSelect { position: static; flex-wrap: wrap; gap: 10px; margin: 0; }
+#desktopCourse .level-select-label { width: 100%; }
+#desktopCourse .lvl-btn { width: 46px; height: 42px; }
+#desktopCourse .mode-btn { position: static; inset: auto; transform: none; max-width: 100%; margin: 24px 0; }
+.course-close { padding: 10px 24px; color: #f4df9d; background: #201c13;
+  border: 1px solid #806c32; border-radius: 8px; cursor: pointer; font: 600 12px 'Orbitron', sans-serif; }
+#desktopCourse button:focus-visible { outline: 2px solid #ffe566; outline-offset: 4px; }
+.desktop-edition { margin-top: 8px; color: #bcb09a; font: 11px 'Exo 2', sans-serif; letter-spacing: 1px; }

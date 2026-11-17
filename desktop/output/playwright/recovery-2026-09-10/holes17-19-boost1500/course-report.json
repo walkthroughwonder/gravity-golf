@@ -1,0 +1,1190 @@
+{
+  "startedAt": "2026-09-10T17:36:47.166Z",
+  "status": "needs-investigation",
+  "archiveSha256": "80eadf449ac29cd0ca4440e5ca9731127b8f7fa42ce99ef93ffe77969c45d709",
+  "method": "Normal game controls with built-in aim assistance and optional Space-held recovery boost from obstacles. No gameplay or score injection. Disposable profile. Shot count and 45-second settling window are bounded smoke-test limits, not proof a course is impossible.",
+  "harnessSha256": "8510eb64dd3b6527742777bbcda94977a69a8547f16617adc4905552e98c1c9f",
+  "scope": {
+    "firstHole": 17,
+    "lastHole": 19,
+    "maxShots": 12,
+    "recoveryBoostMs": 1500,
+    "settleTimeoutMs": 45000,
+    "continuousFullRound": false
+  },
+  "holes": [
+    {
+      "hole": 17,
+      "shots": [
+        {
+          "shot": 1,
+          "before": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "ready",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 0,
+            "par": 6,
+            "timeDisplay": "0.0",
+            "ball": {
+              "x": 0,
+              "y": 2.97,
+              "z": -0.59,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 0,
+              "onPlanetType": "start",
+              "screen": {
+                "x": 341,
+                "y": 599
+              }
+            },
+            "aim": {
+              "assisted": false,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": null
+            },
+            "mastery": {
+              "style": 0,
+              "combo": 0,
+              "bestCombo": 0,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 6
+          },
+          "aim": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "aiming",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 0,
+            "par": 6,
+            "timeDisplay": "0.0",
+            "ball": {
+              "x": 0,
+              "y": 2.97,
+              "z": -0.59,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 0,
+              "onPlanetType": "start",
+              "screen": {
+                "x": 341,
+                "y": 599
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 16.27
+            },
+            "mastery": {
+              "style": 0,
+              "combo": 0,
+              "bestCombo": 0,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 6
+          },
+          "boost": null,
+          "after": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "ready",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 1,
+            "par": 6,
+            "timeDisplay": "11.0",
+            "ball": {
+              "x": 101.35,
+              "y": 4.45,
+              "z": -70.34,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 20,
+              "onPlanetType": "obstacle",
+              "screen": {
+                "x": 624,
+                "y": 401
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 19.79
+            },
+            "mastery": {
+              "style": 360,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 6
+          },
+          "elapsedMs": 11168,
+          "settled": true
+        },
+        {
+          "shot": 2,
+          "before": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "ready",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 1,
+            "par": 6,
+            "timeDisplay": "11.0",
+            "ball": {
+              "x": 101.35,
+              "y": 4.45,
+              "z": -70.34,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 20,
+              "onPlanetType": "obstacle",
+              "screen": {
+                "x": 624,
+                "y": 401
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 19.79
+            },
+            "mastery": {
+              "style": 360,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 6
+          },
+          "aim": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "aiming",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 1,
+            "par": 6,
+            "timeDisplay": "13.3",
+            "ball": {
+              "x": 101.45,
+              "y": 4.44,
+              "z": -70.48,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 20,
+              "onPlanetType": "obstacle",
+              "screen": {
+                "x": 625,
+                "y": 401
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 0.26
+            },
+            "mastery": {
+              "style": 360,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 6
+          },
+          "boost": {
+            "durationMs": 1500,
+            "before": {
+              "desktop": {
+                "edition": "prototype",
+                "dailyMode": false,
+                "courseHoles": 19
+              },
+              "usageData": {
+                "active": false,
+                "consent": "unknown",
+                "queuedEventsThisPage": 0
+              },
+              "commerce": {
+                "freeHoles": 8,
+                "proHoles": 11,
+                "proUnlocked": true,
+                "accessSource": "desktop-full-course",
+                "purchasePhase": "disabled",
+                "liveServices": false,
+                "offerVisible": false
+              },
+              "coordinateSystem": "Three.js world coordinates; +Y is up.",
+              "mode": "flight",
+              "introPlaying": false,
+              "hole": 17,
+              "strokes": 2,
+              "par": 6,
+              "timeDisplay": "13.3",
+              "ball": {
+                "x": 101.71,
+                "y": 4.41,
+                "z": -70.8,
+                "speed": 65.21,
+                "onPlanet": false,
+                "onPlanetIndex": -1,
+                "onPlanetType": null,
+                "screen": {
+                  "x": 620,
+                  "y": 405
+                }
+              },
+              "aim": {
+                "assisted": true,
+                "pilotRoute": false,
+                "deviation": 0,
+                "previewClosestHazard": 0.09
+              },
+              "mastery": {
+                "style": 360,
+                "combo": 0,
+                "bestCombo": 1,
+                "bestGhostVisible": false
+              },
+              "ability": {
+                "name": "STABILIZE",
+                "used": false,
+                "activeSeconds": 0,
+                "disabledForDaily": false
+              },
+              "trainer": {
+                "visible": false,
+                "active": false,
+                "complete": false,
+                "step": -1,
+                "expected": null
+              },
+              "artifactAvailable": true,
+              "boosts": 6
+            },
+            "after": {
+              "desktop": {
+                "edition": "prototype",
+                "dailyMode": false,
+                "courseHoles": 19
+              },
+              "usageData": {
+                "active": false,
+                "consent": "unknown",
+                "queuedEventsThisPage": 0
+              },
+              "commerce": {
+                "freeHoles": 8,
+                "proHoles": 11,
+                "proUnlocked": true,
+                "accessSource": "desktop-full-course",
+                "purchasePhase": "disabled",
+                "liveServices": false,
+                "offerVisible": false
+              },
+              "coordinateSystem": "Three.js world coordinates; +Y is up.",
+              "mode": "flight",
+              "introPlaying": false,
+              "hole": 17,
+              "strokes": 2,
+              "par": 6,
+              "timeDisplay": "14.9",
+              "ball": {
+                "x": 159.67,
+                "y": -20.99,
+                "z": -21.09,
+                "speed": 59.56,
+                "onPlanet": false,
+                "onPlanetIndex": -1,
+                "onPlanetType": null,
+                "screen": {
+                  "x": 642,
+                  "y": 403
+                }
+              },
+              "aim": {
+                "assisted": true,
+                "pilotRoute": false,
+                "deviation": 0,
+                "previewClosestHazard": 7.91
+              },
+              "mastery": {
+                "style": 540,
+                "combo": 1,
+                "bestCombo": 1,
+                "bestGhostVisible": false
+              },
+              "ability": {
+                "name": "STABILIZE",
+                "used": false,
+                "activeSeconds": 0,
+                "disabledForDaily": false
+              },
+              "trainer": {
+                "visible": false,
+                "active": false,
+                "complete": false,
+                "step": -1,
+                "expected": null
+              },
+              "artifactAvailable": true,
+              "boosts": 5
+            }
+          },
+          "after": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "ready",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 2,
+            "par": 6,
+            "timeDisplay": "24.5",
+            "ball": {
+              "x": 211.59,
+              "y": 4.36,
+              "z": 2.27,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 5,
+              "onPlanetType": "goal",
+              "screen": {
+                "x": 625,
+                "y": 393
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 35.07
+            },
+            "mastery": {
+              "style": 540,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 5
+          },
+          "elapsedMs": 11171,
+          "settled": true
+        },
+        {
+          "shot": 3,
+          "before": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "ready",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 2,
+            "par": 6,
+            "timeDisplay": "24.5",
+            "ball": {
+              "x": 211.59,
+              "y": 4.36,
+              "z": 2.27,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 5,
+              "onPlanetType": "goal",
+              "screen": {
+                "x": 625,
+                "y": 393
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 35.07
+            },
+            "mastery": {
+              "style": 540,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 5
+          },
+          "aim": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "aiming",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 2,
+            "par": 6,
+            "timeDisplay": "24.5",
+            "ball": {
+              "x": 211.59,
+              "y": 4.36,
+              "z": 2.27,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 5,
+              "onPlanetType": "goal",
+              "screen": {
+                "x": 625,
+                "y": 393
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 24.05
+            },
+            "mastery": {
+              "style": 540,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 5
+          },
+          "boost": null,
+          "after": {
+            "desktop": {
+              "edition": "prototype",
+              "dailyMode": false,
+              "courseHoles": 19
+            },
+            "usageData": {
+              "active": false,
+              "consent": "unknown",
+              "queuedEventsThisPage": 0
+            },
+            "commerce": {
+              "freeHoles": 8,
+              "proHoles": 11,
+              "proUnlocked": true,
+              "accessSource": "desktop-full-course",
+              "purchasePhase": "disabled",
+              "liveServices": false,
+              "offerVisible": false
+            },
+            "coordinateSystem": "Three.js world coordinates; +Y is up.",
+            "mode": "hole_complete",
+            "introPlaying": false,
+            "hole": 17,
+            "strokes": 3,
+            "par": 6,
+            "timeDisplay": "26.1",
+            "ball": {
+              "x": 212.16,
+              "y": 7.86,
+              "z": 0.92,
+              "speed": 0,
+              "onPlanet": true,
+              "onPlanetIndex": 5,
+              "onPlanetType": "goal",
+              "screen": {
+                "x": 640,
+                "y": 400
+              }
+            },
+            "aim": {
+              "assisted": true,
+              "pilotRoute": false,
+              "deviation": 0,
+              "previewClosestHazard": 23.78
+            },
+            "mastery": {
+              "style": 540,
+              "combo": 0,
+              "bestCombo": 1,
+              "bestGhostVisible": false
+            },
+            "ability": {
+              "name": "STABILIZE",
+              "used": false,
+              "activeSeconds": 0,
+              "disabledForDaily": false
+            },
+            "trainer": {
+              "visible": false,
+              "active": false,
+              "complete": false,
+              "step": -1,
+              "expected": null
+            },
+            "artifactAvailable": true,
+            "boosts": 6
+          },
+          "elapsedMs": 612,
+          "settled": true
+        }
+      ],
+      "title": "NEUTRON ALLEY",
+      "end": {
+        "desktop": {
+          "edition": "prototype",
+          "dailyMode": false,
+          "courseHoles": 19
+        },
+        "usageData": {
+          "active": false,
+          "consent": "unknown",
+          "queuedEventsThisPage": 0
+        },
+        "commerce": {
+          "freeHoles": 8,
+          "proHoles": 11,
+          "proUnlocked": true,
+          "accessSource": "desktop-full-course",
+          "purchasePhase": "disabled",
+          "liveServices": false,
+          "offerVisible": false
+        },
+        "coordinateSystem": "Three.js world coordinates; +Y is up.",
+        "mode": "hole_complete",
+        "introPlaying": false,
+        "hole": 17,
+        "strokes": 3,
+        "par": 6,
+        "timeDisplay": "26.1",
+        "ball": {
+          "x": 212.16,
+          "y": 7.86,
+          "z": 0.92,
+          "speed": 0,
+          "onPlanet": true,
+          "onPlanetIndex": 5,
+          "onPlanetType": "goal",
+          "screen": {
+            "x": 700,
+            "y": 219
+          }
+        },
+        "aim": {
+          "assisted": true,
+          "pilotRoute": false,
+          "deviation": 0,
+          "previewClosestHazard": 23.78
+        },
+        "mastery": {
+          "style": 540,
+          "combo": 0,
+          "bestCombo": 1,
+          "bestGhostVisible": false
+        },
+        "ability": {
+          "name": "STABILIZE",
+          "used": false,
+          "activeSeconds": 0,
+          "disabledForDaily": false
+        },
+        "trainer": {
+          "visible": false,
+          "active": false,
+          "complete": false,
+          "step": -1,
+          "expected": null
+        },
+        "artifactAvailable": true,
+        "boosts": 6
+      },
+      "nextButton": "NEXT HOLE",
+      "screenshot": "hole-17-complete.png"
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "inputs": [
+    {
+      "at": "2026-09-10T17:36:48.776Z",
+      "action": "click",
+      "selector": "#ballGrid .ball-option:first-child"
+    },
+    {
+      "at": "2026-09-10T17:36:48.832Z",
+      "action": "click",
+      "selector": "#pickerProBtn"
+    },
+    {
+      "at": "2026-09-10T17:36:48.865Z",
+      "action": "choose-hole",
+      "hole": 17
+    },
+    {
+      "at": "2026-09-10T17:36:53.524Z",
+      "action": "aim-ball",
+      "point": {
+        "x": 341,
+        "y": 599
+      }
+    },
+    {
+      "at": "2026-09-10T17:37:01.151Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    },
+    {
+      "at": "2026-09-10T17:37:12.321Z",
+      "action": "aim-ball",
+      "point": {
+        "x": 624,
+        "y": 401
+      }
+    },
+    {
+      "at": "2026-09-10T17:37:14.574Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    },
+    {
+      "at": "2026-09-10T17:37:14.624Z",
+      "action": "boost-key-down",
+      "key": "Space",
+      "durationMs": 1500
+    },
+    {
+      "at": "2026-09-10T17:37:16.137Z",
+      "action": "boost-key-up",
+      "key": "Space"
+    },
+    {
+      "at": "2026-09-10T17:37:25.746Z",
+      "action": "aim-ball",
+      "point": {
+        "x": 625,
+        "y": 393
+      }
+    },
+    {
+      "at": "2026-09-10T17:37:26.780Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    },
+    {
+      "at": "2026-09-10T17:37:27.735Z",
+      "action": "click",
+      "selector": "#nextHoleBtn"
+    },
+    {
+      "at": "2026-09-10T17:37:32.340Z",
+      "action": "aim-ball",
+      "point": {
+        "x": 333,
+        "y": 601
+      }
+    },
+    {
+      "at": "2026-09-10T17:37:40.873Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    },
+    {
+      "at": "2026-09-10T17:37:53.167Z",
+      "action": "aim-ball",
+      "point": {
+        "x": 633,
+        "y": 422
+      }
+    },
+    {
+      "at": "2026-09-10T17:37:55.897Z",
+      "action": "click",
+      "selector": "#fireBtn"
+    },
+    {
+      "at": "2026-09-10T17:37:55.937Z",
+      "action": "boost-key-down",
+      "key": "Space",
+      "durationMs": 1500
+    },
+    {
+      "at": "2026-09-10T17:37:57.441Z",
+      "action": "boost-key-up",
+      "key": "Space"
+    }
+  ],
+  "activeHole": {
+    "hole": 18,
+    "shots": [
+      {
+        "shot": 1,
+        "before": {
+          "desktop": {
+            "edition": "prototype",
+            "dailyMode": false,
+            "courseHoles": 19
+          },
+          "usageData": {
+            "active": false,
+            "consent": "unknown",
+            "queuedEventsThisPage": 0
+          },
+          "commerce": {
+            "freeHoles": 8,
+            "proHoles": 11,
+            "proUnlocked": true,
+            "accessSource": "desktop-full-course",
+            "purchasePhase": "disabled",
+            "liveServices": false,
+            "offerVisible": false
+          },
+          "coordinateSystem": "Three.js world coordinates; +Y is up.",
+          "mode": "ready",
+          "introPlaying": false,
+          "hole": 18,
+          "strokes": 0,
+          "par": 6,
+          "timeDisplay": "26.2",
+          "ball": {
+            "x": 0.32,
+            "y": 3.19,
+            "z": 0.32,
+            "speed": 0,
+            "onPlanet": true,
+            "onPlanetIndex": 0,
+            "onPlanetType": "start",
+            "screen": {
+              "x": 333,
+              "y": 601
+            }
+          },
+          "aim": {
+            "assisted": false,
+            "pilotRoute": false,
+            "deviation": 0,
+            "previewClosestHazard": 12.19
+          },
+          "mastery": {
+            "style": 0,
+            "combo": 0,
+            "bestCombo": 0,
+            "bestGhostVisible": false
+          },
+          "ability": {
+            "name": "STABILIZE",
+            "used": false,
+            "activeSeconds": 0,
+            "disabledForDaily": false
+          },
+          "trainer": {
+            "visible": false,
+            "active": false,
+            "complete": false,
+            "step": -1,
+            "expected": null
+          },
+          "artifactAvailable": true,
+          "boosts": 6
+        },
+        "aim": {
+          "desktop": {
+            "edition": "prototype",
+            "dailyMode": false,
+            "courseHoles": 19
+          },
+          "usageData": {
+            "active": false,
+            "consent": "unknown",
+            "queuedEventsThisPage": 0
+          },
+          "commerce": {
+            "freeHoles": 8,
+            "proHoles": 11,
+            "proUnlocked": true,
+            "accessSource": "desktop-full-course",
+            "purchasePhase": "disabled",
+            "liveServices": false,
+            "offerVisible": false
+          },
+          "coordinateSystem": "Three.js world coordinates; +Y is up.",
+          "mode": "aiming",
+          "introPlaying": false,
+          "hole": 18,
+          "strokes": 0,
+          "par": 6,
+          "timeDisplay": "26.2",
+          "ball": {
+            "x": 0.32,
+            "y": 3.19,
+            "z": 0.32,
+            "speed": 0,
+            "onPlanet": true,
+            "onPlanetIndex": 0,
+            "onPlanetType": "start",
+            "screen": {
+              "x": 333,
+              "y": 601
+            }
+          },
+          "aim": {
+            "assisted": true,
+            "pilotRoute": false,
+            "deviation": 0,
+            "previewClosestHazard": 8.25
+          },
+          "mastery": {
+            "style": 0,
+            "combo": 0,
+            "bestCombo": 0,
+            "bestGhostVisible": false
+          },
+          "ability": {
+            "name": "STABILIZE",
+            "used": false,
+            "activeSeconds": 0,
+            "disabledForDaily": false
+          },
+          "trainer": {
+            "visible": false,
+            "active": false,
+            "complete": false,
+            "step": -1,
+            "expected": null
+          },
+          "artifactAvailable": true,
+          "boosts": 6
+        },
+        "boost": null,
+        "after": {
+          "desktop": {
+            "edition": "prototype",
+            "dailyMode": false,
+            "courseHoles": 19
+          },
+          "usageData": {
+            "active": false,
+            "consent": "unknown",
+            "queuedEventsThisPage": 0
+          },
+          "commerce": {
+            "freeHoles": 8,
+            "proHoles": 11,
+            "proUnlocked": true,
+            "accessSource": "desktop-full-course",
+            "purchasePhase": "disabled",
+            "liveServices": false,
+            "offerVisible": false
+          },
+          "coordinateSystem": "Three.js world coordinates; +Y is up.",
+          "mode": "ready",
+          "introPlaying": false,
+          "hole": 18,
+          "strokes": 1,
+          "par": 6,
+          "timeDisplay": "12.2",
+          "ball": {
+            "x": 190.2,
+            "y": 33.22,
+            "z": -37.17,
+            "speed": 0,
+            "onPlanet": true,
+            "onPlanetIndex": 22,
+            "onPlanetType": "obstacle",
+            "screen": {
+              "x": 633,
+              "y": 422
+            }
+          },
+          "aim": {
+            "assisted": true,
+            "pilotRoute": false,
+            "deviation": 0,
+            "previewClosestHazard": 6.97
+          },
+          "mastery": {
+            "style": 180,
+            "combo": 0,
+            "bestCombo": 1,
+            "bestGhostVisible": false
+          },
+          "ability": {
+            "name": "STABILIZE",
+            "used": false,
+            "activeSeconds": 0,
+            "disabledForDaily": false
+          },
+          "trainer": {
+            "visible": false,
+            "active": false,
+            "complete": false,
+            "step": -1,
+            "expected": null
+          },
+          "artifactAvailable": true,
+          "boosts": 6
+        },
+        "elapsedMs": 12292,
+        "settled": true
+      }
+    ],
+    "title": "EVENT HORIZON"
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: Normal boost input must consume one charge.\n\n6 !== 5\n\n    at file:///private/tmp/gravitygolf-recovery-qa/course-runtime.mjs:95:18",
+  "lastState": "{\"desktop\":{\"edition\":\"prototype\",\"dailyMode\":false,\"courseHoles\":19},\"usageData\":{\"active\":false,\"consent\":\"unknown\",\"queuedEventsThisPage\":0},\"commerce\":{\"freeHoles\":8,\"proHoles\":11,\"proUnlocked\":true,\"accessSource\":\"desktop-full-course\",\"purchasePhase\":\"disabled\",\"liveServices\":false,\"offerVisible\":false},\"coordinateSystem\":\"Three.js world coordinates; +Y is up.\",\"mode\":\"flight\",\"introPlaying\":false,\"hole\":18,\"strokes\":2,\"par\":6,\"timeDisplay\":\"16.4\",\"ball\":{\"x\":245.07,\"y\":-0.45,\"z\":-6.43,\"speed\":55.88,\"onPlanet\":false,\"onPlanetIndex\":-1,\"onPlanetType\":null,\"screen\":{\"x\":635,\"y\":403}},\"aim\":{\"assisted\":true,\"pilotRoute\":false,\"deviation\":0,\"previewClosestHazard\":1.44},\"mastery\":{\"style\":360,\"combo\":1,\"bestCombo\":1,\"bestGhostVisible\":false},\"ability\":{\"name\":\"STABILIZE\",\"used\":false,\"activeSeconds\":0,\"disabledForDaily\":false},\"trainer\":{\"visible\":false,\"active\":false,\"complete\":false,\"step\":-1,\"expected\":null},\"artifactAvailable\":true,\"boosts\":6}"
+}
