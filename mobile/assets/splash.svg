@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2732" height="2732" viewBox="0 0 2732 2732">
+  <defs>
+    <radialGradient id="space" cx="40%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#1b1028"/>
+      <stop offset="0.5" stop-color="#080511"/>
+      <stop offset="1" stop-color="#020208"/>
+    </radialGradient>
+    <radialGradient id="ball" cx="31%" cy="25%" r="78%">
+      <stop offset="0" stop-color="#fff5b7"/>
+      <stop offset="0.24" stop-color="#ffe36a"/>
+      <stop offset="0.64" stop-color="#ffb80b"/>
+      <stop offset="1" stop-color="#8d5100"/>
+    </radialGradient>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3ae" stop-opacity="0.2"/>
+      <stop offset="0.5" stop-color="#ffd83d"/>
+      <stop offset="1" stop-color="#ff9d00" stop-opacity="0.22"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="44"/>
+    </filter>
+  </defs>
+
+  <rect width="2732" height="2732" fill="url(#space)"/>
+  <g fill="#fff8df">
+    <circle cx="394" cy="478" r="5" opacity="0.5"/>
+    <circle cx="724" cy="276" r="4" opacity="0.64"/>
+    <circle cx="2194" cy="468" r="6" opacity="0.54"/>
+    <circle cx="2409" cy="1284" r="4" opacity="0.5"/>
+    <circle cx="372" cy="1804" r="5" opacity="0.45"/>
+    <circle cx="2118" cy="2143" r="4" opacity="0.6"/>
+    <circle cx="1004" cy="2294" r="3" opacity="0.45"/>
+  </g>
+  <circle cx="1366" cy="1260" r="520" fill="none" stroke="#82692f" stroke-width="5" opacity="0.18"/>
+  <circle cx="1366" cy="1260" r="680" fill="none" stroke="#5d4820" stroke-width="4" opacity="0.12"/>
+  <ellipse cx="1366" cy="1260" rx="650" ry="350" transform="rotate(-24 1366 1260)" fill="none" stroke="#f5bd20" stroke-width="58" opacity="0.12" filter="url(#glow)"/>
+  <ellipse cx="1366" cy="1260" rx="650" ry="350" transform="rotate(-24 1366 1260)" fill="none" stroke="url(#orbit)" stroke-width="28" stroke-linecap="round" stroke-dasharray="2500 620"/>
+  <ellipse cx="1366" cy="1260" rx="550" ry="250" transform="rotate(26 1366 1260)" fill="none" stroke="#ffe776" stroke-width="10" stroke-linecap="round" stroke-dasharray="1330 840" opacity="0.68"/>
+  <circle cx="1366" cy="1260" r="380" fill="#dda00a" opacity="0.3" filter="url(#glow)"/>
+  <circle cx="1366" cy="1260" r="292" fill="url(#ball)" stroke="#ffe77c" stroke-width="14"/>
+  <circle cx="1280" cy="1164" r="135" fill="#fff8cc" opacity="0.15"/>
+  <circle cx="1906" cy="871" r="35" fill="#ffe266" stroke="#fff2ac" stroke-width="8"/>
+
+  <text x="1366" y="2010" fill="#ffd83d" font-family="Orbitron, Avenir Next, sans-serif" font-size="118" font-weight="800" letter-spacing="28" text-anchor="middle">GRAVITY GOLF</text>
+  <rect x="1114" y="2075" width="504" height="4" rx="2" fill="#967527" opacity="0.7"/>
+</svg>

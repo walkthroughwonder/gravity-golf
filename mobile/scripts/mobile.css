@@ -1,0 +1,147 @@
+html.native-app,
+html.native-app body {
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+  background: #05030d;
+}
+
+html.native-app body {
+  padding: 0;
+}
+
+html.native-app #titleAuth,
+html.native-app #titleProfile,
+html.native-app #userBadge,
+html.native-app #authModal,
+html.native-app #leaderboard,
+html.native-app #postScoreBtn,
+html.native-app #modeOnline,
+html.native-app #mode2p,
+html.native-app #liveMetrics,
+html.native-app #unlockModal,
+html.native-app #unlockPrompt,
+html.native-app #gcUnlockBtn,
+html.native-app #installBtn {
+  display: none !important;
+}
+
+html.native-app #stats {
+  top: max(8px, env(safe-area-inset-top));
+  left: max(8px, env(safe-area-inset-left));
+}
+
+html.native-app #topRightBtns {
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+}
+
+html.native-app #gameBottomBar,
+html.native-app #mobileControls {
+  bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.mobile-privacy-button {
+  border: 0;
+  background: transparent;
+  color: rgba(220, 195, 100, 0.46);
+  font: 700 6px/1 'Orbitron', sans-serif;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  padding: 5px 7px;
+  pointer-events: auto;
+}
+
+#ballPicker #mobilePrivacyBtn {
+  position: fixed;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 5;
+}
+
+#soundSettings #mobilePrivacySettingsBtn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid rgba(200, 170, 60, 0.22);
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+
+#mobilePrivacySheet {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  background: rgba(3, 2, 10, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: auto;
+}
+
+#mobilePrivacySheet.visible {
+  display: flex;
+}
+
+.mobile-privacy-card {
+  width: min(560px, 92vw);
+  max-height: 82vh;
+  overflow: auto;
+  border: 1px solid rgba(255, 217, 87, 0.42);
+  border-radius: 16px;
+  padding: 24px;
+  background: linear-gradient(145deg, rgba(30, 23, 8, 0.98), rgba(8, 6, 17, 0.98));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
+  color: rgba(255, 246, 210, 0.78);
+  font: 500 12px/1.65 'Exo 2', sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.mobile-privacy-card h2 {
+  margin-bottom: 12px;
+  color: #ffe46b;
+  font: 800 18px/1.2 'Orbitron', sans-serif;
+  letter-spacing: 3px;
+}
+
+.mobile-privacy-card p + p {
+  margin-top: 10px;
+}
+
+#mobilePrivacyClose {
+  margin-top: 18px;
+  border: 1px solid rgba(255, 217, 87, 0.5);
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: rgba(255, 215, 75, 0.1);
+  color: #ffe46b;
+  font: 800 8px/1 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+@media (max-height: 450px) {
+  .mobile-privacy-card {
+    padding: 16px 20px;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .mobile-privacy-card h2 {
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  .mobile-privacy-card p + p {
+    margin-top: 7px;
+  }
+
+  #mobilePrivacyClose {
+    margin-top: 11px;
+    padding: 8px 13px;
+  }
+}

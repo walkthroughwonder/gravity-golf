@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Gravity Golf</string>
+    <string name="title_activity_main">Gravity Golf</string>
+    <string name="package_name">com.epoch6.gravitygolf</string>
+    <string name="custom_url_scheme">com.epoch6.gravitygolf</string>
+</resources>

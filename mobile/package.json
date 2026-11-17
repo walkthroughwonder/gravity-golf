@@ -1,0 +1,32 @@
+{
+  "name": "gravity-golf-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Native iOS and Android wrapper for Gravity Golf",
+  "scripts": {
+    "build:web": "node scripts/prepare-web.mjs",
+    "build:assets": "node scripts/generate-assets.mjs",
+    "generate:native-assets": "npm run build:assets && npx capacitor-assets generate --ios --android --pwaNoAppleFetch true",
+    "verify:web": "node scripts/verify-web.mjs",
+    "sync": "npm run build:web && npx cap sync",
+    "add:ios": "npm run build:web && npx cap add ios --packagemanager SPM",
+    "add:android": "npm run build:web && npx cap add android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/screen-orientation": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
+    "@fontsource-variable/exo-2": "^5.2.8",
+    "@fontsource-variable/orbitron": "^5.2.8",
+    "three": "0.172.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  }
+}

@@ -10979,6 +10979,9 @@ function animate() {
 // Init ball picker and load first level (must be after all declarations)
 initBallPicker();
 
+// Auto-start: skip title screen, go straight to ball picker (1P mode)
+document.getElementById('mode1p').click();
+
 // Spawn title screen stars
 (function() {
   const container = document.getElementById('titleStars');

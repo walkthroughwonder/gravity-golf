@@ -1,0 +1,11 @@
+node_modules/
+www/
+icons/
+android/.gradle/
+android/.idea/
+android/build/
+android/app/build/
+android/local.properties
+ios/App/DerivedData/
+*.xcuserstate
+xcuserdata/

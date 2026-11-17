@@ -1,0 +1,34 @@
+{
+  "appId": "com.epoch6.gravitygolf",
+  "appName": "Gravity Golf",
+  "webDir": "www",
+  "backgroundColor": "#05030d",
+  "loggingBehavior": "none",
+  "ios": {
+    "backgroundColor": "#05030d",
+    "contentInset": "never",
+    "preferredContentMode": "mobile",
+    "scheme": "GravityGolf"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#05030d",
+    "captureInput": true
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 1200,
+      "backgroundColor": "#05030d",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "overlaysWebView": true,
+      "style": "LIGHT",
+      "backgroundColor": "#05030d"
+    }
+  }
+}
